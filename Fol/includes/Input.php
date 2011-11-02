@@ -20,13 +20,13 @@ class Input {
 		global $Config;
 
 		$get = (array)filter_input_array(INPUT_GET);
-		$post = arrayMergeReplaceRecursiveStrict($this->arrayFiles(), (array)filter_input_array(INPUT_POST));
+		$post = $this->arrayMerge($this->arrayFiles(), (array)filter_input_array(INPUT_POST));
 
 		unset($_GET, $_POST, $_FILES);
 
 		$this->get = array_keys($get);
 		$this->post = array_keys($post);
-		$this->vars = arrayMergeReplaceRecursiveStrict($get, $post);
+		$this->vars = $this->arrayMerge($get, $post);
 
 		$config = $Config->get('scene', 'scene');
 
@@ -58,7 +58,7 @@ class Input {
 			}
 
 			foreach ($values as $type_info => $info) {
-				$array_files[$name] = arrayMergeReplaceRecursiveStrict($array_files[$name], $this->_arrayFiles($info, $type_info));
+				$array_files[$name] = $this->arrayMerge($array_files[$name], $this->_arrayFiles($info, $type_info));
 			}
 		}
 
@@ -409,6 +409,36 @@ class Input {
 		}
 
 		return array(FILTER_UNSAFE_RAW);
+	}
+
+
+
+	/*
+	 * private function arrayMerge (array $array1, [array $array2], ...)
+	 *
+	 * Merge two or more arrays, replacing their values
+	 * Returns array
+	 */
+	private function arrayMerge () {
+		$params = func_get_args();
+
+		$return = array_shift($params);
+
+		foreach ($params as $array) {
+			if (!is_array($array)) {
+				continue;
+			}
+
+			foreach ($array as $key => $value) {
+				if (isset($return[$key]) && is_array($value) && is_array($return[$key])) {
+					$return[$key] = $this->arrayMerge($return[$key], $value);
+				} else {
+					$return[$key] = $value;
+				}
+			}
+		}
+
+		return $return;
 	}
 
 

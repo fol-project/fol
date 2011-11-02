@@ -202,7 +202,7 @@ class Router {
 
 					list($Class, $Method) = explodeTrim(':', $route_config['controller']);
 
-					$Class = 'Controllers\\'.camelCase($Class, true);
+					$Class = 'Controllers\\'.$this->camelCase($Class, true);
 
 					if (!$Method && !class_exists($Class)) {
 						return false;
@@ -221,19 +221,19 @@ class Router {
 
 		if (!$Class) {
 			if ($path) {
-				$Class = 'Controllers\\'.camelCase($path[0], true);
+				$Class = 'Controllers\\'.$this->camelCase($path[0], true);
 
 				if (class_exists($Class)) {
 					array_shift($path);
 					$Class = new \ReflectionClass($Class);
 
-					$Method = $path ? camelCase(array_shift($path)) : 'index';
+					$Method = $path ? $this->camelCase(array_shift($path)) : 'index';
 				} else {
-					$Class = new \ReflectionClass('Controllers\\'.camelCase($config['default'], true));
-					$Method = camelCase(array_shift($path));
+					$Class = new \ReflectionClass('Controllers\\'.$this->camelCase($config['default'], true));
+					$Method = $this->camelCase(array_shift($path));
 				}
 			} else {
-				$Class = 'Controllers\\'.camelCase($config['default'], true);
+				$Class = 'Controllers\\'.$this->camelCase($config['default'], true);
 
 				if (class_exists($Class)) {
 					$Class = new \ReflectionClass($Class);
@@ -324,6 +324,25 @@ class Router {
 		}
 
 		return false;
+	}
+
+
+
+	/**
+	 * private function camelCase (string $string, [boolean $upper_first])
+	 *
+	 * Transform a string "my-string" to camelCase: "myString"
+	 * Returns string
+	 */
+	private function camelCase ($string, $upper_first = false) {
+		$string = str_replace('-', ' ', $string);
+		$string = str_replace(' ', '', ucwords($string));
+
+		if (!$upper_first) {
+			return lcfirst($string);
+		}
+
+		return $string;
 	}
 }
 ?>
