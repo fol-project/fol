@@ -1,9 +1,8 @@
 <?php
 namespace Controllers;
 
-class Main {
+class Main extends Base {
 	public function index () {
-		echo '<p>Estamos en index</p>';
 	}
 
 	public function seccion ($seccion = 'default') {

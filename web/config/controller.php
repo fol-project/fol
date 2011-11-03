@@ -1,6 +1,6 @@
 <?php
 $config['default'] = 'Main';
 $config['routes'] = array(
-	'/categoria' => 'Main:seccion'
+	'/categoria/(seccion)' => 'Main:seccion'
 );
 ?>

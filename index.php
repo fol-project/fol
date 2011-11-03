@@ -5,14 +5,26 @@ define('FOL_VERSION', '0.1a');
 
 putenv('DOCUMENT_ROOT='.realpath(getenv('DOCUMENT_ROOT')));
 define('BASE_PATH', __DIR__.'/');
-define('BASE_WWW', preg_replace('#/+#', '/', '/'.preg_replace('|^'.getenv('DOCUMENT_ROOT').'|i', '', BASE_PATH)));
+define('BASE_HTTP', preg_replace('#/+#', '/', '/'.preg_replace('|^'.getenv('DOCUMENT_ROOT').'|i', '', BASE_PATH)));
 define('ENVIRONMENT', 'default');
 
-require_once(BASE_PATH.'Fol/functions.php');
+include(BASE_PATH.'library/functions.php');
 
-$Config = new Fol\Config();
-$Router = new Fol\Router();
-$Input = new Fol\Input();
+use Fol\Config;
+use Fol\Router;
+use Fol\Input;
 
-$Router->go();
+$Config = new Config();
+
+$Config->set('scenes', array(
+	'web' => array(
+		'path' => BASE_PATH.'web/',
+		'detection' => 'subfolder'
+	)
+));
+
+$Router = new Router();
+$Input = new Input();
+
+include(SCENE_PATH.'bootstrap.php');
 ?>
