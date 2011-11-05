@@ -312,7 +312,7 @@ class Router {
 		}
 
 		if ($defaults) {
-			$route = preg_replace('#(\('.implode('|', array_keys($defaults)).'(\s+[^\)]+)?\))#', '\\1?', $route);
+			$route = preg_replace('#(\('.implode('|', array_keys($defaults)).'(\s+[^\)]+)?\)[^?])#', '\\1?', $route);
 		}
 
 		$route = preg_replace_callback('#/\((\w+)(\s+[^\)]+)?\)\??#', function ($matches) {
