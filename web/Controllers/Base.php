@@ -1,9 +1,15 @@
 <?php
 namespace Controllers;
 
+use Fol\Templates;
+
 abstract class Base {
+	protected $Templates;
+
 	public function __construct () {
-		echo memory_get_usage().'<br>';
+		$this->Templates = new Templates;
+
+		$this->Templates->set('base', 'html.php');
 	}
 }
 ?>

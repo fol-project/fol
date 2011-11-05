@@ -67,12 +67,12 @@ class Router {
 		$config = $Config->get('scenes');
 
 		//Detect subdomain
-		if ($this->subdomains && $config[strtolower($this->subdomains[0])]['detection'] == 'subdomain') {
+		if ($this->subdomains && $config[strtolower($this->subdomains[0])]['detection'] === 'subdomain') {
 			return strtolower(array_shift($this->subdomains));
 		}
 
 		//Detect subfolder
-		if ($this->path && $config[strtolower($this->path[0])]['detection'] == 'subfolder') {
+		if ($this->path && $config[strtolower($this->path[0])]['detection'] === 'subfolder') {
 			return strtolower(array_shift($this->path));
 		}
 
@@ -97,7 +97,7 @@ class Router {
 		$config = $config['modules'];
 
 		//Detect subdomain
-		if ($this->subdomains && ($config['detection'] == 'subdomain') && in_array(strtolower($this->subdomains[0]), $config['detection'])) {
+		if ($this->subdomains && ($config['detection'] === 'subdomain') && in_array(strtolower($this->subdomains[0]), $config['detection'])) {
 			return strtolower(array_shift($this->subdomains));
 		}
 
@@ -134,7 +134,7 @@ class Router {
 	private function detectExitMode ($config) {
 		$config = $config['exit_modes'];
 
-		if ($config['detection'] == 'subdomain') {
+		if ($config['detection'] === 'subdomain') {
 			if ($this->subdomains && in_array(strtolower($this->subdomains[0]), $config['detection'])) {
 				return strtolower(array_shift($this->config));
 			}

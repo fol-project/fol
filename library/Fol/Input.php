@@ -509,7 +509,7 @@ class Input {
 	 * Returns string
 	 */
 	public function getScheme () {
-		return ($_SERVER['HTTPS'] == 'on') ? 'https' : 'http';
+		return ($_SERVER['HTTPS'] === 'on') ? 'https' : 'http';
 	}
 
 

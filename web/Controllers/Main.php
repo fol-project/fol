@@ -3,7 +3,7 @@ namespace Controllers;
 
 class Main extends Base {
 	public function index () {
-		echo 'index';
+		echo $this->Templates->render('base');
 	}
 
 	public function show ($section, $post = 'default') {

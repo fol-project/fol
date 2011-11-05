@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * function __autoload ($class_name)
  */
 function __autoload ($class_name) {
@@ -41,4 +41,20 @@ function explodeTrim ($delimiter, $text, $limit = null) {
 	}
 
 	return $return;
+}
+
+
+
+/**
+ * function isNumericalArray (array $array)
+ *
+ * Returns true if the array is numerical or false if it's associative
+ * Returns boolean
+ */
+function isNumericalArray ($array) {
+	if (is_array($array)) {
+		return preg_match('/^[0-9]+$/', implode(array_keys($array)));
+	} else {
+		return false;
+	}
 }

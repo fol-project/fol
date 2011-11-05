@@ -9,7 +9,6 @@ include(BASE_PATH.'library/functions.php');
 
 use Fol\Config;
 use Fol\Router;
-use Fol\Input;
 
 $Config = new Config();
 
@@ -22,7 +21,6 @@ $Config->set('scenes', array(
 ));
 
 $Router = new Router();
-$Input = new Input();
 
 include(SCENE_PATH.'bootstrap.php');
 ?>
