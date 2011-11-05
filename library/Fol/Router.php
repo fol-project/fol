@@ -200,11 +200,11 @@ class Router {
 			$path_route = '/'.implode('/', $path);
 
 			foreach ($config['routes'] as $route => $route_config) {
-				if ($route = $this->matchRoute($path_route, $route)) {
-					if (is_string($route_config)) {
-						$route_config = array('controller' => $route_config);
-					}
+				if (is_string($route_config)) {
+					$route_config = array('controller' => $route_config);
+				}
 
+				if ($route = $this->matchRoute($path_route, $route, $route_config['defaults'])) {
 					list($Class, $Method) = explodeTrim(':', $route_config['controller']);
 
 					$Class = 'Controllers\\'.$this->camelCase($Class, true);
@@ -214,7 +214,7 @@ class Router {
 
 						if ($Class->isInstantiable() && $Class->hasMethod($Method)) {
 							$Method = $Class->getMethod($Method);
-							$parameters = is_array($route_config['defaults']) ? array_merge($route['parameters'], $route_config['defaults']) : $route['parameters'];
+							$parameters = is_array($route_config['defaults']) ? array_merge($route_config['defaults'], $route['parameters']) : $route['parameters'];
 
 							if ($Method->isPublic() && !$Method->isStatic() && ($Method->getNumberOfRequiredParameters() <= count($parameters))) {
 								$params = array();
@@ -293,10 +293,12 @@ class Router {
 
 
 	/**
-	 * private function matchRoute (string $original, $route)
+	 * private function matchRoute (string $original, string $route, array $defaults)
 	 *
+	 * Check the route using a regular expression
+	 * Returns array/false
 	 */
-	private function matchRoute ($original, $route) {
+	private function matchRoute ($original, $route, $defaults) {
 		if (strpos($route, '(') === false) {
 			if (preg_match('|^'.$route.'$|', $original, $matches)) {
 				return array(
@@ -309,12 +311,20 @@ class Router {
 			return false;
 		}
 
-		$route = preg_replace_callback('|\((\w+)(\s+[^\)]+)?\)|', function ($matches) {
+		if ($defaults) {
+			$route = preg_replace('#(\('.implode('|', array_keys($defaults)).'(\s+[^\)]+)?\))#', '\\1?', $route);
+		}
+
+		$route = preg_replace_callback('#/\((\w+)(\s+[^\)]+)?\)\??#', function ($matches) {
 			if (!$matches[2]) {
 				$matches[2] = '[^/]+';
 			}
 
-			return '(?P<'.$matches[1].'>'.trim($matches[2]).')';
+			if (substr($matches[0], -1) === '?') {
+				return '/?(?P<'.$matches[1].'>'.trim($matches[2]).')?';
+			}
+
+			return '/(?P<'.$matches[1].'>'.trim($matches[2]).')';
 		}, $route);
 
 		if (preg_match('|^'.$route.'$|', $original, $matches)) {

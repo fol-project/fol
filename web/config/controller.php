@@ -1,6 +1,12 @@
 <?php
 $config['default'] = 'Main';
+
 $config['routes'] = array(
-	'/categoria/(seccion)' => 'Main:seccion'
+	'/ruta/(fixo)/(variable)' => array(
+		'controller' => 'Main:seccion',
+		'defaults' => array(
+			'variable' => 'variable-defecto'
+		)
+	)
 );
 ?>

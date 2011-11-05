@@ -5,8 +5,8 @@ class Main extends Base {
 	public function index () {
 	}
 
-	public function seccion ($seccion = 'default') {
-		echo "<p>Estamos na seccion $seccion</p>";
+	public function seccion ($fixo, $variable = 'default') {
+		echo "<p>$fixo / $variable</p>";
 	}
 }
 ?>
