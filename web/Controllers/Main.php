@@ -3,10 +3,11 @@ namespace Controllers;
 
 class Main extends Base {
 	public function index () {
+		echo 'index';
 	}
 
-	public function seccion ($fixo, $variable = 'default') {
-		echo "<p>$fixo / $variable</p>";
+	public function show ($section, $post = 'default') {
+		echo "<p>$section / $post</p>";
 	}
 }
 ?>

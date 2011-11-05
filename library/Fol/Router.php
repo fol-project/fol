@@ -193,13 +193,13 @@ class Router {
 	private function getController ($path) {
 		global $Config;
 
-		$config = $Config->get('controller');
+		$config = $Config->get('routes');
 
-		//Get controller by routes
-		if ($config['routes']) {
+		//Get controller by routings
+		if ($config['routing']) {
 			$path_route = '/'.implode('/', $path);
 
-			foreach ($config['routes'] as $route => $route_config) {
+			foreach ($config['routing'] as $route => $route_config) {
 				if (is_string($route_config)) {
 					$route_config = array('controller' => $route_config);
 				}
@@ -214,16 +214,17 @@ class Router {
 
 						if ($Class->isInstantiable() && $Class->hasMethod($Method)) {
 							$Method = $Class->getMethod($Method);
-							$parameters = is_array($route_config['defaults']) ? array_merge($route_config['defaults'], $route['parameters']) : $route['parameters'];
 
-							if ($Method->isPublic() && !$Method->isStatic() && ($Method->getNumberOfRequiredParameters() <= count($parameters))) {
+							if ($Method->isPublic() && !$Method->isStatic()) {
 								$params = array();
 
 								foreach ($Method->getParameters() as $Parameter) {
 									$name = $Parameter->getName();
 
-									if (isset($parameters[$name])) {
-										$params[] = $parameters[$name];
+									if ($route['parameters'][$name]) {
+										$params[] = $route['parameters'][$name];
+									} else if (isset($route_config['defaults'][$name])) {
+										$params[] = $route_config['defaults'][$name];
 									} else if ($Parameter->isOptional()) {
 										$params[] = $Parameter->getDefaultValue();
 									} else {
