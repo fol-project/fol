@@ -2,11 +2,12 @@
 namespace Fol;
 
 class Input {
+	public $actions;
+	public $format;
 	public $language;
 	public $vars;
 	public $get;
 	public $post;
-	public $message = array();
 
 
 
@@ -110,7 +111,7 @@ class Input {
 			}
 		}
 
-		$this->deleteVariable($variable);
+		$this->delete($variable);
 
 		return $actions;
 	}
@@ -149,7 +150,7 @@ class Input {
 			case 'get':
 				if ($languages[$this->vars['lang']]) {
 					$language = $this->vars['lang'];
-					$this->deleteVariable('lang');
+					$this->delete('lang');
 				}
 				break;
 
@@ -160,58 +161,23 @@ class Input {
 				break;
 		}
 
-		if ($language) {
-			if ($this->getCookie($cookie) != $language) {
-				$this->setCookie($cookie, $language, $duration);
-			}
-
-			return $language;
-		}
-
-		if (($language = $this->getCookie($cookie)) && $languages[$language]) {
-			return $language;
-		}
-
 		if (($language = $config['default']) && $languages[$language]) {
-			$this->setCookie($cookie, $language, $duration);
 			return $language;
 		}
 
 		foreach ($this->getLanguages() as $language) {
 			if ($languages[$language]) {
-				$this->setCookie($cookie, $language, $duration);
 				return $language;
 			}
 		}
 
 		foreach ($languages as $language => $available) {
 			if ($available) {
-				$this->setCookie($cookie, $language, $duration);
 				return $language;
 			}
 		}
 
 		return false;
-	}
-
-
-
-	/**
-	 * private function detectMessage (void)
-	 *
-	 * Loads the flash message
-	 * Returns string/false
-	 */
-	private function detectMessage () {
-		$message_text = $this->scene.'-'.$this->module.'-message_text';
-		$message_type = $this->scene.'-'.$this->module.'-message_type';
-
-		$this->message['inbox'] = $this->getCookie($message_text);
-		$this->message['type'] = $this->getCookie($message_type);
-		$this->message['outbox'] = '';
-
-		$this->deleteCookie($message_text);
-		$this->deleteCookie($message_type);
 	}
 
 
@@ -243,47 +209,12 @@ class Input {
 
 
 	/**
-	 * public function setMessage (string $text, [string $type])
-	 *
-	 * Create or edit the flash message
-	 * Returns none
-	 */
-	public function setMessage ($text, $type = null) {
-		$this->message['input'] = $this->message['input'] = $text;
-		$this->message['type'] = $type;
-	}
-
-
-
-	/**
-	 * public function getMessage (void)
-	 *
-	 * Returns string
-	 */
-	public function getMessage () {
-		return $this->message['input'];
-	}
-
-
-
-	/**
-	 * public function getMessageType (void)
-	 *
-	 * Returns string
-	 */
-	public function getMessageType () {
-		return $this->message['type'];
-	}
-
-
-
-	/**
-	 * public function getVariable (string $name, [string $filter])
+	 * public function get (string $name, [string $filter])
 	 *
 	 * Get (and optionally filter) a variable value
 	 * Returns mixed
 	 */
-	public function getVariable ($name, $filter = null) {
+	public function get ($name, $filter = null) {
 		if ($filter) {
 			$filter = $this->getSanitizeFilter($filter);
 		}
@@ -309,69 +240,25 @@ class Input {
 
 
 	/**
-	 * public function setVariable (string $name, mixed $value)
+	 * public function set (string $name, mixed $value)
 	 *
 	 * Changes or creates a new variable
 	 * Returns none
 	 */
-	public function setVariable ($name, $value) {
+	public function set ($name, $value) {
 		$this->vars[$name] = $value;
 	}
 
 
 
 	/**
-	 * public function deleteVariable (string $name)
+	 * public function delete (string $name)
 	 *
 	 * Deletes a variable
 	 * Returns none
 	 */
-	public function deleteVariable ($name) {
+	public function delete ($name) {
 		unset($this->vars[$name]);
-	}
-
-
-
-	/**
-	 * public function getCookie (string $name, [string $filter])
-	 *
-	 * Get (and optionally filter) a cookie value
-	 * Returns mixed
-	 */
-	public function getCookie ($name, $filter = null) {
-		if ($filter) {
-			$filter = $this->getSanitizeFilter($filter);
-
-			return filter_input(INPUT_COOKIE, $name, $filter[0], $filter[1]);
-		}
-
-		return filter_input(INPUT_COOKIE, $name);
-	}
-
-
-
-	/**
-	 * public function setCookie (string $name, string $value, [int $duration])
-	 *
-	 * Returns boolean
-	 */
-	public function setCookie ($name, $value, $duration = null) {
-		if (is_null($duration)) {
-			$duration = 86400; //one day
-		}
-
-		return setcookie($name, $value, time() + $duration, BASE_WWW);
-	}
-
-
-
-	/**
-	 * public function deleteCookie (string $name)
-	 *
-	 * Returns boolean
-	 */
-	public function deleteCookie ($name) {
-		return setcookie($name, '', 1, BASE_WWW);
 	}
 
 

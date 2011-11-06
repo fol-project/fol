@@ -1,14 +1,10 @@
 <?php
 namespace Controllers;
 
-use Fol\Templates;
+use Fol\Controller;
 
-abstract class Base {
-	protected $Templates;
-
+abstract class Base extends Controller {
 	public function __construct () {
-		$this->Templates = new Templates;
-
 		$this->Templates->set('base', 'html.php');
 	}
 }
