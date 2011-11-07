@@ -5,7 +5,6 @@ class Input {
 	public $actions;
 	public $format;
 	public $language;
-	public $vars;
 	public $get;
 	public $post;
 
@@ -21,13 +20,14 @@ class Input {
 		global $Config;
 
 		$get = (array)filter_input_array(INPUT_GET);
-		$post = $this->arrayMerge($this->arrayFiles(), (array)filter_input_array(INPUT_POST));
+
+		if ($_FILES) {
+			$this->post = $this->arrayMerge($this->arrayFiles(), (array)filter_input_array(INPUT_POST));
+		} else {
+			$this->post = (array)filter_input_array(INPUT_POST);
+		}
 
 		unset($_GET, $_POST, $_FILES);
-
-		$this->get = array_keys($get);
-		$this->post = array_keys($post);
-		$this->vars = $this->arrayMerge($get, $post);
 
 		$config = $Config->get('scene', 'scene');
 
@@ -35,6 +35,7 @@ class Input {
 		$this->language = $this->detectLanguage($config);
 		$this->format = $this->detectFormat();
 	}
+
 
 
 
@@ -98,7 +99,11 @@ class Input {
 	private function detectActions ($variable) {
 		$actions = array();
 
-		foreach ((array)$this->vars[$variable] as $name => $value) {
+		if (!$variable) {
+			return array();
+		}
+
+		foreach ((array)$this->postGet($variable) as $name => $value) {
 			if (is_int($name)) {
 				$name = $value;
 				$value = null;
@@ -209,44 +214,93 @@ class Input {
 
 
 	/**
-	 * public function get (string $name, [string $filter])
+	 * public function get ([string $name], [string $filter])
 	 *
-	 * Get (and optionally filter) a variable value
+	 * Get (and optionally filter) a variable value via GET
 	 * Returns mixed
 	 */
-	public function get ($name, $filter = null) {
+	public function get ($name = null, $filter = null) {
+		if (is_null($name)) {
+			return $this->get;
+		}
+
 		if ($filter) {
 			$filter = $this->getSanitizeFilter($filter);
 		}
 
+		if (isset($this->get[$name])) {
+			return $filter ? filter_var($this->get[$name], $filter[0], $filter[1]) : $this->get[$name];
+		}
+
 		if (strpos($name, '[') && strpos($name, ']')) {
 			$subarrays = explode('[', str_replace(']', '', $name));
-			$value = $this->vars;
+			$value = $this->get;
 
 			while ($subarrays) {
 				$value = $value[array_shift($subarrays)];
 			}
 
-			if (isset($value) && $filter) {
-				return filter_var($value, $filter[0], $filter[1]);
+			if (isset($value)) {
+				return $filter ? filter_var($value, $filter[0], $filter[1]) : $value;
 			}
-		}
-
-		if (isset($this->vars[$name]) && $filter) {
-			return filter_var($this->vars[$name], $filter[0], $filter[1]);
 		}
 	}
 
 
 
 	/**
-	 * public function set (string $name, mixed $value)
+	 * public function post ([string $name], [string $filter])
 	 *
-	 * Changes or creates a new variable
-	 * Returns none
+	 * Get (and optionally filter) a variable value via POST
+	 * Returns mixed
 	 */
-	public function set ($name, $value) {
-		$this->vars[$name] = $value;
+	public function post ($name = null, $filter = null) {
+		if (is_null($name)) {
+			return $this->post;
+		}
+
+		if ($filter) {
+			$filter = $this->getSanitizeFilter($filter);
+		}
+
+		if (isset($this->post[$name])) {
+			return $filter ? filter_var($this->post[$name], $filter[0], $filter[1]) : $this->post[$name];
+		}
+
+		if (strpos($name, '[') && strpos($name, ']')) {
+			$subarrays = explode('[', str_replace(']', '', $name));
+			$value = $this->post;
+
+			while ($subarrays) {
+				$value = $value[array_shift($subarrays)];
+			}
+
+			if (isset($value)) {
+				return $filter ? filter_var($value, $filter[0], $filter[1]) : $value;
+			}
+		}
+	}
+
+
+
+	/**
+	 * public function postGet ([string $name], [string $filter])
+	 *
+	 * Get (and optionally filter) a variable value via POST or GET
+	 * Returns mixed
+	 */
+	public function postGet ($name = null, $filter = null) {
+		if (is_null($name)) {
+			return $this->arrayMerge($this->get, $this->post);
+		}
+
+		$variable = $this->post($name, $filter);
+
+		if (is_null($variable)) {
+			return $this->get($name, $filter);
+		}
+
+		return $variable;
 	}
 
 
@@ -254,11 +308,72 @@ class Input {
 	/**
 	 * public function delete (string $name)
 	 *
-	 * Deletes a variable
+	 * Deletes a variable in GET and POST
 	 * Returns none
 	 */
 	public function delete ($name) {
-		unset($this->vars[$name]);
+		unset($this->get[$name], $this->post[$name]);
+	}
+
+
+
+	/**
+	 * public function cookie (string $name, [string $filter])
+	 *
+	 * Get (and optionally filter) a cookie value
+	 * Returns mixed
+	 */
+	public function cookie ($name, $filter = null) {
+		if ($filter) {
+			$filter = $this->getSanitizeFilter($filter);
+
+			return filter_input(INPUT_COOKIE, $name, $filter[0], $filter[1]);
+		}
+
+		return filter_input(INPUT_COOKIE, $name);
+	}
+
+
+
+	/**
+	 * public function setCookie (string $name, [string $value], [int $expire])
+	 *
+	 * Returns boolean
+	 */
+	public function setCookie ($name, $value = '', $expire = 0) {
+		$defaults = array(
+			'path' => BASE_WWW,
+			'domain' => getenv('SERVER_NAME'),
+			'secure' => false,
+			'httponly' => false
+		);
+
+		if (!is_array($name)) {
+			$name = array(
+				'name' => $name,
+				'value' => $value,
+				'expire' => $expire
+			);
+		}
+
+		$name += $defaults;
+
+		if ($name['expire']) {
+			$name['expire'] += time();
+		}
+
+		return setcookie($name['name'], $name['value'], $name['expire'], $name['path'], $name['domain'], $name['secure'], $name['httponly']);
+	}
+
+
+
+	/**
+	 * public function deleteCookie (string $name)
+	 *
+	 * Returns boolean
+	 */
+	public function deleteCookie ($name) {
+		return setcookie($name, '', 1, BASE_WWW);
 	}
 
 
