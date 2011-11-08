@@ -3,6 +3,7 @@ namespace Fol;
 
 class Templates {
 	private $templates;
+	private $renders;
 
 
 
@@ -62,7 +63,9 @@ class Templates {
 
 
 	/**
-	 * public function render (string $render_settings, [array $data], [string $wrap])
+	 * public function render (string $template, [array $data], [string $wrap])
+	 * public function render (array $render_settings)
+	 * public function render (array $render_name)
 	 *
 	 * Render a template
 	 *
@@ -70,6 +73,10 @@ class Templates {
 	 */
 	public function render ($render_settings, $data = null, $wrap = null) {
 		if (is_string($render_settings)) {
+			if (isset($this->renders[$render_settings])) {
+				return $this->renders[$render_settings];
+			}
+
 			$render_settings = array(
 				'template' => $render_settings,
 				'data' => $data
@@ -113,6 +120,19 @@ class Templates {
 		}
 
 		return $result;
+	}
+
+
+
+	/**
+	 * public function setRender (string $render_name, string $template, [array $data], [string $wrap])
+	 * public function setRender (string $render_name, array $render_settings)
+	 *
+	 * Set a name to a template file
+	 * Returns none
+	 */
+	public function setRender ($render_name, $render_settings, $data = null, $wrap = null) {
+		$this->renders[$render_name] = $this->render($render_settings, $data, $wrap);
 	}
 
 

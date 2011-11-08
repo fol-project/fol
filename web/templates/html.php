@@ -4,6 +4,6 @@
 	</head>
 
 	<body>
-		Ola
+		<?php echo $this->render('content'); ?>
 	</body>
 </html>

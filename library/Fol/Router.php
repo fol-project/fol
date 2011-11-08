@@ -177,8 +177,23 @@ class Router {
 			} else {
 				throw new \Exception('Controller not found', 404);
 			}
-		} catch (Exception $e) {
-			echo $e->getCode();
+		} catch (\Exception $e) {
+			global $Config;
+
+			$config = $Config->get('routes');
+
+			if ($class = $config['exceptions'][$e->getCode()]) {
+				list($class, $method) = explodeTrim(':', $class);
+
+				$class = '\\Controllers\\'.$class;
+
+				if (class_exists($class)) {
+					$Exception = new $class;
+					$Exception->$method($e->getMessage());
+				}
+			} else {
+				echo $e->getCode().': '.$e->getMessage();
+			}
 		}
 	}
 
@@ -252,11 +267,11 @@ class Router {
 				$Class = new \ReflectionClass($Class);
 				$Method = $path ? $this->camelCase(array_shift($path)) : 'index';
 			} else {
-				$Class = new \ReflectionClass('Controllers\\'.$this->camelCase($config['default'], true));
+				$Class = new \ReflectionClass('Controllers\\'.$config['default']);
 				$Method = $this->camelCase(array_shift($path));
 			}
 		} else {
-			$Class = 'Controllers\\'.$this->camelCase($config['default'], true);
+			$Class = 'Controllers\\'.$config['default'];
 
 			if (class_exists($Class)) {
 				$Class = new \ReflectionClass($Class);
