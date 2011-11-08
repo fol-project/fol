@@ -2,7 +2,6 @@
 namespace Fol;
 
 class Input {
-	public $actions;
 	public $format;
 	public $language;
 	public $get;
@@ -19,7 +18,7 @@ class Input {
 	public function __construct () {
 		global $Config;
 
-		$get = (array)filter_input_array(INPUT_GET);
+		$this->get = (array)filter_input_array(INPUT_GET);
 
 		if ($_FILES) {
 			$this->post = $this->arrayMerge($this->arrayFiles(), (array)filter_input_array(INPUT_POST));
@@ -31,7 +30,6 @@ class Input {
 
 		$config = $Config->get('scene', 'scene');
 
-		$this->actions = $this->detectActions($config['actions_variable']);
 		$this->language = $this->detectLanguage($config);
 		$this->format = $this->detectFormat();
 	}
@@ -87,40 +85,6 @@ class Input {
 
 		return $return;
 	}
-
-
-
-	/**
-	 * private function detectActions (string $variable)
-	 *
-	 * Returns the current actions
-	 * Return array
-	 */
-	private function detectActions ($variable) {
-		$actions = array();
-
-		if (!$variable) {
-			return array();
-		}
-
-		foreach ((array)$this->postGet($variable) as $name => $value) {
-			if (is_int($name)) {
-				$name = $value;
-				$value = null;
-			}
-
-			$name = trim($name);
-
-			if ($name) {
-				$actions[$name] = $value;
-			}
-		}
-
-		$this->delete($variable);
-
-		return $actions;
-	}
-
 
 
 
@@ -313,6 +277,18 @@ class Input {
 	 */
 	public function delete ($name) {
 		unset($this->get[$name], $this->post[$name]);
+	}
+
+
+
+	/**
+	 * public function exists (string $name)
+	 *
+	 * Check if a variable is set in GET or POST
+	 * Returns boolean
+	 */
+	public function exists ($name) {
+		return (isset($this->get[$name]) || isset($this->post[$name])) ? true : false;
 	}
 
 

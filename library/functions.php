@@ -22,6 +22,25 @@ spl_autoload_register('__autoload');
 
 
 /**
+ * function camelCase (string $string, [boolean $upper_first])
+ *
+ * Transform a string "my-string" to camelCase: "myString"
+ * Returns string
+ */
+function camelCase ($string, $upper_first = false) {
+	$string = str_replace('-', ' ', $string);
+	$string = str_replace(' ', '', ucwords($string));
+
+	if (!$upper_first) {
+		return lcfirst($string);
+	}
+
+	return $string;
+}
+
+
+
+/**
  * function explodeTrim (string $delimiter, string $text, [int $limit])
  *
  * Explode a string and returns only the non-empty elements

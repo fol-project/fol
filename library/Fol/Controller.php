@@ -10,6 +10,7 @@ class Controller {
 	*/
 	public function __get ($name) {
 		switch ($name) {
+			case 'Actions':
 			case 'Templates':
 			case 'Session':
 				$class = 'Fol\\'.$name;

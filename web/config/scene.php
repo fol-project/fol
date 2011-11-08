@@ -1,6 +1,4 @@
 <?php
-$config['actions_variable'] = 'action';
-
 $config['modules'] = array(
 	'detection' => 'subfolder',
 	'subfolder' => 'admin',

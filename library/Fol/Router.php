@@ -222,7 +222,7 @@ class Router {
 				if ($route = $this->matchRoute($path_route, $route, $route_config['defaults'])) {
 					list($Class, $Method) = explodeTrim(':', $route_config['controller']);
 
-					$Class = 'Controllers\\'.$this->camelCase($Class, true);
+					$Class = 'Controllers\\'.camelCase($Class, true);
 
 					if ($Method && class_exists($Class)) {
 						$Class = new \ReflectionClass($Class);
@@ -259,16 +259,16 @@ class Router {
 
 		//Get controller by path
 		if ($path) {
-			$Class = 'Controllers\\'.$this->camelCase($path[0], true);
+			$Class = 'Controllers\\'.camelCase($path[0], true);
 
 			if (class_exists($Class)) {
 				array_shift($path);
 		
 				$Class = new \ReflectionClass($Class);
-				$Method = $path ? $this->camelCase(array_shift($path)) : 'index';
+				$Method = $path ? camelCase(array_shift($path)) : 'index';
 			} else {
 				$Class = new \ReflectionClass('Controllers\\'.$config['default']);
-				$Method = $this->camelCase(array_shift($path));
+				$Method = camelCase(array_shift($path));
 			}
 		} else {
 			$Class = 'Controllers\\'.$config['default'];
@@ -352,25 +352,6 @@ class Router {
 		}
 
 		return false;
-	}
-
-
-
-	/**
-	 * private function camelCase (string $string, [boolean $upper_first])
-	 *
-	 * Transform a string "my-string" to camelCase: "myString"
-	 * Returns string
-	 */
-	private function camelCase ($string, $upper_first = false) {
-		$string = str_replace('-', ' ', $string);
-		$string = str_replace(' ', '', ucwords($string));
-
-		if (!$upper_first) {
-			return lcfirst($string);
-		}
-
-		return $string;
 	}
 }
 ?>
