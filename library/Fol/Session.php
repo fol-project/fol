@@ -2,7 +2,7 @@
 namespace Fol;
 
 class Session {
-	public $message = array();
+	private $message = array();
 
 
 
@@ -13,27 +13,12 @@ class Session {
 	 * Returns none
 	 */
 	public function __construct () {
-		$this->detectMessage();
-	}
+		$this->message['input'] = filter_input(INPUT_COOKIE, 'message_text');
+		$this->message['type'] = filter_input(INPUT_COOKIE, 'message_type');
+		$this->message['output'] = '';
 
-
-
-	/**
-	 * private function detectMessage (void)
-	 *
-	 * Loads the flash message
-	 * Returns string/false
-	 */
-	private function detectMessage () {
-		$message_text = $this->scene.'-'.$this->module.'-message_text';
-		$message_type = $this->scene.'-'.$this->module.'-message_type';
-
-		$this->message['inbox'] = $this->get($message_text);
-		$this->message['type'] = $this->get($message_type);
-		$this->message['outbox'] = '';
-
-		$this->delete($message_text);
-		$this->delete($message_type);
+		setcookie('message_text', '', 1, BASE_WWW);
+		setcookie('message_type', '', 1, BASE_WWW);
 	}
 
 
@@ -45,7 +30,7 @@ class Session {
 	 * Returns none
 	 */
 	public function setMessage ($text, $type = null) {
-		$this->message['input'] = $this->message['input'] = $text;
+		$this->message['input'] = $text;
 		$this->message['type'] = $type;
 	}
 
@@ -69,6 +54,22 @@ class Session {
 	 */
 	public function getMessageType () {
 		return $this->message['type'];
+	}
+
+
+
+	/**
+	 * public function saveMessage (void)
+	 *
+	 * Returns boolean
+	 */
+	public function saveMessage () {
+		if ($this->message['outbox']) {
+			setcookie('message_text', $this->message['outbox'], 0, BASE_WWW);
+		}
+		if ($this->message['type']) {
+			setcookie('message_type', $this->message['type'], 0, BASE_WWW);
+		}
 	}
 }
 ?>

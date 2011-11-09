@@ -15,7 +15,7 @@ class Controller {
 			case 'Session':
 				$class = 'Fol\\'.$name;
 				return $this->$name = new $class;
-			
+
 			case 'Config':
 			case 'Input':
 			case 'Router':
