@@ -18,6 +18,7 @@ class Controller {
 
 			case 'Config':
 			case 'Input':
+			case 'Output':
 			case 'Router':
 				global $$name;
 				return $this->$name = $$name;
