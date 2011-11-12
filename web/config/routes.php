@@ -7,11 +7,6 @@ $config['exceptions'] = array(
 );
 
 $config['routing'] = array(
-	'/ver/(section)?/(post)' => array(
-		'controller' => 'Main:show',
-		'defaults' => array(
-			'section' => 'Ola'
-		)
-	)
+//	'/ver/(section [0-9]+)/(post)' => 'Main:show',
 );
 ?>

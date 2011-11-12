@@ -44,14 +44,15 @@ class Output {
 
 
 	/**
-	 * public function setContentType (string $type)
+	 * public function setContentType (string $type, [string $charset])
 	 *
 	 * Sets the content type header to output
 	 * Returns none
 	 */
-	public function setContentType ($type) {
+	public function setContentType ($type, $charset = 'UTF-8') {
 		switch ($type) {
 			case 'js':
+			case 'json':
 			case 'html':
 			case 'css':
 				$type = 'text/'.$type;
@@ -74,7 +75,7 @@ class Output {
 				break;
 		}
 
-		$this->addHeader('Content-Type: '.$type, true);
+		$this->addHeader('Content-Type: '.$type.' '.$charset, true);
 	}
 
 
@@ -124,8 +125,7 @@ class Output {
 	 */
 	public function show () {
 		foreach ($this->headers as $header) {
-			//header($header[0], $header[1]);
-			echo $header[0].'<br>';
+			header($header[0], $header[1]);
 		}
 
 		echo $this->content;

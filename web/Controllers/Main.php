@@ -3,40 +3,43 @@ namespace Controllers;
 
 class Main extends Base {
 	public function index () {
-		/*
+
+		$this->Models->Comments->sayHello();
+
+		return;
 		$database = $this->Config->get('database');
 
-		$Db = new \Fol\Database\Mysql($database['default']);
+		$Db = new \Fol\Database($database['default']);
 
-		$result = $Db->select(array(
-			'fields' => array(
-				'posts' => array('id', 'title', 'posts'),
-				'comments' => array('id', 'text')
+		$result = $Db->generateSelectQuery(array(
+			'data' => array(
+				'COUNT(*) as total',
+				'posts' => array('id', 'imaxe'),
 			),
-			'conditions' => array(
-				'posts.id' => 45
+			'where' => array(
+				'posts.id !=' => 45,
+				'post.name &' => ':name'
 			),
 			'limit' => 45,
 			'offset' => 3
 		));
-		*/
 
-		$this->Templates->render('content', 'content.php');
-		$content = $this->Templates->render('base');
-		$this->Output->setContentType('html');
-		$this->Output->setContent('ola, que tal');
-
-		//print_r($result);
-
+		echo $result."<br>";
 	}
 
 	public function show ($section, $post = 'default') {
 		if ($this->Input->format == 'json') {
-			echo json_encode(array('seccion' => $section, 'post' => $post));
+			$this->Output->setContentType('json');
+			$this->Output->setContent($content);
+			//echo json_encode(array('seccion' => $section, 'post' => $post));
 			return;
 		}
 
 		echo "<p>$section / $post</p>";
+	}
+
+	protected function fotos () {
+		echo 'fotos';
 	}
 }
 ?>
