@@ -1,4 +1,5 @@
 <?php
+
 /**
  * function __autoload ($class_name)
  */
@@ -76,4 +77,18 @@ function isNumericalArray ($array) {
 	} else {
 		return false;
 	}
+}
+
+
+
+/**
+ * function exception ([string $message], [int $code])
+ *
+ * Throw a exception object
+ * Returns false
+ */
+function exception ($message = '', $code = 500) {
+	throw new \Fol\Exception($message, $code);
+
+	return false;
 }

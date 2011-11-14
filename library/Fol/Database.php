@@ -15,8 +15,7 @@ class Database extends \PDO {
 		$this->settings = $settings;
 
 		if (!in_array($settings['driver'], parent::getAvailableDrivers())) {
-			throw new \Exception('This database driver is not supported', 500);
-			return false;
+			return exception('This database driver is not supported');
 		}
 
 		if ($this->settings['driver'] === 'mysql') {
@@ -27,8 +26,7 @@ class Database extends \PDO {
 		try {
 			parent::__construct($dsn, $this->settings['user'], $this->settings['password'], $options);
 		} catch (\PDOException $e) {
-			echo 'Connection failed: '.$e->getMessage();
-			return false;
+			return exception('Connection failed: '.$e->getMessage());
 		}
 
 		$this->setAttribute(parent::ATTR_DEFAULT_FETCH_MODE, parent::FETCH_ASSOC);
@@ -179,6 +177,169 @@ class Database extends \PDO {
 		$query .= $this->limit($select['offset'], $select['limit']);
 
 		return $this->affectedRows();
+	}
+
+
+
+	/**
+	 * public function getScheme ()
+	 *
+	 * Generate a database scheme array
+	 * Returns array
+	 */
+	public function getScheme () {
+		$scheme = array();
+
+		$statement = $this->query('SHOW TABLES');
+		$statement->execute();
+
+		foreach ($statement->fetchAll(parent::FETCH_COLUMN) as $table) {
+			$describe = $this->query('DESCRIBE `'.$table.'`;');
+			$describe->execute();
+			$scheme[$table]['columns'] = $describe->fetchAll();
+
+			$indexes = $this->query('SHOW INDEX FROM `'.$table.'`;');
+			$indexes->execute();
+			$indexes_list = array();
+
+			foreach ($indexes->fetchAll() as $index) {
+				if (!isset($indexes_list[$index['Key_name']])) {
+					$indexes_list[$index['Key_name']] = array(
+						'Key_name' => $index['Key_name'],
+						'Non_unique' => $index['Non_unique'],
+						'Index_type' => $index['Index_type'],
+						'Columns' => array(
+							$index['Seq_in_index'] => array(
+								'Column_name' => $index['Column_name'],
+								'Sub_part' => $index['Sub_part']
+							)
+						)
+					);
+
+					continue;
+				}
+
+				$indexes_list[$index['Key_name']]['columns'][$index['Seq_in_index']] = array(
+					'Column_name' => $index['Column_name'],
+					'Sub_part' => $index['Sub_part']
+				);
+			}
+
+			$scheme[$table]['indexes'] = $indexes_list;
+		}
+
+		return $scheme;
+	}
+
+
+
+	/**
+	 * public function generateUpdateSchemeQuery ($new_scheme)
+	 *
+	 * Generate a scheme query string
+	 * Returns array
+	 */
+	public function generateUpdateSchemeQuery ($new_scheme) {
+		$query = array();
+
+		$old_scheme = $this->getScheme();
+
+		$merged_scheme = array_unique(array_merge(array_keys($old_scheme), array_keys($new_scheme)));
+
+		foreach ($merged_scheme as $table) {
+			if (!$old_scheme[$table]) {
+				echo $table.'ola';
+				$columns = array();
+
+				foreach ($new_scheme[$table]['columns'] as $column) {
+					$columns[] = '`'.$column['Field'].'` '.$this->columnScheme($column);
+				}
+
+				$query[] = 'CREATE TABLE `'.$table.'` ('.implode(', ', $columns).') ENGINE=MyISAM DEFAULT CHARSET=utf8;';
+				continue;
+			}
+
+			if (!$new_scheme[$table]) {
+				$query[] = 'DROP TABLE `'.$table.'`;';
+				continue;
+			}
+
+			$merged_columns = array_unique(array_merge(array_keys($old_scheme[$table]['columns']), array_keys($new_scheme[$table]['columns'])));
+
+			foreach ($merged_columns as $column) {
+				if (!$old_scheme[$table]['columns'][$column]) {
+					$query[] = 'ALTER TABLE `'.$table.'` ADD `'.$column.'` '.$this->columnScheme($new_scheme[$table]['columns'][$column]);
+					continue;
+				}
+
+				if (!$new_scheme[$table]['columns'][$column]) {
+					$query[] = 'ALTER TABLE `'.$table.'` DROP `'.$column.'`';
+					continue;
+				}
+
+				if (array_diff_assoc($new_scheme[$table]['columns'][$column], $old_scheme[$table]['columns'][$column])) {
+					$query[] = 'ALTER TABLE `'.$table.'` MODIFY `'.$column.'` '.$this->columnScheme($new_scheme[$table]['columns'][$column]);
+				}
+			}
+
+			$merged_indexes = array_unique(array_merge(array_keys($old_scheme[$table]['indexes']), array_keys($new_scheme[$table]['indexes'])));
+
+			foreach ($merged_indexes as $index) {
+				if (!$old_scheme[$table]['indexes'][$index]) {
+					if ($index['Key_name'] === 'PRIMARY') {
+						$query[] = 'ALTER TABLE `'.$table.'` ADD PRIMARY KEY `'.$index['Key_name'].'` (`'.$index['Columns'][1]['Column_name'].'`)';
+						continue;
+					}
+
+					$columns = array();
+
+					foreach ($index['Columns'] as $column) {
+						$columns[] = '`'.$column['Column_name'].'`'.($colum['Sub_part'] ? ' ('.$colum['Sub_part'].')' : '');
+					}
+
+					if ($index['Non_unique'] === 1) {
+						$query[] = 'ALTER TABLE `'.$table.'` ADD INDEX `'.$index['Key_name'].'` ('.implode(',', $columns).')';
+						continue;
+					}
+					
+					$query[] = 'ALTER TABLE `'.$table.'` ADD UNIQUE `'.$index['Key_name'].'` ('.implode(',', $columns).')';
+					continue;
+				}
+
+				if (!$new_scheme[$table]['indexes'][$index]) {
+					if ($index['Key_name'] === 'PRIMARY') {
+						$query[] = 'ALTER TABLE `'.$table.'` DROP PRIMARY KEY `'.$index['Key_name'].'` (`'.$index['Columns'][1]['Column_name'].'`)';
+						continue;
+					}
+
+					$query[] = 'ALTER TABLE `'.$table.'` DROP INDEX `'.$index['Key_name'].'`';
+				}
+			}
+		}
+
+		return $query;
+	}
+
+
+
+	/**
+	 * private function columnScheme (array $settings)
+	 *
+	 * Creates a definition column
+	 * Returns string
+	 */
+	private function columnScheme ($settings) {
+		$query = $settings['Type'];
+
+		$query .= ($settings['Null'] === 'YES') ? ' NULL' : ' NOT NULL';
+
+		if ($settings['Extra'] === 'auto_increment') {
+			$query .= ' AUTO_INCREMENT PRIMARY KEY';
+		} else if ($settings['default']) {
+			$query .= ' default "'.$settings['default'].'"';
+		}
+
+		return $query;
 	}
 
 

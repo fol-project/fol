@@ -3,15 +3,33 @@ namespace Controllers;
 
 class Main extends Base {
 	public function index () {
-
-		$this->Models->Comments->sayHello();
-
 		return;
 		$database = $this->Config->get('database');
 
 		$Db = new \Fol\Database($database['default']);
 
-		$result = $Db->generateSelectQuery(array(
+		$scheme = $Db->getScheme();
+		print_r($scheme);
+return;
+		$scheme['tags'] = array(
+			'columns' => array(
+				array(
+					'Field' => 'id',
+					'Type' => 'int(8)',
+					'Null' => 'NO',
+					'Key' => 'PRI',
+					'Default' => '',
+					'Extra' => 'auto_increment'
+				)
+			)
+		);
+
+		$scheme['post2'] = $scheme['posts'];
+		$update = $Db->generateUpdateSchemeQuery($scheme);
+
+		return;
+
+		$query = $Db->generateSelectQuery(array(
 			'data' => array(
 				'COUNT(*) as total',
 				'posts' => array('id', 'imaxe'),
@@ -24,7 +42,12 @@ class Main extends Base {
 			'offset' => 3
 		));
 
-		echo $result."<br>";
+		$result = $Db->prepare($query);
+		$result->bindValue(':name', 'pirolas');
+		$result->execute();
+		print_r($result->fetchAll());
+
+//		echo $result."<br>";
 	}
 
 	public function show ($section, $post = 'default') {

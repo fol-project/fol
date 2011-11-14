@@ -44,7 +44,7 @@ class Router {
 
 			$config = $Config->get('scenes');
 
-			define(SCENE_PATH, $config[$this->scene]['path']);
+			define('SCENE_PATH', $config[$this->scene]['path']);
 
 			$config = $Config->get('scene', 'scene', $this->scene);
 
@@ -177,23 +177,8 @@ class Router {
 			} else {
 				throw new \Exception('Controller not found', 404);
 			}
-		} catch (\Exception $e) {
-			global $Config;
-
-			$config = $Config->get('routes');
-
-			if ($class = $config['exceptions'][$e->getCode()]) {
-				list($class, $method) = explodeTrim(':', $class);
-
-				$class = '\\Controllers\\'.$class;
-
-				if (class_exists($class)) {
-					$Exception = new $class;
-					$Exception->$method($e->getMessage());
-				}
-			} else {
-				echo $e->getCode().': '.$e->getMessage();
-			}
+		} catch (\Fol\Exception $e) {
+			$e->runController();
 		}
 	}
 

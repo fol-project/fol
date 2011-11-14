@@ -1,6 +1,4 @@
 <?php
-error_reporting(E_ALL & ~E_NOTICE);
-
 define('FOL_VERSION', '0.1a');
 
 define('BASE_PATH', __DIR__.'/');

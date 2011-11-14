@@ -102,16 +102,15 @@ class Input {
 			return false;
 		}
 
-		$cookie = $this->scene.'-'.$this->module.'-language';
-		$duration = 3600*24*365;
-
 
 		//Language detection
 		$language = '';
 
 		switch($config['detection']) {
 			case 'subfolder':
-				if ($languages[$this->path[0]]) {
+				global $Router;
+
+				if ($Router->path && $languages[$Router->path[0]]) {
 					$language = array_shift($this->path);
 				}
 				break;
@@ -134,9 +133,9 @@ class Input {
 			return $language;
 		}
 
-		foreach ($this->getLanguages() as $language) {
-			if ($languages[$language]) {
-				return $language;
+		foreach ($this->httpAcceptLanguages() as $language) {
+			if ($languages[$language['short']]) {
+				return $language['short'];
 			}
 		}
 
@@ -160,12 +159,10 @@ class Input {
 	private function detectFormat () {
 		global $Router;
 
-		if (!$Router->path) {
-			return false;
-		}
+		if (!$Router->path || (strpos(end($Router->path), '.') === false)) {
+			$accept = current($this->httpAccept());
 
-		if (strpos(end($Router->path), '.') === false) {
-			return false;
+			return $accept ? $accept['short'] : false;
 		}
 
 		$info = pathinfo(array_pop($Router->path));
@@ -422,42 +419,57 @@ class Input {
 
 
 	/**
-	 * public function getLanguages (void)
+	 * public function httpAcceptLanguages (void)
 	 *
-	 * Returns the browser accepted languages
+	 * Returns the browser accept languages header
 	 * Returns array
 	 */
-	public function getLanguages () {
+	public function httpAcceptLanguages () {
 		if (!$_SERVER['HTTP_ACCEPT_LANGUAGE']) {
 			return array();
 		}
 
-		$browser = explode(',', str_replace(array(' ', 'q='), '', strtolower($_SERVER['HTTP_ACCEPT_LANGUAGE'])));
+		preg_match_all('#(([\w]+)\-?([^,;/]+)?)(;q=([0-9\.]+))?#', $_SERVER['HTTP_ACCEPT_LANGUAGE'], $matches, PREG_SET_ORDER);
+
 		$languages = array();
 
-		foreach ($browser as $language) {
-			list($language, $q) = explode(';', $language);
-
-			$q = is_null($q) ? 1 : $q;
-
-			if (strstr($language, '-')) {
-				$language = explode('-', $language);
-
-				if (!$languages[$language[1]]) {
-					$languages[$language[1]] = $q;
-				}
-
-				if (!$languages[$language[0]]) {
-					$languages[$language[0]] = $q;
-				}
-			} else {
-				$languages[$language] = $q;
-			}
+		foreach ($matches as $match) {
+			$languages[] = array(
+				'q' => isset($match[5]) ? floatval($match[5]) : 1,
+				'language' => $match[1],
+				'short' => $match[2]
+			);
 		}
 
-		arsort($languages, SORT_NUMERIC);
+		return $languages;
+	}
 
-		return array_keys($languages);
+
+
+	/**
+	 * public function httpAccept (void)
+	 *
+	 * Returns the http accept header
+	 * Returns array
+	 */
+	public function httpAccept () {
+		if (!$_SERVER['HTTP_ACCEPT']) {
+			return array();
+		}
+
+		preg_match_all('#(([\w]+)/([^,;/]+))(;q=([0-9\.]+))?#', $_SERVER['HTTP_ACCEPT'], $matches, PREG_SET_ORDER);
+
+		$formats = array();
+
+		foreach ($matches as $match) {
+			$formats[] = array(
+				'q' => isset($match[5]) ? floatval($match[5]) : 1,
+				'mimetype' => $match[1],
+				'short' => $match[3]
+			);
+		}
+
+		return $formats;
 	}
 
 
