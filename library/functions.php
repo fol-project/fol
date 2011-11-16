@@ -92,3 +92,17 @@ function exception ($message = '', $code = 500) {
 
 	return false;
 }
+
+
+
+/**
+ * function pre ($value)
+ *
+ * Throw a exception object
+ * Returns false
+ */
+function pre ($pre) {
+	echo '<pre>';
+	print_r($pre);
+	echo '</pre>';
+}

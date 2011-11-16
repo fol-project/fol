@@ -196,7 +196,10 @@ class Database extends \PDO {
 		foreach ($statement->fetchAll(parent::FETCH_COLUMN) as $table) {
 			$describe = $this->query('DESCRIBE `'.$table.'`;');
 			$describe->execute();
-			$scheme[$table]['columns'] = $describe->fetchAll();
+
+			foreach ($describe->fetchAll() as $column) {
+				$scheme[$table]['columns'][$column['Field']] = $column;
+			}
 
 			$indexes = $this->query('SHOW INDEX FROM `'.$table.'`;');
 			$indexes->execute();
@@ -248,7 +251,6 @@ class Database extends \PDO {
 
 		foreach ($merged_scheme as $table) {
 			if (!$old_scheme[$table]) {
-				echo $table.'ola';
 				$columns = array();
 
 				foreach ($new_scheme[$table]['columns'] as $column) {
@@ -256,63 +258,56 @@ class Database extends \PDO {
 				}
 
 				$query[] = 'CREATE TABLE `'.$table.'` ('.implode(', ', $columns).') ENGINE=MyISAM DEFAULT CHARSET=utf8;';
-				continue;
-			}
 
-			if (!$new_scheme[$table]) {
+			} else if (!$new_scheme[$table]) {
 				$query[] = 'DROP TABLE `'.$table.'`;';
-				continue;
-			}
 
-			$merged_columns = array_unique(array_merge(array_keys($old_scheme[$table]['columns']), array_keys($new_scheme[$table]['columns'])));
+			} else {
+				$merged_columns = array_unique(array_merge(array_keys($old_scheme[$table]['columns']), array_keys($new_scheme[$table]['columns'])));
 
-			foreach ($merged_columns as $column) {
-				if (!$old_scheme[$table]['columns'][$column]) {
-					$query[] = 'ALTER TABLE `'.$table.'` ADD `'.$column.'` '.$this->columnScheme($new_scheme[$table]['columns'][$column]);
-					continue;
-				}
-
-				if (!$new_scheme[$table]['columns'][$column]) {
-					$query[] = 'ALTER TABLE `'.$table.'` DROP `'.$column.'`';
-					continue;
-				}
-
-				if (array_diff_assoc($new_scheme[$table]['columns'][$column], $old_scheme[$table]['columns'][$column])) {
-					$query[] = 'ALTER TABLE `'.$table.'` MODIFY `'.$column.'` '.$this->columnScheme($new_scheme[$table]['columns'][$column]);
+				foreach ($merged_columns as $column) {
+					if (!$old_scheme[$table]['columns'][$column]) {
+						$query[] = 'ALTER TABLE `'.$table.'` ADD `'.$column.'` '.$this->columnScheme($new_scheme[$table]['columns'][$column]);
+					} else if (!$new_scheme[$table]['columns'][$column]) {
+						$query[] = 'ALTER TABLE `'.$table.'` DROP `'.$column.'`';
+						continue;
+					} else if (array_diff_assoc($new_scheme[$table]['columns'][$column], $old_scheme[$table]['columns'][$column])) {
+						$query[] = 'ALTER TABLE `'.$table.'` MODIFY `'.$column.'` '.$this->columnScheme($new_scheme[$table]['columns'][$column]);
+					}
 				}
 			}
 
-			$merged_indexes = array_unique(array_merge(array_keys($old_scheme[$table]['indexes']), array_keys($new_scheme[$table]['indexes'])));
+			$merged_indexes = array_unique(array_merge(array_keys((array)$old_scheme[$table]['indexes']), array_keys((array)$new_scheme[$table]['indexes'])));
 
 			foreach ($merged_indexes as $index) {
 				if (!$old_scheme[$table]['indexes'][$index]) {
 					if ($index['Key_name'] === 'PRIMARY') {
-						$query[] = 'ALTER TABLE `'.$table.'` ADD PRIMARY KEY `'.$index['Key_name'].'` (`'.$index['Columns'][1]['Column_name'].'`)';
+						$query[] = 'ALTER TABLE `'.$table.'` ADD PRIMARY KEY `'.$index.'` (`'.$new_scheme[$table]['indexes'][$index]['Columns'][1]['Column_name'].'`)';
 						continue;
 					}
 
 					$columns = array();
 
-					foreach ($index['Columns'] as $column) {
+					foreach ($new_scheme[$table]['indexes'][$index]['Columns'] as $column) {
 						$columns[] = '`'.$column['Column_name'].'`'.($colum['Sub_part'] ? ' ('.$colum['Sub_part'].')' : '');
 					}
 
-					if ($index['Non_unique'] === 1) {
-						$query[] = 'ALTER TABLE `'.$table.'` ADD INDEX `'.$index['Key_name'].'` ('.implode(',', $columns).')';
+					if ($new_scheme[$table]['indexes'][$index]['Non_unique'] === 1) {
+						$query[] = 'ALTER TABLE `'.$table.'` ADD INDEX `'.$index.'` ('.implode(',', $columns).')';
 						continue;
 					}
 					
-					$query[] = 'ALTER TABLE `'.$table.'` ADD UNIQUE `'.$index['Key_name'].'` ('.implode(',', $columns).')';
+					$query[] = 'ALTER TABLE `'.$table.'` ADD UNIQUE `'.$index.'` ('.implode(',', $columns).')';
 					continue;
 				}
 
 				if (!$new_scheme[$table]['indexes'][$index]) {
 					if ($index['Key_name'] === 'PRIMARY') {
-						$query[] = 'ALTER TABLE `'.$table.'` DROP PRIMARY KEY `'.$index['Key_name'].'` (`'.$index['Columns'][1]['Column_name'].'`)';
+						$query[] = 'ALTER TABLE `'.$table.'` DROP PRIMARY KEY `'.$index.'` (`'.$old_scheme[$table]['indexes'][$index]['Columns'][1]['Column_name'].'`)';
 						continue;
 					}
 
-					$query[] = 'ALTER TABLE `'.$table.'` DROP INDEX `'.$index['Key_name'].'`';
+					$query[] = 'ALTER TABLE `'.$table.'` DROP INDEX `'.$index.'`';
 				}
 			}
 		}

@@ -3,29 +3,9 @@ namespace Controllers;
 
 class Main extends Base {
 	public function index () {
-		return;
 		$database = $this->Config->get('database');
 
 		$Db = new \Fol\Database($database['default']);
-
-		$scheme = $Db->getScheme();
-		print_r($scheme);
-return;
-		$scheme['tags'] = array(
-			'columns' => array(
-				array(
-					'Field' => 'id',
-					'Type' => 'int(8)',
-					'Null' => 'NO',
-					'Key' => 'PRI',
-					'Default' => '',
-					'Extra' => 'auto_increment'
-				)
-			)
-		);
-
-		$scheme['post2'] = $scheme['posts'];
-		$update = $Db->generateUpdateSchemeQuery($scheme);
 
 		return;
 
