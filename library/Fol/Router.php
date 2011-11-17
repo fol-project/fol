@@ -2,11 +2,11 @@
 namespace Fol;
 
 class Router {
+	public $Controller;
 	public $domain;
 	public $subdomains = array();
 	public $path;
 	public $scene;
-	public $module;
 	public $exit_mode;
 
 
@@ -38,7 +38,7 @@ class Router {
 		$path = str_replace('$', '', parse_url($path, PHP_URL_PATH));
 		$this->path = explodeTrim('/', urldecode($path));
 
-		//Detect scene/module/exit_mode
+		//Detect scene/exit_mode
 		if (($this->scene = $this->detectScene())) {
 			global $Config;
 
@@ -48,7 +48,6 @@ class Router {
 
 			$config = $Config->get('scene', 'scene', $this->scene);
 
-			$this->module = $this->detectModule($config);
 			$this->exit_mode = $this->detectExitMode($config);
 		}
 	}
@@ -88,47 +87,9 @@ class Router {
 
 
 	/**
-	 * private function detectModule (array $config)
-	 *
-	 * Detects the current module
-	 * Return string/false
-	 */
-	private function detectModule ($config) {
-		$config = $config['modules'];
-
-		//Detect subdomain
-		if ($this->subdomains && ($config['detection'] === 'subdomain') && in_array(strtolower($this->subdomains[0]), $config['detection'])) {
-			return strtolower(array_shift($this->subdomains));
-		}
-
-		//Detect subfolder
-		if ($this->path && ($config['detection'] === 'subfolder')) {
-			if (strtolower($this->path[0]) !== $config['subfolder']) {
-				return false;
-			}
-
-			array_shift($this->path);
-
-			if (in_array(strtolower($this->path[0]), $config['availables'])) {
-				return strtolower(array_shift($this->path));
-			}
-
-			//Get first by default
-			if ($config['availables']) {
-				reset($config['availables']);
-				return key($config['availables']);
-			}
-		}
-
-		return false;
-	}
-
-
-
-	/**
 	 * private function detectExitMode (array $config)
 	 *
-	 * Detects the current module
+	 * Detects the current exit_mode
 	 * Return string/false
 	 */
 	private function detectExitMode ($config) {
@@ -172,9 +133,10 @@ class Router {
 
 		try {
 			if ($class) {
-				$Controller = new $class;
-				call_user_func_array(array($Controller, $method), $parameters);
+				$this->Controller = new $class;
+				call_user_func_array(array($this->Controller, $method), $parameters);
 			} else {
+				$this->Controller = null;
 				throw new \Exception('Controller not found', 404);
 			}
 		} catch (\Fol\Exception $e) {
