@@ -28,7 +28,7 @@ class Input {
 
 		unset($_GET, $_POST, $_FILES);
 
-		$config = $Config->get('scene', 'scene');
+		$config = $Config->get('scene');
 
 		$this->language = $this->detectLanguage($config);
 		$this->format = $this->detectFormat();

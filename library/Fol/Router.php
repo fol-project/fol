@@ -7,7 +7,6 @@ class Router {
 	public $subdomains = array();
 	public $path;
 	public $scene;
-	public $exit_mode;
 
 
 
@@ -38,17 +37,13 @@ class Router {
 		$path = str_replace('$', '', parse_url($path, PHP_URL_PATH));
 		$this->path = explodeTrim('/', urldecode($path));
 
-		//Detect scene/exit_mode
+		//Detect scene
 		if (($this->scene = $this->detectScene())) {
 			global $Config;
 
 			$config = $Config->get('scenes');
 
 			define('SCENE_PATH', $config[$this->scene]['path']);
-
-			$config = $Config->get('scene', 'scene', $this->scene);
-
-			$this->exit_mode = $this->detectExitMode($config);
 		}
 	}
 
@@ -87,36 +82,6 @@ class Router {
 
 
 	/**
-	 * private function detectExitMode (array $config)
-	 *
-	 * Detects the current exit_mode
-	 * Return string/false
-	 */
-	private function detectExitMode ($config) {
-		$config = $config['exit_modes'];
-
-		if ($config['detection'] === 'subdomain') {
-			if ($this->subdomains && in_array(strtolower($this->subdomains[0]), $config['detection'])) {
-				return strtolower(array_shift($this->config));
-			}
-		} else if ($config['detection'] === 'subfolder') {
-			if ($this->path && in_array(strtolower($this->path[0]), $config['availables'])) {
-				return strtolower(array_shift($this->path));
-			}
-		}
-
-		//Get first by default
-		if ($config['availables']) {
-			reset($config['availables']);
-			return key($config['availables']);
-		}
-
-		return false;
-	}
-
-
-
-	/**
 	 * public function go ([string $path])
 	 *
 	 * Check the route and execute the controller
@@ -124,12 +89,10 @@ class Router {
 	 */
 	public function go ($path = null) {
 		if ($path) {
-			$path = explodeTrim('/', $path);
-		} else {
-			$path = $this->path;
+			$this->path = explodeTrim('/', $path);
 		}
 
-		list($class, $method, $parameters) = $this->getController($path);
+		list($class, $method, $parameters) = $this->getController($this->path);
 
 		try {
 			if ($class) {
@@ -137,7 +100,7 @@ class Router {
 				call_user_func_array(array($this->Controller, $method), $parameters);
 			} else {
 				$this->Controller = null;
-				throw new \Exception('Controller not found', 404);
+				exception('Controller not found', 404);
 			}
 		} catch (\Fol\Exception $e) {
 			$e->runController();
@@ -194,6 +157,8 @@ class Router {
 									}
 								}
 
+								$this->path = $path;
+
 								return array($Class->getName(), $Method->getName(), $params);
 							}
 						}
@@ -233,6 +198,7 @@ class Router {
 
 			if ($Method->isPublic() && !$Method->isStatic() && ($Method->getNumberOfRequiredParameters() <= count($path))) {
 				$params = array();
+				$this->path = $path;
 
 				foreach ($Method->getParameters() as $Parameter) {
 					$name = $Parameter->getName();

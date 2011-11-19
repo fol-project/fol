@@ -3,6 +3,8 @@ namespace Controllers;
 
 class Main extends Base {
 	public function index () {
+		echo '<link href="/fol/file/index.css" type="text/css" rel="stylesheet" />';
+		return;
 		$database = $this->Config->get('database');
 
 		$Db = new \Fol\Database($database['default']);
