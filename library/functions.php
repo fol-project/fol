@@ -6,15 +6,12 @@
 function __autoload ($class_name) {
 	$path = explode('\\', $class_name);
 	$file = array_pop($path);
+	$file = implode('/', $path).'/'.$file.'.php';
 
-	if ($path[0] === 'Fol') {
-		$file = BASE_PATH.'library/'.implode('/', $path).'/'.$file.'.php';
-	} else {
-		$file = SCENE_PATH.implode('/', $path).'/'.$file.'.php';
-	}
-
-	if (is_file($file)) {
-		include_once($file);
+	if (is_file(BASE_PATH.'library/'.$file)) {
+		include_once(BASE_PATH.'library/'.$file);
+	} else if (is_file(SCENE_PATH.$file)) {
+		include_once(SCENE_PATH.$file);
 	}
 }
 
