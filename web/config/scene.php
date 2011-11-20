@@ -10,6 +10,7 @@ $config['languages'] = array(
 
 $config['autoload'] = array(
 	'Actions' => 'Fol\\Actions',
+	'Cache' => 'Fol\\Cache',
 	'Models' => 'Fol\\Models',
 	'Session' => 'Fol\\Session',
 	'Templates' => 'Fol\\Templates',
