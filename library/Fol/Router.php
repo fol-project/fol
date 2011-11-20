@@ -84,8 +84,8 @@ class Router {
 	/**
 	 * public function go ([string $path])
 	 *
-	 * Check the route and execute the controller
-	 * Returns boolean
+	 * Check the route and execute the controller. Returns the value returned by the controller
+	 * Returns mixed
 	 */
 	public function go ($path = null) {
 		if ($path) {
@@ -97,7 +97,7 @@ class Router {
 		try {
 			if ($class) {
 				$this->Controller = new $class;
-				call_user_func_array(array($this->Controller, $method), $parameters);
+				$result = call_user_func_array(array($this->Controller, $method), $parameters);
 			} else {
 				$this->Controller = null;
 				exception('Controller not found', 404);
@@ -105,6 +105,8 @@ class Router {
 		} catch (\Fol\Exception $e) {
 			$e->runController();
 		}
+
+		return $result;
 	}
 
 

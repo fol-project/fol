@@ -1,2 +1,6 @@
-FOL is a php5 framework developed by Oscar Otero (http://oscarotero.com).
-It uses the phpCan (http://idc.anavallasuiza.com/project/phpcan) framework as base but it's lighter, faster and with the MVC pattern.
+FOL is a light and fast php framework developed by Oscar Otero (http://oscarotero.com).
+
+- Written in PHP 5.3
+- MVC pattern
+- Easy to learn and use
+- Very flexible
