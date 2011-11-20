@@ -1,0 +1,75 @@
+s:1437:".wrapper {
+	width: 960px;
+	background: url(http://griddle.it/960-12-30) repeat-y;
+	margin: 0 auto;
+	overflow: auto;
+}
+.wrapper > div {
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	border: solid 1px #333;
+	background: blue;
+}
+.menu {
+	width: 135px;
+	float: left;
+	display: inline;
+	margin-right: 30px;
+	margin-left: 82px;
+}
+.content {
+	padding: 20px;
+	width: 465px;
+	float: left;
+	display: inline;
+	margin-right: 30px;
+	margin-left: 0px;
+}
+.content p {
+	background: rgba(0, 0, 0, 0.2);
+	width: 121px;
+	float: left;
+	display: inline;
+	margin-right: 30px;
+	margin-left: 0px;
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#33000000', endColorStr='#33000000');
+	-ms-filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#33000000', endColorStr='#33000000');
+}
+.content p:last-child {
+	margin-right: 0;
+}
+.aside {
+	margin-right: 0;
+	width: 217px;
+	float: left;
+	display: inline;
+	margin-left: 0px;
+}
+.footer {
+	float: left;
+	width: 100%;
+}
+.footer p {
+	width: 167px;
+	float: left;
+	display: inline;
+	margin-right: 30px;
+	margin-left: 0px;
+}
+.footer p:last-child {
+	margin-right: 0;
+}
+.bounce {
+	animation: 1s ease;
+	-moz-animation: 1s ease;
+	-webkit-animation: 1s ease;
+	-o-animation: 1s ease;
+	-ms-animation: 1s ease;
+	animation-name: bounce;
+	-moz-animation-name: bounce;
+	-webkit-animation-name: bounce;
+	-o-animation-name: bounce;
+	-ms-animation-name: bounce;
+}
+";
