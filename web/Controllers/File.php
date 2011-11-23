@@ -13,9 +13,8 @@ class File extends Controller {
 		$this->Output->setCache(60);
 
 		$file = $this->getFile();
-		$cache_file = str_replace('/', '-', $file);
 
-		if ($this->Cache->File->exists($cache_file)) {
+		if ($this->Cache->File->exists($file)) {
 			return $this->Output->setContent($this->Cache->File->get($cache_file));
 		}
 
@@ -32,7 +31,7 @@ class File extends Controller {
 
 		$css = $Stylecow->toString();
 
-		$this->Cache->File->set($cache_file, $css);
+		$this->Cache->File->set($file, $css);
 
 		$this->Output->setContent($css);
 	}

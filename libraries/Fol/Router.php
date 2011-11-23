@@ -3,6 +3,9 @@ namespace Fol;
 
 class Router {
 	public $Controller;
+	public $controller;
+	public $method;
+	public $params;
 	public $domain;
 	public $subdomains = array();
 	public $path;
@@ -43,7 +46,9 @@ class Router {
 
 			$config = $Config->get('scenes');
 
-			define('SCENE_PATH', $config[$this->scene]['path']);
+			define('SCENE_PATH', BASE_PATH.$config[$this->scene]['folder'].'/');
+			define('SCENE_HTTP', BASE_HTTP.(($config[$this->scene]['detection'] === 'subfolder') ? $this->scene.'/' : ''));
+			define('SCENE_REAL_HTTP', BASE_HTTP.$config[$this->scene]['folder'].'/');
 		}
 	}
 
@@ -97,6 +102,9 @@ class Router {
 		try {
 			if ($class) {
 				$this->Controller = new $class;
+				$this->controller = $class;
+				$this->method = $method;
+				$this->parameters = $parameters;
 				$result = call_user_func_array(array($this->Controller, $method), $parameters);
 			} else {
 				$this->Controller = null;
@@ -120,7 +128,7 @@ class Router {
 	private function getController ($path) {
 		global $Config;
 
-		$config = $Config->get('routes');
+		$config = $Config->get('controller');
 
 		//Get controller by routings
 		if ($config['routing']) {

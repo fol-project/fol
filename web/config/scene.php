@@ -1,4 +1,10 @@
 <?php
+
+/*
+ * Languages availables in the scene
+ * You can define various languages without activate them
+ * If default is empty, the browser accepted language will be used
+ */
 $config['languages'] = array(
 	'detection' => 'subfolder',
 	'default' => '',
@@ -6,13 +12,5 @@ $config['languages'] = array(
 		'gl' => true,
 		'es' => false
 	)
-);
-
-$config['autoload'] = array(
-	'Actions' => 'Fol\\Actions',
-	'Cache' => 'Fol\\Cache',
-	'Models' => 'Fol\\Models',
-	'Session' => 'Fol\\Session',
-	'Templates' => 'Fol\\Templates',
 );
 ?>

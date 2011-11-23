@@ -144,7 +144,7 @@ class Templates {
 	 */
 	private function includeFile ($file, $data = array()) {
 		if ($data) {
-			extract($data, EXTR_SKIP);
+			extract((array)$data, EXTR_SKIP);
 		}
 
 		ob_start();

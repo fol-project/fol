@@ -8,8 +8,8 @@ function __autoload ($class_name) {
 	$file = array_pop($path);
 	$file = implode('/', $path).'/'.$file.'.php';
 
-	if (is_file(BASE_PATH.'library/'.$file)) {
-		include_once(BASE_PATH.'library/'.$file);
+	if (is_file(BASE_PATH.'libraries/'.$file)) {
+		include_once(BASE_PATH.'libraries/'.$file);
 	} else if (is_file(SCENE_PATH.$file)) {
 		include_once(SCENE_PATH.$file);
 	}
@@ -88,6 +88,76 @@ function exception ($message = '', $code = 500) {
 	throw new \Fol\Exception($message, $code);
 
 	return false;
+}
+
+
+
+/**
+ * function path (string $path)
+ *
+ * Returns an absolute path
+ * Returns string
+ */
+function path ($path) {
+	if ($path[0] === '/') {
+		return BASE_PATH.substr($path, 1);
+	}
+
+	return SCENE_PATH.$path;
+}
+
+
+
+/**
+ * function url (string $url)
+ *
+ * Returns an absolute url
+ * Returns string
+ */
+function url ($path) {
+	if ($path[0] === '/') {
+		return BASE_HTTP.substr($path, 1);
+	}
+
+	return BASE_HTTP.$path;
+}
+
+
+
+/*
+ * function arrayMergeReplaceRecursive (array $array1, array $array2, [array $array3, ...])
+ *
+ * Merge two arrays recursively replacing the repeated values
+ * Returns array
+ */
+function arrayMergeReplaceRecursive () {
+	$params = func_get_args();
+
+	$return = array_shift($params);
+
+	foreach ($params as $array) {
+		if (!is_array($array)) {
+			continue;
+		}
+
+		foreach ($array as $key => $value) {
+			if (is_numeric($key) && (!in_array($value, $return))) {
+				if (is_array($value)) {
+					$return[] = arrayMergeReplaceRecursive($return[$$key], $value);
+				} else {
+					$return[] = $value;
+				}
+			} else {
+				if (isset($return[$key]) && is_array($value) && is_array($return[$key])) {
+					$return[$key] = arrayMergeReplaceRecursive($return[$key], $value);
+				} else {
+					$return[$key] = $value;
+				}
+			}
+		}
+	}
+
+	return $return;
 }
 
 

@@ -4,16 +4,18 @@ namespace Fol\Cache;
 class File {
 
 	/**
-	 * public function set ($name, [$value])
+	 * public function set ($name, [$value], [int $expire])
 	 *
 	 * Saves a variable in a file
 	 * Returns boolean
 	 */
-	public function set ($name, $value) {
-		$filename = SCENE_PATH.'cache/'.$name;
+	public function set ($name, $value, $expire = 3600) {
+		$filename = SCENE_PATH.'cache/'.md5($name);
 
 		if (!is_file($filename) || is_writable($filename)) {
 			file_put_contents($filename, serialize($value));
+
+			touch($filename, time() + $expire);
 
 			return true;
 		}
@@ -24,15 +26,15 @@ class File {
 
 
 	/**
-	 * public function get ($name, [$expire])
+	 * public function get ($name)
 	 *
 	 * Returns a variable saved in a file
 	 * Returns mixed
 	 */
-	public function get ($name, $expire = null) {
-		$filename = SCENE_PATH.'cache/'.$name;
+	public function get ($name) {
+		$filename = SCENE_PATH.'cache/'.md5($name);
 
-		if (!is_file($filename) || (!is_null($expire) && (filemtime($filename) + $expire) < time())) {
+		if (!is_file($filename) || (filemtime($filename) < time())) {
 			return null;
 		}
 
@@ -42,16 +44,16 @@ class File {
 
 
 	/**
-	 * public function exists ($name, [$expire])
+	 * public function exists ($name)
 	 *
 	 * Returns if exists a file
 	 * Returns boolean
 	 */
-	public function exists ($name, $expire = null) {
-		$filename = SCENE_PATH.'cache/'.$name;
+	public function exists ($name) {
+		$filename = SCENE_PATH.'cache/'.md5($name);
 
-		if (!is_file($filename) || (!is_null($expire) && (filemtime($filename) + $expire) < time())) {
-			return false;
+		if (!is_file($filename) || (filemtime($filename) < time())) {
+			return null;
 		}
 
 		return true;

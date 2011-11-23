@@ -18,10 +18,10 @@ class Controller {
 				return $this->$name = $$name;
 
 			default:
-				$scene = $this->Config->get('scene');
+				$autoload = $this->Config->get('controller', 'autoload');
 
-				if ($scene['autoload'][$name]) {
-					return $this->$name = new $scene['autoload'][$name];
+				if ($autoload[$name]) {
+					return $this->$name = new $autoload[$name];
 				}
 		}
 	}
