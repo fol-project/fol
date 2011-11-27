@@ -9,14 +9,7 @@ class File extends Controller {
 	}
 
 	public function css () {
-		$this->Output->setContentType('css');
-		$this->Output->setCache(60);
-
 		$file = $this->getFile();
-
-		if ($this->Cache->File->exists($file)) {
-			return $this->Output->setContent($this->Cache->File->get($cache_file));
-		}
 
 		$Stylecow = new \Stylecow\Stylecow;
 
@@ -27,17 +20,27 @@ class File extends Controller {
 			'Grid',
 			'Matches',
 			'Nested_rules',
-		));
+		))->toString();
 
-		$css = $Stylecow->toString();
+		$this->Output->setContentType('css');
+		$this->Output->setCache(60);
+		$this->Output->setContent($Stylecow->toString());
 
-		$this->Cache->File->set($file, $css);
-
-		$this->Output->setContent($css);
+		$this->Cache->setPage($this->Output, 3600*24);
 	}
 
-	public function js ($text) {
-		echo "<p>500: $text</p>";
+	public function img () {
+		$file = $this->getFile();
+
+		$Image = new \Image\Gd;
+
+		$Image->load(SCENE_PATH.$file)->transform($this->Input->get('transform'));
+
+		$this->Output->setContentType($Image->getMimeType());
+		$this->Output->setCache(60);
+		$this->Output->setContent($Image->toString());
+
+		$this->Cache->setPage($this->Output, 3600*24);
 	}
 }
 ?>

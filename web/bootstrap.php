@@ -1,11 +1,16 @@
 <?php
 use Fol\Input;
 use Fol\Output;
+use Fol\Cache;
 
-$Input = new Input();
-$Output = new Output();
+$Cache = new Cache();
 
-$Router->go();
+if (!$Cache->getPage($Output)) {
+	$Input = new Input();
+	$Output = new Output();
+
+	$Router->go();
+}
 
 $Output->show();
 ?>

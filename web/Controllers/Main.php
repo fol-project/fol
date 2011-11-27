@@ -3,7 +3,7 @@ namespace Controllers;
 
 class Main extends Base {
 	public function index () {
-		echo 'index';
+		$this->Output->setContent('index');
 		return;
 		$database = $this->Config->get('database');
 
