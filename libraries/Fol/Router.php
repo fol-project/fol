@@ -2,83 +2,24 @@
 namespace Fol;
 
 class Router {
-	public $Controller;
-	public $controller;
-	public $method;
-	public $params;
-	public $domain;
-	public $subdomains = array();
-	public $path;
-	public $scene;
-
-
 
 	/**
-	 * public function __construct (void)
+	 * static function getExceptionController (string $name_app, Fol\Exception $Exception, [array $config])
 	 *
-	 * Detects request info
-	 * Returns none
+	 * Check the route and returns the controller for a exception
+	 * Returns array/false
 	 */
-	public function __construct () {
+	static function getExceptionController ($name_app, Exception $Exception, array $config = array()) {
+		if (($controller = $config['exceptions'][$Exception->getCode()]) || ($controller = $config['exceptions'][0])) {
+			$namespace = 'Apps\\'.camelCase($name_app, true).'\\Controllers\\';
 
-		//Domain and subdomains
-		$server = array_reverse(explode('.', getenv('SERVER_NAME')));
+			list($class, $method) = explode(':', $controller, 2);
 
-		if ($server[0] === 'localhost') {
-			$this->domain = array_shift($server);
-			$this->subdomains = $server;
-		} else if ($domain[1] === 'co' && strlen($domain[0]) === 2) {
-			$this->domain = $server[2].'.'.$server[1].'.'.$server[0];
-			$this->subdomains = array_slice($server, 3);
-		} else {
-			$this->domain = $server[1].'.'.$server[0];
-			$this->subdomains = array_slice($server, 2);
-		}
+			$class = $namespace.camelCase($class, true);
 
-		//Path
-		$path = preg_replace('|^'.preg_quote(BASE_HTTP).'|', '', getenv('REQUEST_URI'));
-		$path = str_replace('$', '', parse_url($path, PHP_URL_PATH));
-		$this->path = explodeTrim('/', urldecode($path));
-
-		//Detect scene
-		if (($this->scene = $this->detectScene())) {
-			global $Config;
-
-			$config = $Config->get('scenes');
-
-			define('SCENE_PATH', BASE_PATH.$config[$this->scene]['folder'].'/');
-			define('SCENE_HTTP', BASE_HTTP.(($config[$this->scene]['detection'] === 'subfolder') ? $this->scene.'/' : ''));
-			define('SCENE_REAL_HTTP', BASE_HTTP.$config[$this->scene]['folder'].'/');
-		}
-	}
-
-
-
-	/**
-	 * private function detectScene (void)
-	 *
-	 * Detects the current scene
-	 * Returns string/false
-	 */
-	private function detectScene () {
-		global $Config;
-
-		$config = $Config->get('scenes');
-
-		//Detect subdomain
-		if ($this->subdomains && $config[strtolower($this->subdomains[0])]['detection'] === 'subdomain') {
-			return strtolower(array_shift($this->subdomains));
-		}
-
-		//Detect subfolder
-		if ($this->path && $config[strtolower($this->path[0])]['detection'] === 'subfolder') {
-			return strtolower(array_shift($this->path));
-		}
-
-		//Get first scene by default
-		if ($config) {
-			reset($config);
-			return key($config);
+			if (class_exists($class)) {
+				return self::checkController($class, $method, array($Exception));
+			}
 		}
 
 		return false;
@@ -87,91 +28,26 @@ class Router {
 
 
 	/**
-	 * public function go ([string $path])
-	 *
-	 * Check the route and execute the controller. Returns the value returned by the controller
-	 * Returns mixed
-	 */
-	public function go ($path = null) {
-		if ($path) {
-			$this->path = explodeTrim('/', $path);
-		}
-
-		list($class, $method, $parameters) = $this->getController($this->path);
-
-		try {
-			if ($class) {
-				$this->Controller = new $class;
-				$this->controller = $class;
-				$this->method = $method;
-				$this->parameters = $parameters;
-				$result = call_user_func_array(array($this->Controller, $method), $parameters);
-			} else {
-				$this->Controller = null;
-				exception('Controller not found', 404);
-			}
-		} catch (\Fol\Exception $e) {
-			$e->runController();
-		}
-
-		return $result;
-	}
-
-
-
-	/**
-	 * private function getController (array $path)
+	 * static function getController (string $name_app, Fol\Request $Request, [array $config])
 	 *
 	 * Check the route and returns the controller
 	 * Returns array/false
 	 */
-	private function getController ($path) {
-		global $Config;
+	static function getController ($name_app, Request $Request, array $config = array()) {
+		$namespace = 'Apps\\'.camelCase($name_app, true).'\\Controllers\\';
+		$url = $Request->getUrl();
 
-		$config = $Config->get('controller');
-
-		//Get controller by routings
 		if ($config['routing']) {
-			$path_route = '/'.implode('/', $path);
+			foreach ($config['routing'] as $route => $settings) {
+				$settings = is_string($settings) ? array('controller' => $settings) : (array)$settings;
 
-			foreach ($config['routing'] as $route => $route_config) {
-				if (is_string($route_config)) {
-					$route_config = array('controller' => $route_config);
-				}
+				if ($match = self::match($url, $route, $settings)) {
+					list($class, $method) = explode(':', $match['settings']['controller'], 2);
 
-				if ($route = $this->matchRoute($path_route, $route, $route_config['defaults'])) {
-					list($Class, $Method) = explodeTrim(':', $route_config['controller']);
+					$class = $namespace.camelCase($class, true);
 
-					$Class = 'Controllers\\'.camelCase($Class, true);
-
-					if ($Method && class_exists($Class)) {
-						$Class = new \ReflectionClass($Class);
-
-						if ($Class->isInstantiable() && $Class->hasMethod($Method)) {
-							$Method = $Class->getMethod($Method);
-
-							if ($Method->isPublic() && !$Method->isStatic()) {
-								$params = array();
-
-								foreach ($Method->getParameters() as $Parameter) {
-									$name = $Parameter->getName();
-
-									if ($route['parameters'][$name]) {
-										$params[] = $route['parameters'][$name];
-									} else if (isset($route_config['defaults'][$name])) {
-										$params[] = $route_config['defaults'][$name];
-									} else if ($Parameter->isOptional()) {
-										$params[] = $Parameter->getDefaultValue();
-									} else {
-										return false;
-									}
-								}
-
-								$this->path = $path;
-
-								return array($Class->getName(), $Method->getName(), $params);
-							}
-						}
+					if (class_exists($class)) {
+						return self::checkController($class, $method, $match['parameters']);
 					}
 
 					return false;
@@ -179,51 +55,29 @@ class Router {
 			}
 		}
 
-		//Get controller by path
-		if ($path) {
-			$Class = 'Controllers\\'.camelCase($path[0], true);
+		$url = explodeTrim('/', $url);
 
-			if (class_exists($Class)) {
-				array_shift($path);
-		
-				$Class = new \ReflectionClass($Class);
-				$Method = $path ? camelCase(array_shift($path)) : 'index';
-			} else {
-				$Class = new \ReflectionClass('Controllers\\'.$config['default']);
-				$Method = camelCase(array_shift($path));
-			}
-		} else {
-			$Class = 'Controllers\\'.$config['default'];
+		if ($url) {
+			$class = $namespace.camelCase($url[0], true);
 
-			if (class_exists($Class)) {
-				$Class = new \ReflectionClass($Class);
-				$Method = 'index';
-			} else {
-				return false;
+			if (class_exists($class)) {
+				array_shift($url);
+				$method = $url ? camelCase(array_shift($url)) : 'index';
+
+				return self::checkController($class, $method, $url);
 			}
+
+			if (class_exists($namespace.$config['default'])) {
+				$method = camelCase(array_shift($url));
+
+				return self::checkController($namespace.$config['default'], $method, $url);
+			}
+
+			return false;
 		}
 
-		if ($Class->isInstantiable() && $Class->hasMethod($Method)) {
-			$Method = $Class->getMethod($Method);
-
-			if ($Method->isPublic() && !$Method->isStatic() && ($Method->getNumberOfRequiredParameters() <= count($path))) {
-				$params = array();
-				$this->path = $path;
-
-				foreach ($Method->getParameters() as $Parameter) {
-					$name = $Parameter->getName();
-
-					if ($path) {
-						$params[] = array_shift($path);
-					} else if ($Parameter->isOptional()) {
-						$params[] = $Parameter->getDefaultValue();
-					} else {
-						return false;
-					}
-				}
-
-				return array($Class->getName(), $Method->getName(), $params);
-			}
+		if (class_exists($namespace.$config['default'])) {
+			return self::checkController($namespace.$config['default'], 'index');
 		}
 
 		return false;
@@ -232,46 +86,112 @@ class Router {
 
 
 	/**
-	 * private function matchRoute (string $original, string $route, array $defaults)
+	 * static function match (string $url, string $route, array $settings)
 	 *
-	 * Check the route using a regular expression
-	 * Returns array/false
+	 * Returns boolean
 	 */
-	private function matchRoute ($original, $route, $defaults) {
+	static private function match ($url, $route, $settings) {
 		if (strpos($route, '(') === false) {
-			if (preg_match('|^'.$route.'$|', $original, $matches)) {
+			if (preg_match('|^'.preg_quote($route, '|').'$|', $url, $matches)) {
 				return array(
-					'regexp' => $route,
-					'route' => $matches[0],
-					'parameters' => array()
+					'routing' => $matches[0],
+					'parameters' => (array)$settings['defaults'],
+					'settings' => $settings
 				);
 			}
 
 			return false;
 		}
 
-		if ($defaults) {
-			$route = preg_replace('#(\('.implode('|', array_keys($defaults)).'(\s+[^\)]+)?\)[^?])#', '\\1?', $route);
+		if ($settings['defaults']) {
+			$route = preg_replace('#(\('.implode('|', array_keys($settings['defaults'])).'(\s+[^\)]+)?\)[^?])#', '\\1?', $route);
 		}
 
-		$route = preg_replace_callback('#/\((\w+)(\s+[^\)]+)?\)\??#', function ($matches) {
-			if (!$matches[2]) {
-				$matches[2] = '[^/]+';
-			}
+		$route = preg_replace_callback('#/\((\w+)(\s+[^\)]+)?\)\??#', array($this, 'matchCallback'), $route);
 
-			if (substr($matches[0], -1) === '?') {
-				return '/?(?P<'.$matches[1].'>'.trim($matches[2]).')?';
-			}
-
-			return '/(?P<'.$matches[1].'>'.trim($matches[2]).')';
-		}, $route);
-
-		if (preg_match('|^'.$route.'$|', $original, $matches)) {
-			return array(
-				'regexp' => $route,
-				'route' => array_shift($matches),
-				'parameters' => $matches
+		if (preg_match('|^'.$route.'$|', $url, $matches)) {
+			$return = array(
+				'routing' => array_shift($matches),
+				'parameters' => (array)$settings['defaults'],
+				'settings' => $settings
 			);
+
+			foreach ($matches as $name => $value) {
+				if (is_string($name)) {
+					$return['parameters'][$name] = $value;
+					next($matches);
+				}
+			}
+
+			return $return;
+		}
+
+		return false;
+	}
+
+
+
+	/**
+	 * static function matchCallback (array $matches)
+	 *
+	 * Returns string
+	 */
+	static private function matchCallback ($matches) {
+		if (!$matches[2]) {
+			$matches[2] = '[^/]+';
+		}
+
+		if (substr($matches[0], -1) === '?') {
+			return '/?(?P<'.$matches[1].'>'.trim($matches[2]).')?';
+		}
+
+		return '/(?P<'.$matches[1].'>'.trim($matches[2]).')';
+	}
+
+
+
+	/**
+	 * static function checkController (string $class, string $method, [array $parameters])
+	 *
+	 * Returns boolean
+	 */
+	static private function checkController ($class, $method, array $parameters = array()) {
+		$Class = new \ReflectionClass($class);
+
+		if ($Class->isInstantiable() && $Class->hasMethod($method)) {
+			$Method = $Class->getMethod($method);
+
+			if ($Method->isPublic() && !$Method->isStatic()) {
+				$all_params = $params = array();
+
+				//knatsort of parameters
+				if ($parameters) {
+					$tmp_parameters = $parameters;
+					$keys = array_keys($parameters);
+					$parameters = array();
+
+					natsort($keys);
+					foreach ($keys as $key) {
+						$parameters[$key] = $tmp_parameters[$key];
+					}
+				}
+
+				foreach ($Method->getParameters() as $Parameter) {
+					$name = $Parameter->getName();
+
+					if ($parameters[$names]) {
+						$all_params[$name] = $params[$name] = $parameters[$name];
+					} else if ($parameters[0]) {
+						$all_params[$name] = $params[$name] = array_shift($parameters);
+					} else if ($Parameter->isOptional()) {
+						$all_params[$name] = $Parameter->getDefaultValue();
+					} else {
+						return false;
+					}
+				}
+
+				return array($Class->getName(), $Method->getName(), $all_params, array_merge($parameters, $params));
+			}
 		}
 
 		return false;

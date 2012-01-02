@@ -1,5 +1,5 @@
 <?php
-//Original code from phpCan Image class (http://idc.anavallasuiza.com/)
+//Original code from phpCan Gd class (http://idc.anavallasuiza.com/)
 
 namespace Image;
 

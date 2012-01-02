@@ -1,9 +1,67 @@
 <?php
 namespace Fol;
 
-class Config {
-	public $item = array();
-	private $paths = array();
+use Fol\Containers\Container;
+
+class Config extends Container {
+	private $basedir;
+
+
+
+	/**
+	 * public function __construct ([string $basedir])
+	 *
+	 * Returns none
+	 */
+	public function __construct ($basedir = null) {
+		$this->setBaseDir($basedir ? $basedir : BASE_PATH.BASE_DIR);
+	}
+
+
+
+	/**
+	 * public function setBaseDir (string $basedir)
+	 *
+	 * Returns none
+	 */
+	public function setBaseDir ($basedir) {
+		$this->basedir = $basedir;
+	}
+
+
+
+	/**
+	 * public function getBaseDir ()
+	 *
+	 * Returns string
+	 */
+	public function getBaseDir () {
+		return $this->basedir;
+	}
+
+
+
+	/**
+	 * public function setEnvironment (string $environment)
+	 *
+	 * Sets the environment subdirectory
+	 * Returns none
+	 */
+	public function setEnvironment ($environment) {
+		$this->environment = $environment;
+	}
+
+
+
+	/**
+	 * public function getEnvironment ()
+	 *
+	 * Gets the environment subdirectory
+	 * Returns string
+	 */
+	public function getEnvironment () {
+		return $this->environment;
+	}
 
 
 
@@ -13,15 +71,18 @@ class Config {
 	 * Returns mixed
 	 */
 	public function load ($name) {
+		if (!$this->basedir) {
+			return;
+		}
+
 		$file = $name.'.php';
-		$basedir = SCENE_PATH.'config/';
 
 		$config = array();
 
-		if (file_exists($basedir.ENVIRONMENT.'/'.$file)) {
-			include ($basedir.ENVIRONMENT.'/'.$file);
-		} else if (file_exists($basedir.$file)) {
-			include ($basedir.$file);
+		if ($this->environment && file_exists($this->basedir.$this->environment.'/'.$file)) {
+			include ($this->basedir.$this->environment.'/'.$file);
+		} else if (file_exists($this->basedir.$file)) {
+			include ($this->basedir.$file);
 		}
 
 		$this->set($name, $config, $context);
@@ -32,56 +93,34 @@ class Config {
 
 
 	/**
-	 * public function get (string $name, [string $key])
+	 * public function get ([string $name], [string $key])
 	 *
 	 * Returns mixed
 	 */
-	public function get ($name, $key = null) {
-		if (!isset($this->item[$name])) {
+	public function get ($name = null, $key = null) {
+		if (func_num_args() === 0) {
+			return $this->items;
+		}
+
+		if (!isset($this->items[$name])) {
 			$this->load($name);
 		}
 
-		return $key ? $this->item[$name][$key] : $this->item[$name];
+		return $key ? $this->items[$name][$key] : $this->items[$name];
 	}
 
 
 
 	/**
-	 * public function set (string $name, mixed $value)
+	 * public function remove (string $name, [string $key])
 	 *
 	 * Returns none
 	 */
-	public function set ($name, $value) {
-		$this->item[$name] = $value;
-	}
-
-
-
-	/**
-	 * public function delete (string $name, [string $key])
-	 *
-	 * Returns none
-	 */
-	public function delete ($name, $key = null) {
+	public function remove ($name, $key = null) {
 		if ($key) {
-			unset($this->item[$name][$key]);
+			unset($this->items[$name][$key]);
 		} else {
-			unset($this->item[$name]);
-		}
-	}
-
-
-
-	/**
-	 * public function add (string $name, mixed $value)
-	 *
-	 * Returns none
-	 */
-	public function add ($name, $value) {
-		if (is_array($value)) {
-			$this->item[$name] = arrayMergeReplaceRecursive((array)$this->item[$name], $value);
-		} else {
-			$this->item[$name] = $value;
+			unset($this->items[$name]);
 		}
 	}
 }

@@ -1,26 +1,21 @@
 <?php
-define('FOL_VERSION', '0.1a');
+use Fol\Loader;
+use Fol\App;
 
+define('FOL_VERSION', '0.1a');
 define('BASE_PATH', __DIR__.'/');
 define('BASE_HTTP', preg_replace('|/+|', '/', '/'.preg_replace('|^'.realpath(getenv('DOCUMENT_ROOT')).'|i', '', BASE_PATH)));
-define('ENVIRONMENT', 'default');
 
 include(BASE_PATH.'libraries/functions.php');
+include(BASE_PATH.'libraries/Fol/Loader.php');
 
-use Fol\Config;
-use Fol\Router;
+$Loader = new Loader;
+$Loader->registerNamespace('Apps', BASE_PATH.'apps/');
 
-$Config = new Config();
+$App = App::create('Web');
+$App->setEnvironment('default');
 
-//Scenes config
-$Config->set('scenes', array(
-	'main' => array(
-		'folder' => 'web',
-		'detection' => 'subfolder'
-	)
-));
+$Response = $App->execute();
 
-$Router = new Router();
-
-include(SCENE_PATH.'bootstrap.php');
+$Response->send();
 ?>

@@ -1,25 +1,6 @@
 <?php
 
 /**
- * function __autoload ($class_name)
- */
-function __autoload ($class_name) {
-	$path = explode('\\', $class_name);
-	$file = array_pop($path);
-	$file = implode('/', $path).'/'.$file.'.php';
-
-	if (is_file(BASE_PATH.'libraries/'.$file)) {
-		include_once(BASE_PATH.'libraries/'.$file);
-	} else if (is_file(SCENE_PATH.$file)) {
-		include_once(SCENE_PATH.$file);
-	}
-}
-
-spl_autoload_register('__autoload');
-
-
-
-/**
  * function camelCase (string $string, [boolean $upper_first])
  *
  * Transform a string "my-string" to camelCase: "myString"
@@ -92,38 +73,6 @@ function exception ($message = '', $code = 500) {
 
 
 
-/**
- * function path (string $path)
- *
- * Returns an absolute path
- * Returns string
- */
-function path ($path) {
-	if ($path[0] === '/') {
-		return BASE_PATH.substr($path, 1);
-	}
-
-	return SCENE_PATH.$path;
-}
-
-
-
-/**
- * function url (string $url)
- *
- * Returns an absolute url
- * Returns string
- */
-function url ($path) {
-	if ($path[0] === '/') {
-		return BASE_HTTP.substr($path, 1);
-	}
-
-	return BASE_HTTP.$path;
-}
-
-
-
 /*
  * function arrayMergeReplaceRecursive (array $array1, array $array2, [array $array3, ...])
  *
@@ -170,6 +119,18 @@ function arrayMergeReplaceRecursive () {
  */
 function pre ($pre) {
 	echo '<pre>';
-	print_r($pre);
+	
+	echo '<strong>'.gettype($pre)."</strong>\n";
+
+	echo '<em>';
+	debug_print_backtrace();
+	echo '</em>'."\n";
+
+	if (is_bool($pre)) {
+		echo $pre ? 'TRUE' : 'FALSE';
+	} else {
+		print_r($pre);
+	}
+
 	echo '</pre>';
 }

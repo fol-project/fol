@@ -2,28 +2,18 @@
 namespace Fol;
 
 class Controller {
+	protected $App;
+	protected $Request;
+
 
 	/**
-	 * public function __get ($name)
+	 * public function __construct ($App, Fol\Request $Request)
 	 *
-	 * Returns mixed
+	 * Returns none
 	 */
-	public function __get ($name) {
-		switch ($name) {
-			case 'Config':
-			case 'Input':
-			case 'Output':
-			case 'Router':
-				global $$name;
-				return $this->$name = $$name;
-
-			default:
-				$autoload = $this->Config->get('controller', 'autoload');
-
-				if ($autoload[$name]) {
-					return $this->$name = new $autoload[$name];
-				}
-		}
+	public function __construct ($App, Request $Request) {
+		$this->App = $App;
+		$this->Request = $Request;
 	}
 }
 ?>

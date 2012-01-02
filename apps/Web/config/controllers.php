@@ -1,21 +1,8 @@
 <?php
 
 /*
- * Classes which will be autoloaded using $this->class_name
- * For example: $this->Actions
- */
-$config['autoload'] = array(
-	'Actions' => 'Fol\\Actions',
-	'Cache' => 'Fol\\Cache',
-	'Models' => 'Fol\\Models',
-	'Session' => 'Fol\\Session',
-	'Templates' => 'Fol\\Templates',
-);
-
-
-/*
  * Default controller if it is not specified
- * For example in "/"
+ * For example in the index
  */
 $config['default'] = 'Main';
 
@@ -23,8 +10,10 @@ $config['default'] = 'Main';
 /*
  * Controller to execute for each excepcion code
  * For example the exception 404 executes the controller Exception:notFound
+ * 0 for all non specified exception controllers
  */
 $config['exceptions'] = array(
+	0 => 'Exception:others',
 	404 => 'Exception:notFound',
 	500 => 'Exception:serverError'
 );

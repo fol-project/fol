@@ -1,6 +1,6 @@
 FOL is a light and fast php framework developed by Oscar Otero (http://oscarotero.com).
 
 - Written in PHP 5.3
-- MVC pattern
+- HMVC pattern
 - Easy to learn and use
-- Very flexible
+- Very flexible and extensible
