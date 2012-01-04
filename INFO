@@ -1,0 +1,21 @@
+Que é FOL?
+
+FOL son as iniciais de... bueno, eso mellor déixoo á túa imaxinación. Trátase dun "framework" escrito en PHP por min (Oscar Otero) como exercicio de deseño e como ferramenta para desenvolver experimentos e proxectos persoais. A intención non é facer un framework desos que o teñen todo senón construír unha estructura moi flexible e extensible que permita xuntar outras librerías externas para facer algo novo. Tampouco é o que se chama un "microframework" xa que ten máis de 2 ou 3 arquivos. Sería máis ben un "miniframework", aínda que só en tamaño inicial, xa que se hai algo feito en PHP por aí, malo será que non llo poidas engadir e chegar a facer proxectos grandes.
+
+
+Existen 5 factores que considerei indispensables á hora de crealo:
+
+1. Debe ser extremadamente rápido e lixeiro. Por iso á hora de facer un "Hello world" emprega non máis de 1.3 Mb. Neste artigo (http://www.laurencegellert.com/2011/06/memory-usage-in-php-frameworks/) comentan a memoria empregada por varios frameworks para poder comparar.
+
+2. Debe estar orientado a obxectos e explotar as vantaxes que ofrecen as últimas versións de PHP (é moito máis divertido que traballar con versións antigas). Por iso precisa dun entorno con PHP 5.3 ou superior.
+
+3. Debe ser flexible e moi DRY (Don't repeat youself). Emprega o patrón de MVC permitindo facer HMVC (ou sexa, poder executar sub-controladores dentro dun controlador), permitindo facer proxectos escalables e que extendan a outros proxectos.
+
+4. Debe ser moi fácil de aprender. A lóxica é moi sinxela, evitando facer cousas "máxicas" para que todo sexa entendible. Non existen moitas normas.
+
+5. Debe levarse ben con librarías externas e poder cambiar ou extender en calquera momento as librarías que se usen. Por iso a primeira clase que se emprega é Loader, que autocarga as demáis clases que se precisen, só no momento en que se precisan, e que permite configurar onde cargar cada cousa.
+
+
+Cal é a situación actual?
+
+Por agora aínda está en fase beta. Falta por probar cousas e crear outras novas. Paciencia.
