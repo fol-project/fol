@@ -100,7 +100,7 @@ class Request {
 	 */
 	public function setUrl ($url) {
 		$this->url = $url;
-		$this->Path->removeAll();
+		$this->Path->clear();
 	}
 
 

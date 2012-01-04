@@ -7,35 +7,31 @@ class App {
 	public $http;
 	public $real_http;
 
-	public $Request;
+	public $Parent;
 	public $Classes;
 
 
 
 	/**
-	 * static function create (string $name, [Fol\Request $Request])
+	 * static function create (string $name, [Object $Parent])
 	 *
 	 * Returns object
 	 */
-	static function create ($name, Request $Request = null) {
+	static function create ($name, $Parent = null) {
 		$app = 'Apps\\'.camelCase($name, true).'\\App';
 
-		if (is_null($Request)) {
-			$Request = Request::createFromGlobals();
-		}
-
-		return new $app($Request);
+		return new $app($Parent);
 	}
 
 
 
 	/**
-	 * public function __construct (Fol\Request $Request)
+	 * public function __construct ([Object $Parent])
 	 *
 	 * Returns none
 	 */
-	public function __construct (Request $Request) {
-		$this->Request = $Request;
+	public function __construct ($Parent = null) {
+		$this->Parent = $Parent;
 
 		$Class = new \ReflectionClass($this);
 
@@ -87,18 +83,14 @@ class App {
 
 
 	/**
-	 * public function execute ()
+	 * public function execute ([fol\Request $Request])
 	 *
 	 * Executes the controller of the application
 	 * Returns none
 	 */
-	public function execute ($Request = null) {
+	public function execute (Request $Request = null) {
 		if (is_null($Request)) {
-			$Request = $this->Request;
-		} else if (is_string($Request)) {
-			$url = $Request;
-			$Request = clone $this->Request;
-			$Request->setUrl($url);
+			$Request = Request::createFromGlobals();
 		}
 
 		$config = $this->Config->get('controllers');
