@@ -2,8 +2,11 @@
 namespace Fol;
 
 class Loader {
-	private $namespaces = array();
+	public $default_base_path;
+
 	private $classes = array();
+	private $namespaces = array();
+	private $namespaces_paths = array();
 
 
 
@@ -13,7 +16,24 @@ class Loader {
 	 * Returns none
 	 */
 	public function __construct () {
+		$this->default_base_path = BASE_PATH.'libraries/';
+		$this->register();
+	}
+
+
+	/**
+	 * Installs this class loader on the SPL autoload stack.
+	 */
+	public function register () {
 		spl_autoload_register(array($this, 'autoload'));
+	}
+
+
+	/**
+	 * Uninstalls this class loader from the SPL autoloader stack.
+	 */
+    public function unregister () {
+		spl_autoload_unregister(array($this, 'autoload'));
 	}
 
 
@@ -25,6 +45,8 @@ class Loader {
 	 * Returns none
 	 */
 	private function autoload ($class_name) {
+		$class_name = ltrim($class_name, '\\');
+
 		if (isset($this->classes[$class_name])) {
 			$file = $this->classes[$class_name];
 
@@ -35,21 +57,26 @@ class Loader {
 			return;
 		}
 
-		$file = explode('\\', $class_name);
+		$namespace = '';
 
-		if (isset($this->namespaces[$file[0]])) {
-			$path = $this->namespaces[array_shift($file)];
-
-			$file = $path.implode('/', $file).'.php';
-
-			if (is_file($file)) {
-				include_once($file);
-			}
-
-			return;
+		if ($last_pos = strripos($class_name, '\\')) {
+			$namespace = substr($class_name, 0, $last_pos);
+			$class_name = substr($class_name, $last_pos + 1);
 		}
 
-		$file = BASE_PATH.'libraries/'.implode('/', $file).'.php';
+		$base_path = $this->default_base_path;
+
+		foreach (array_keys($this->namespaces) as $ns) {
+			if (strpos($namespace, $ns) === 0) {
+				$base_path = $this->namespaces_paths[$ns];
+				$namespace = preg_replace('#^'.$ns.'#', '', $namespace);
+
+				break;
+			}
+		}
+
+		$file = $base_path.str_replace('\\', DIRECTORY_SEPARATOR, $namespace).DIRECTORY_SEPARATOR;
+		$file .= str_replace('_', DIRECTORY_SEPARATOR, $class_name).'.php';
 
 		if (is_file($file)) {
 			include_once($file);
@@ -68,13 +95,19 @@ class Loader {
 	public function registerNamespace ($namespace, $path = null) {
 		if (is_array($namespace)) {
 			foreach ($namespace as $key => $value) {
-				$this->namespaces[$key] = $value;
+				$this->registerNamespace($key, $value);
 			}
 
 			return;
 		}
 
-		$this->namespaces[$namespace] = $path;
+		if (!isset($this->namespaces[$namespace])) {
+			$this->namespaces[$namespace] = substr_count($namespace, '\\');
+
+			arsort($this->namespaces, SORT_NUMERIC);
+		}
+
+		$this->namespaces_paths[$namespace] = $path;
 	}
 
 

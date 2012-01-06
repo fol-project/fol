@@ -60,58 +60,6 @@ function isNumericalArray ($array) {
 
 
 /**
- * function exception ([string $message], [int $code])
- *
- * Throw a exception object
- * Returns false
- */
-function exception ($message = '', $code = 500) {
-	throw new \Fol\Exception($message, $code);
-
-	return false;
-}
-
-
-
-/*
- * function arrayMergeReplaceRecursive (array $array1, array $array2, [array $array3, ...])
- *
- * Merge two arrays recursively replacing the repeated values
- * Returns array
- */
-function arrayMergeReplaceRecursive () {
-	$params = func_get_args();
-
-	$return = array_shift($params);
-
-	foreach ($params as $array) {
-		if (!is_array($array)) {
-			continue;
-		}
-
-		foreach ($array as $key => $value) {
-			if (is_numeric($key) && (!in_array($value, $return))) {
-				if (is_array($value)) {
-					$return[] = arrayMergeReplaceRecursive($return[$$key], $value);
-				} else {
-					$return[] = $value;
-				}
-			} else {
-				if (isset($return[$key]) && is_array($value) && is_array($return[$key])) {
-					$return[$key] = arrayMergeReplaceRecursive($return[$key], $value);
-				} else {
-					$return[$key] = $value;
-				}
-			}
-		}
-	}
-
-	return $return;
-}
-
-
-
-/**
  * function pre ($value)
  *
  * Throw a exception object

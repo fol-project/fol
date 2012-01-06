@@ -1,7 +1,7 @@
 <?php
-namespace Fol\Cache;
+namespace Fol;
 
-class File {
+class Cache_File {
 
 	/**
 	 * public function set ($name, [$value], [int $expire])

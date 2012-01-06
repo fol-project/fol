@@ -1,21 +1,67 @@
 Que é FOL?
 
-FOL son as iniciais de... bueno, eso mellor déixoo á túa imaxinación. Trátase dun "framework" escrito en PHP por min (Oscar Otero) como exercicio de deseño e como ferramenta para desenvolver experimentos e proxectos persoais. A intención non é facer un framework desos que o teñen todo senón construír unha estructura moi flexible e extensible que permita xuntar outras librerías externas para facer algo novo. Tampouco é o que se chama un "microframework" xa que ten máis de 2 ou 3 arquivos. Sería máis ben un "miniframework", aínda que só en tamaño inicial, xa que se hai algo feito en PHP por aí, malo será que non llo poidas engadir e chegar a facer proxectos grandes.
+FOL son as iniciais de... bueno, eso mellor déixoo á túa imaxinación.
+Trátase dun framework escrito en PHP por Oscar Otero como exercicio de deseño 
+e como ferramenta para desenvolver experimentos e proxectos persoais. A intención 
+non é facer un super framework desos que teñen de todo senón todo o contrario: construír 
+algo manexable, moi flexible e que permita xuntar librerías externas.
+
 
 
 Existen 5 factores que considerei indispensables á hora de crealo:
 
-1. Debe ser extremadamente rápido e lixeiro. Por iso á hora de facer un "Hello world" emprega non máis de 1.3 Mb. Neste artigo (http://www.laurencegellert.com/2011/06/memory-usage-in-php-frameworks/) comentan a memoria empregada por varios frameworks para poder comparar.
+1. Debe ser extremadamente rápido e lixeiro.
+   Só carga as cousas que precisa en cada momento.
 
-2. Debe estar orientado a obxectos e explotar as vantaxes que ofrecen as últimas versións de PHP (é moito máis divertido que traballar con versións antigas). Por iso precisa dun entorno con PHP 5.3 ou superior.
+2. Debe estar orientado a obxectos e explotar as vantaxes que ofrecen as últimas versións de PHP.
+   Sempre é moito mellor e máis divertido traballar con versións novas que antigas.
+   Por iso precisa dun entorno con PHP 5.3 ou superior.
 
-3. Debe ser flexible e moi DRY (Don't repeat youself). Emprega o patrón de MVC permitindo facer HMVC (ou sexa, poder executar sub-controladores dentro dun controlador), permitindo facer proxectos escalables e que extendan a outros proxectos.
+3. Debe ser flexible e moi DRY (Don't repeat youself).
+   Emprega o patrón de MVC permitindo facer HMVC (executar sub-controladores dentro dun controlador),
+   permitindo facer proxectos dende o máis básico ata escalalos a algo máis grande.
 
-4. Debe ser moi fácil de aprender. A lóxica é moi sinxela, evitando facer cousas "máxicas" para que todo sexa entendible. Non existen moitas normas.
+4. Debe ser moi fácil de aprender.
+   A lóxica ten que ser moi sinxela, evitando facer cousas demasiado "máxicas" para que todo sexa 
+   entendible, sen demasiadas normas.
 
-5. Debe levarse ben con librarías externas e poder cambiar ou extender en calquera momento as librarías que se usen. Por iso a primeira clase que se emprega é Loader, que autocarga as demáis clases que se precisen, só no momento en que se precisan, e que permite configurar onde cargar cada cousa.
+5. Debe levarse ben con librarías externas.
+   Un framework que non teña moitas librerías propias pero que se leve ben con librarías de terceiros 
+   ten moitas máis posibilidades que se fose ao contrario.
 
 
-Cal é a situación actual?
 
-Por agora aínda está en fase beta. Falta por probar cousas e crear outras novas. Paciencia.
+COMPONENTES DE FOL
+
+Todo framework que se preste debe contar coas seguintes utilidades ou componentes:
+
+* Xestión de erros.
+  FOL pode xestionar os erros de php lanzando excepcións ErrorException e HttpException (este última é 
+  unha extensión da clase Exception para manexar erros de servidor, como 404, etc)
+
+* Xestión de carga de clases.
+  FOL contén a clase Loader, que autocarga as demáis clases que se precisen, só no momento en que se 
+  precisan, permitindo configurar onde e como cargar cada cousa. Ademáis emprega por defecto o estándar 
+  PSR-0 (https://gist.github.com/1234504)
+
+* Xestión de cache
+  A clase Cache permite cachear calquera cousa. Contén dúas subclases: Apc e File, e pode ser ampliada 
+  facilmente por outros tipos de cache que se queiran empregar
+
+
+
+FILOSOFÍA E REFERENCIAS
+
+FOL é o produto de todo este tempo mirando como funcionan outros frameworks, lendo artigos sobre PHP e vendo 
+ata onde estan indo as cousas. Foi tamén produto da experiencia de traballar con outro framework chamado 
+PhpCan (http://idc.anavallasuiza.com) e poder ver os seus puntos fortes e débiles. De todos xeitos, a gran 
+referencia para este proxecto foi Symfony2 (http://symfony.com/) e a súa filosofía "Request -> Response" 
+pero cun enfoque máis sinxelo, ao estilo do MicroPHP Manifesto 
+(http://funkatron.com/posts/the-microphp-manifesto.html). Tamén me pareceu interesante Alloy 
+(http://alloyframework.org/) e Kohana (http://kohanaframework.org/) que estan totalmente enfocados ao patrón
+HMVC.
+
+
+CAL É A SITUACIÓN ACTUAL?
+
+Por agora aínda está en fase alfa (0.1a). Falta por probar cousas e crear outras novas. Paciencia.

@@ -4,13 +4,13 @@ namespace Fol;
 class Router {
 
 	/**
-	 * static function getExceptionController (string $name_app, Fol\Exception $Exception, [array $config])
+	 * static function getExceptionController (string $name_app, Object $Exception, string $controller)
 	 *
-	 * Check the route and returns the controller for a exception
+	 * Check and returns the controller for a exception
 	 * Returns array/false
 	 */
-	static function getExceptionController ($name_app, Exception $Exception, array $config = array()) {
-		if (($controller = $config['exceptions'][$Exception->getCode()]) || ($controller = $config['exceptions'][0])) {
+	static function getExceptionController ($name_app, $Exception, $controller) {
+		if ($controller) {
 			$namespace = 'Apps\\'.camelCase($name_app, true).'\\Controllers\\';
 
 			list($class, $method) = explode(':', $controller, 2);
@@ -35,13 +35,13 @@ class Router {
 	 */
 	static function getController ($name_app, Request $Request, array $config = array()) {
 		$namespace = 'Apps\\'.camelCase($name_app, true).'\\Controllers\\';
-		$url = $Request->getUrl();
+		$path = $Request->getPath();
 
 		if ($config['routing']) {
 			foreach ($config['routing'] as $route => $settings) {
 				$settings = is_string($settings) ? array('controller' => $settings) : (array)$settings;
 
-				if ($match = self::match($url, $route, $settings)) {
+				if ($match = self::match($path, $route, $settings)) {
 					list($class, $method) = explode(':', $match['settings']['controller'], 2);
 
 					$class = $namespace.camelCase($class, true);
@@ -55,22 +55,22 @@ class Router {
 			}
 		}
 
-		$url = explodeTrim('/', $url);
+		$path = explodeTrim('/', $path);
 
-		if ($url) {
-			$class = $namespace.camelCase($url[0], true);
+		if ($path) {
+			$class = $namespace.camelCase($path[0], true);
 
 			if (class_exists($class)) {
-				array_shift($url);
-				$method = $url ? camelCase(array_shift($url)) : 'index';
+				array_shift($path);
+				$method = $path ? camelCase(array_shift($path)) : 'index';
 
-				return self::checkController($class, $method, $url);
+				return self::checkController($class, $method, $path);
 			}
 
 			if (class_exists($namespace.$config['default'])) {
-				$method = camelCase(array_shift($url));
+				$method = camelCase(array_shift($path));
 
-				return self::checkController($namespace.$config['default'], $method, $url);
+				return self::checkController($namespace.$config['default'], $method, $path);
 			}
 
 			return false;
@@ -86,13 +86,13 @@ class Router {
 
 
 	/**
-	 * static function match (string $url, string $route, array $settings)
+	 * static function match (string $path, string $route, array $settings)
 	 *
 	 * Returns boolean
 	 */
-	static private function match ($url, $route, $settings) {
+	static private function match ($path, $route, $settings) {
 		if (strpos($route, '(') === false) {
-			if (preg_match('|^'.preg_quote($route, '|').'$|', $url, $matches)) {
+			if (preg_match('|^'.preg_quote($route, '|').'$|', $path, $matches)) {
 				return array(
 					'routing' => $matches[0],
 					'parameters' => (array)$settings['defaults'],
@@ -109,7 +109,7 @@ class Router {
 
 		$route = preg_replace_callback('#/\((\w+)(\s+[^\)]+)?\)\??#', array($this, 'matchCallback'), $route);
 
-		if (preg_match('|^'.$route.'$|', $url, $matches)) {
+		if (preg_match('|^'.$route.'$|', $path, $matches)) {
 			$return = array(
 				'routing' => array_shift($matches),
 				'parameters' => (array)$settings['defaults'],

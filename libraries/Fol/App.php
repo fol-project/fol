@@ -108,8 +108,17 @@ class App {
 			} else {
 				exception(Response::$status[404], 404);
 			}
-		} catch (\Fol\Exception $Exception) {
-			if ($controller = Router::getExceptionController($this->name, $Exception, $config)) {
+		} catch (\Fol\HttpException $Exception) {
+			if ($controller = Router::getExceptionController($this->name, $Exception, $config['http_exception'])) {
+				list($class, $method) = $controller;
+
+				$controller = new $class($this);
+				$Response = $controller->$method($Exception);
+			} else {
+				$Response = new Response($Exception->getMessage(), $Exception->getCode());
+			}
+		} catch (\ErrorException $Exception) {
+			if ($controller = Router::getExceptionController($this->name, $Exception, $config['error_exception'])) {
 				list($class, $method) = $controller;
 
 				$controller = new $class($this);
@@ -119,7 +128,7 @@ class App {
 			}
 		}
 
-		if (!is_object($Response) || get_class($Response) !== 'Fol\\Response') {
+		if (!is_object($Response) || (get_class($Response) !== 'Fol\\Response')) {
 			$Response = new Response($Response);
 		}
 

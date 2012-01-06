@@ -8,15 +8,10 @@ $config['default'] = 'Main';
 
 
 /*
- * Controller to execute for each excepcion code
- * For example the exception 404 executes the controller Exception:notFound
- * 0 for all non specified exception controllers
+ * Controllers to execute if HttpException or ErrorException are throw
  */
-$config['exceptions'] = array(
-	0 => 'Exception:others',
-	404 => 'Exception:notFound',
-	500 => 'Exception:serverError'
-);
+$config['http_exception'] = 'Exception:http';
+$config['error_exception'] = 'Exception:error';
 
 
 /*

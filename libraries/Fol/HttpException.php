@@ -1,7 +1,7 @@
 <?php
 namespace Fol;
 
-class Exception extends \Exception {
+class HttpException extends \Exception {
 
 	/**
 	 * public function __construct (string $message, [int $code])

@@ -85,7 +85,7 @@ class Config extends Container {
 			include ($this->basedir.$file);
 		}
 
-		$this->set($name, $config, $context);
+		$this->set($name, $config);
 
 		return $config;
 	}

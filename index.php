@@ -1,4 +1,5 @@
 <?php
+use Fol\Errors;
 use Fol\Loader;
 use Fol\App;
 
@@ -11,6 +12,8 @@ include(BASE_PATH.'libraries/Fol/Loader.php');
 
 $Loader = new Loader;
 $Loader->registerNamespace('Apps', BASE_PATH.'apps/');
+
+Errors::register();
 
 $App = App::create('Web');
 $App->setEnvironment('default');

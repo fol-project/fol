@@ -114,7 +114,7 @@ class Container {
 	 */
 	public function add ($name, $value) {
 		if (is_array($value)) {
-			$this->items[$name] = arrayMergeReplaceRecursive((array)$this->items[$name], $value);
+			$this->items[$name] = array_replace_recursive((array)$this->items[$name], $value);
 		} else {
 			$this->items[$name] = $value;
 		}

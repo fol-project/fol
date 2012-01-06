@@ -1,7 +1,7 @@
 <?php
-namespace Fol\Cache;
+namespace Fol;
 
-class Apc {
+class Cache_Apc {
 
 	/**
 	 * public function __construct ()
