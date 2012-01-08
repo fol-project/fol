@@ -1,7 +1,7 @@
 <?php
 namespace Fol;
 
-class App {
+abstract class App {
 	public $name;
 	public $path;
 	public $http;
@@ -9,6 +9,8 @@ class App {
 
 	public $Parent;
 	public $Classes;
+
+	private $environment;
 
 
 
@@ -26,11 +28,11 @@ class App {
 
 
 	/**
-	 * public function __construct ([Object $Parent])
+	 * final public function __construct ([Object $Parent])
 	 *
 	 * Returns none
 	 */
-	public function __construct ($Parent = null) {
+	final public function __construct ($Parent = null) {
 		$this->Parent = $Parent;
 
 		$Class = new \ReflectionClass($this);
@@ -41,8 +43,22 @@ class App {
 		$this->real_http = BASE_HTTP.preg_replace('|^'.BASE_PATH.'|i', '', $this->path);
 
 		$this->Classes = new Containers\Classes;
-		$this->Classes->set('Config', 'Fol\\Config', array($this->path.'config/'));
+
+		$this->Classes->set(array(
+			array('Config', 'Fol\\Config', array($this->path.'config/')),
+			array('Cache', 'Fol\\Cache')
+		));
 	}
+
+
+
+	/**
+	 * abstract public function bootstrap ()
+	 *
+	 * Runs the application
+	 * Returns none
+	 */
+	abstract public function bootstrap ();
 
 
 
@@ -83,20 +99,16 @@ class App {
 
 
 	/**
-	 * public function execute ([fol\Request $Request])
+	 * public function execute (Fol\Request $Request)
 	 *
 	 * Executes the controller of the application
 	 * Returns none
 	 */
-	public function execute (Request $Request = null) {
-		if (is_null($Request)) {
-			$Request = Request::createFromGlobals();
-		}
-
-		$config = $this->Config->get('controllers');
+	public function execute (Request $Request) {
+		$controllers_config = $this->Config->get('controllers');
 
 		try {
-			$controller = Router::getController($this->name, $Request, $config);
+			$controller = Router::getController($this->name, $Request, $controllers_config);
 
 			if ($controller) {
 				list($class, $method, $parameters, $path) = $controller;
@@ -104,35 +116,51 @@ class App {
 				$Request->Path->set($path);
 
 				$controller = new $class($this, $Request);
+
 				$Response = call_user_func_array(array($controller, $method), $parameters);
 			} else {
-				exception(Response::$status[404], 404);
-			}
-		} catch (\Fol\HttpException $Exception) {
-			if ($controller = Router::getExceptionController($this->name, $Exception, $config['http_exception'])) {
-				list($class, $method) = $controller;
-
-				$controller = new $class($this);
-				$Response = $controller->$method($Exception);
-			} else {
-				$Response = new Response($Exception->getMessage(), $Exception->getCode());
-			}
-		} catch (\ErrorException $Exception) {
-			if ($controller = Router::getExceptionController($this->name, $Exception, $config['error_exception'])) {
-				list($class, $method) = $controller;
-
-				$controller = new $class($this);
-				$Response = $controller->$method($Exception);
-			} else {
-				$Response = new Response($Exception->getMessage(), $Exception->getCode());
+				throw new HttpException(Response::$status[404], 404);
 			}
 		}
 
-		if (!is_object($Response) || (get_class($Response) !== 'Fol\\Response')) {
+		catch (HttpException $Exception) {
+			$Response = $this->executeException($Exception, $controllers_config['HttpException']);
+		}
+
+		catch (\ErrorException $Exception) {
+			$Response = $this->executeException($Exception, $controllers_config['ErrorException']);
+		}
+
+		if (!($Response instanceof Response)) {
 			$Response = new Response($Response);
 		}
 
 		return $Response;
+	}
+
+
+	
+	/**
+	 * private function executeException ($Exception, $controller)
+	 *
+	 * Executes the controller of the exception application
+	 * Returns none
+	 */
+	private function executeException ($Exception, $controller) {
+		if ($controller = Router::getExceptionController($this->name, $Exception, $controller)) {
+			list($class, $method) = $controller;
+
+			$controller = new $class($this);
+			$Response = $controller->$method($Exception);
+
+			if (!is_object($Response) || (get_class($Response) !== 'Fol\\Response')) {
+				return new Response($Response);
+			}
+
+			return $Response;
+		}
+		
+		return new Response($Exception->getMessage(), $Exception->getCode());
 	}
 }
 ?>

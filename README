@@ -1,33 +1,42 @@
+AQUI TES O FOL
+(o resto da gaita xa é cousa túa)
+
+
 Que é FOL?
 
 FOL son as iniciais de... bueno, eso mellor déixoo á túa imaxinación.
 Trátase dun framework escrito en PHP por Oscar Otero (http://oscarotero.com) como exercicio 
 de deseño e como ferramenta para desenvolver experimentos e proxectos persoais. A intención 
-non é facer un super framework desos que teñen de todo senón todo o contrario: construír 
-algo manexable, moi flexible e que permita xuntar librerías externas.
+non é facer un super framework desos que o teñen todo senón todo o contrario: construír 
+algo manexable, moi flexible e que permita xuntar librerías externas. Vamos, un microframework,
+pero algo máis completo e moi extensible.
 
 
 
-Existen 5 factores que considerei indispensables á hora de crealo:
+Existen 6 factores que considerei indispensables á hora de crealo:
 
 1. Debe ser extremadamente rápido e lixeiro.
    Só carga as cousas que precisa en cada momento.
 
 2. Debe estar orientado a obxectos e explotar as vantaxes que ofrecen as últimas versións de PHP.
    Sempre é moito mellor e máis divertido traballar con versións novas que antigas.
-   Por iso precisa dun entorno con PHP 5.3 ou superior.
+   Por iso precisa dun entorno con PHP 5.3 ou superior. E mudareino a 5.4 cando saia a version estable.
 
 3. Debe ser flexible e moi DRY (Don't repeat youself).
    Emprega o patrón de MVC permitindo facer HMVC (executar sub-controladores dentro dun controlador),
    permitindo facer proxectos dende o máis básico ata escalalos a algo máis grande.
 
-4. Debe ser moi fácil de aprender.
+4. Debe ser moi intuitivo e fácil de entender.
    A lóxica ten que ser moi sinxela, evitando facer cousas demasiado "máxicas" para que todo sexa 
-   entendible, sen demasiadas normas.
+   entendible. Un framework sen demasiadas normas complexas.
 
 5. Debe levarse ben con librarías externas.
    Un framework que non teña moitas librerías propias pero que se leve ben con librarías de terceiros 
    ten moitas máis posibilidades que se fose ao contrario.
+
+6. Debe poder funcionar sen ter que configurar demasiadas cousas
+   Non hai nada máis pesado que andar configurando mil cousas, sobre todo se leva menos tempo e 
+   resulta menos complicado e máis entendible facer as cousas directamente.
 
 
 
@@ -36,13 +45,14 @@ COMPONENTES DE FOL
 Todo framework moderno que se preste debe contar coas seguintes utilidades ou componentes:
 
 * Xestión de erros.
-  FOL pode xestionar os erros de php lanzando excepcións ErrorException e HttpException (este última é 
-  unha extensión da clase Exception para manexar erros de servidor, como 404, etc)
+  FOL pode xestionar os erros de php lanzando excepcións. Posúe a clase HttpException (para manexar erros
+  relativos a http, como páxina non atopada (404), etc)
 
 * Xestión de carga de clases.
   FOL contén a clase Loader, que autocarga as demáis clases que se precisen, só no momento en que se 
   precisan, permitindo configurar onde e como cargar cada cousa. Ademáis emprega por defecto o estándar 
-  PSR-0 (https://gist.github.com/1234504)
+  PSR-0 (https://gist.github.com/1234504). Tamén é importante ter unha clase que xestione as
+  Inxecións de dependencias (meter clases como parámetros doutras clases).
 
 * Xestión de cache
   A clase Cache permite cachear calquera cousa. Contén dúas subclases: Apc e File, e pode ser ampliada 
@@ -53,15 +63,24 @@ Todo framework moderno que se preste debe contar coas seguintes utilidades ou co
 FILOSOFÍA E REFERENCIAS
 
 FOL é o produto de todo este tempo mirando como funcionan outros frameworks, lendo artigos sobre PHP e vendo 
-ata onde estan indo as cousas. Foi tamén produto da experiencia de traballar con outro framework chamado 
-PhpCan (http://idc.anavallasuiza.com) e poder ver os seus puntos fortes e débiles. De todos xeitos, a gran 
-referencia para este proxecto foi Symfony2 (http://symfony.com/) e a súa filosofía "Request -> Response" 
-pero cun enfoque máis sinxelo, ao estilo do MicroPHP Manifesto 
-(http://funkatron.com/posts/the-microphp-manifesto.html). Tamén me pareceu interesante Alloy 
-(http://alloyframework.org/) e Kohana (http://kohanaframework.org/) que estan totalmente enfocados ao patrón
-HMVC.
+por onde estan indo as cousas e cales son as necesidades da web moderna. Foi tamén produto da experiencia 
+de traballar con outro framework chamado PhpCan (http://idc.anavallasuiza.com) e poder ver os seus puntos 
+fortes e débiles. De todos xeitos, a gran referencia para este proxecto foi Symfony2 (http://symfony.com/), 
+pero cun enfoque máis sinxelo, seguindo un pouco a filosofía do MicroPHP Manifesto 
+(http://funkatron.com/posts/the-microphp-manifesto.html). Tamén me pareceron interesantes outros proxectos
+como Codeigniter (http://codeigniter.com/) Alloy (http://alloyframework.org/) ou Kohana 
+(http://kohanaframework.org/) asi como varios microframeworks.
+
 
 
 CAL É A SITUACIÓN ACTUAL?
 
-Por agora aínda está en fase alfa (0.1a). Falta por probar cousas e crear outras novas. Paciencia.
+Por agora aínda está en fase alfa (0.1a). Falta por probar cousas e crear outras novas. Paciencia. Varios
+dos to-dos que quedan por facer:
+
+* Completar a clase Request e Response
+* Pensar como debe funcionar o gardado de cookies
+* Seguridade: protección xss, etc
+* As rutas deberían poder controlar peticións get, post, put, delete, https etc
+* Dependence Injection Container (renomear e mellorar a clase Classes). Substituír por clases "cargadoras" como Cache, Models, etc
+* Escribir a documentación e eso. Debería ocupar todo unha soa páxina.

@@ -44,22 +44,6 @@ function explodeTrim ($delimiter, $text, $limit = null) {
 
 
 /**
- * function isNumericalArray (array $array)
- *
- * Returns true if the array is numerical or false if it's associative
- * Returns boolean
- */
-function isNumericalArray ($array) {
-	if (is_array($array)) {
-		return preg_match('/^[0-9]+$/', implode(array_keys($array)));
-	} else {
-		return false;
-	}
-}
-
-
-
-/**
  * function pre ($value)
  *
  * Throw a exception object

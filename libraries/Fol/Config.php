@@ -68,6 +68,7 @@ class Config extends Container {
 	/**
 	 * public function load (string $name)
 	 *
+	 * Loads the data of config files (in php or ini format)
 	 * Returns mixed
 	 */
 	public function load ($name) {
@@ -77,12 +78,14 @@ class Config extends Container {
 
 		$file = $name.'.php';
 
-		$config = array();
-
-		if ($this->environment && file_exists($this->basedir.$this->environment.'/'.$file)) {
-			include ($this->basedir.$this->environment.'/'.$file);
-		} else if (file_exists($this->basedir.$file)) {
-			include ($this->basedir.$file);
+		if ($this->environment && file_exists($this->basedir.$this->environment.'/'.$name.'.php')) {
+			$config = include($this->basedir.$this->environment.'/'.$name.'.php');
+		} else if ($this->environment && file_exists($this->basedir.$this->environment.'/'.$name.'.ini')) {
+			$config = parse_ini_file($this->basedir.$this->environment.'/'.$name.'.ini', true);
+		} else if (file_exists($this->basedir.$name.'.php')) {
+			$config = include($this->basedir.$name.'.php');
+		} else if (file_exists($this->basedir.$name.'.ini')) {
+			$config = parse_ini_file($this->basedir.$name.'.ini', true);
 		}
 
 		$this->set($name, $config);

@@ -7,18 +7,37 @@ use Fol\App;
 
 class Main extends Controller {
 	public function index () {
-		return trigger_error('Mola');
+		$content = $this->Views->render('html.php', array('variable' => 'mola'));
 
-		$request = \Fol\Request::create('ola/quetal/estamos.php?ben=moiben');
+		$Response = new Response($content);
 
-		pre($request);
-		return;
-		return new Response('Ola Mundo');
-		$App = App::create('Web2', $this->App);
+		$this->App->Cache->File->set($this->Request->getId(), $Response);
 
-		$this->Request->setUrl(implode('/', $this->Request->Path->getNumerical()));
+		return $Response;
+	}
 
-		return $App->execute($this->Request);
+	public function testSpeed () {
+		$repeticions = 10000;
+		
+		$time = microtime(true);
+
+		for ($n = 0; $n < $repeticions; $n++) {
+			include($this->App->path.'config/controllers.php');
+		}
+
+		echo '<p>Total caso 1: '.(microtime(true) - $time).'</p>';
+
+		$time = microtime(true);
+
+		for ($n = 0; $n < $repeticions; $n++) {
+			parse_ini_file($this->App->path.'config/controllers.ini', true);
+		}
+
+		echo '<p>Total caso 2: '.(microtime(true) - $time).'</p>';
+	}
+
+	public function show ($section) {
+		return new Response("ola $section, que tal");
 	}
 }
 ?>

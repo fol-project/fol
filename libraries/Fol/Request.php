@@ -143,7 +143,13 @@ class Request {
 	 * Returns string
 	 */
 	public function getId () {
-		return md5(serialize(array($this->url, $this->Path->get(), $this->Get->get(), $this->Post->get(), $this->Files->get())));
+		return md5(serialize(array(
+			$this->getPath(),
+			$this->Path->get(),
+			$this->Get->get(),
+			$this->Post->get(),
+			$this->Files->get()
+		)));
 	}
 
 

@@ -22,6 +22,17 @@ class Errors {
 
 
 	/**
+	 * static public function unregister ()
+	 *
+	 * Register the error handler.
+	 * Returns Error instance
+	 */
+	static public function unregister () {
+		restore_error_handler();
+	}
+
+
+	/**
 	 * public public function setLevel ($level)
 	 *
 	 * Sets the error level.

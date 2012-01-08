@@ -10,15 +10,9 @@ define('BASE_HTTP', preg_replace('|/+|', '/', '/'.preg_replace('|^'.realpath(get
 include(BASE_PATH.'libraries/functions.php');
 include(BASE_PATH.'libraries/Fol/Loader.php');
 
-$Loader = new Loader;
-$Loader->registerNamespace('Apps', BASE_PATH.'apps/');
+Loader::register();
+Loader::registerNamespace('Apps', BASE_PATH.'apps/');
 
 Errors::register();
 
-$App = App::create('Web');
-$App->setEnvironment('default');
-
-$Response = $App->execute();
-
-$Response->send();
-?>
+App::create('Web')->bootstrap();

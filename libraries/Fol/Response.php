@@ -100,6 +100,30 @@ class Response {
 
 
 	/**
+	 * public function appendContent (string $content)
+	 *
+	 * Appends content
+	 * Returns none
+	 */
+	public function appendContent ($content) {
+		$this->content .= (string)$content;
+	}
+
+
+
+	/**
+	 * public function prependContent (string $content)
+	 *
+	 * Prepends content
+	 * Returns none
+	 */
+	public function prependContent ($content) {
+		$this->content = (string)$content.$this->content;
+	}
+
+
+
+	/**
 	 * public function getContent (string $content)
 	 *
 	 * Gets content

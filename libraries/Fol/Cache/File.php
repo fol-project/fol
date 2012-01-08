@@ -2,6 +2,45 @@
 namespace Fol;
 
 class Cache_File {
+	private $folder;
+
+
+	/**
+	 * public function __construct ([string $folder])
+	 *
+	 * Returns object/none
+	 */
+	public function __construct ($folder = null) {
+		if ($folder) {
+			$this->setFolder($folder);
+		}
+	}
+
+
+
+	/**
+	 * public function setFolder (string $folder)
+	 *
+	 * Sets the cache folder
+	 * Returns none
+	 */
+	public function setFolder ($folder) {
+		$this->folder = $folder;
+	}
+
+
+
+	/**
+	 * public function getFolder ()
+	 *
+	 * Returns string
+	 */
+	public function getFolder ($name = null) {
+		return $this->folder;
+	}
+
+
+
 
 	/**
 	 * public function set ($name, [$value], [int $expire])
@@ -10,7 +49,7 @@ class Cache_File {
 	 * Returns boolean
 	 */
 	public function set ($name, $value, $expire = 3600) {
-		$filename = SCENE_PATH.'cache/'.md5($name);
+		$filename = $this->settings['folder'].md5($name);
 
 		if (!is_file($filename) || is_writable($filename)) {
 			file_put_contents($filename, serialize($value));
@@ -32,7 +71,7 @@ class Cache_File {
 	 * Returns mixed
 	 */
 	public function get ($name) {
-		$filename = SCENE_PATH.'cache/'.md5($name);
+		$filename = $this->settings['folder'].md5($name);
 
 		if (!is_file($filename) || (filemtime($filename) < time())) {
 			return null;
@@ -50,7 +89,7 @@ class Cache_File {
 	 * Returns boolean
 	 */
 	public function exists ($name) {
-		$filename = SCENE_PATH.'cache/'.md5($name);
+		$filename = $this->settings['folder'].md5($name);
 
 		if (!is_file($filename) || (filemtime($filename) < time())) {
 			return null;
@@ -68,7 +107,7 @@ class Cache_File {
 	 * Returns boolean
 	 */
 	public function delete ($name) {
-		$filename = SCENE_PATH.'cache/'.$name;
+		$filename = $this->settings['folder'].md5($name);
 
 		return is_file($filename) ? unlink($filename) : null;
 	}

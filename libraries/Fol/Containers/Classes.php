@@ -30,7 +30,7 @@ class Classes extends Container {
 	public function set ($name, $class = null, array $arguments = array()) {
 		if (is_array($name)) {
 			foreach ($name as $class) {
-				$this->set($class[0], $class[1], $class[2]);
+				$this->set($class[0], $class[1], (array)$class[2]);
 			}
 
 			return;

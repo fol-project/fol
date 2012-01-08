@@ -38,11 +38,16 @@ class Router {
 		$path = $Request->getPath();
 
 		if ($config['routing']) {
-			foreach ($config['routing'] as $route => $settings) {
-				$settings = is_string($settings) ? array('controller' => $settings) : (array)$settings;
+			foreach ($config['routing'] as $name => $settings) {
+				if (!is_array($settings)) {
+					$settings = array(
+						'pattern' => $name,
+						'controller' => $settings
+					);
+				}
 
-				if ($match = self::match($path, $route, $settings)) {
-					list($class, $method) = explode(':', $match['settings']['controller'], 2);
+				if ($match = self::match($path, $settings)) {
+					list($class, $method) = explode(':', $settings['controller'], 2);
 
 					$class = $namespace.camelCase($class, true);
 
@@ -86,34 +91,32 @@ class Router {
 
 
 	/**
-	 * static function match (string $path, string $route, array $settings)
+	 * static function match (string $path, array $route)
 	 *
 	 * Returns boolean
 	 */
-	static private function match ($path, $route, $settings) {
-		if (strpos($route, '(') === false) {
-			if (preg_match('|^'.preg_quote($route, '|').'$|', $path, $matches)) {
+	static private function match ($path, $route) {
+		if (strpos($route['pattern'], '(') === false) {
+			if (preg_match('|^'.preg_quote($route['pattern'], '|').'$|', $path, $matches)) {
 				return array(
 					'routing' => $matches[0],
-					'parameters' => (array)$settings['defaults'],
-					'settings' => $settings
+					'parameters' => (array)$route['defaults']
 				);
 			}
 
 			return false;
 		}
 
-		if ($settings['defaults']) {
-			$route = preg_replace('#(\('.implode('|', array_keys($settings['defaults'])).'(\s+[^\)]+)?\)[^?])#', '\\1?', $route);
+		if ($route['defaults']) {
+			$route['pattern'] = preg_replace('#(\('.implode('|', array_keys($route['defaults'])).'(\s+[^\)]+)?\)[^?])#', '\\1?', $route['pattern']);
 		}
 
-		$route = preg_replace_callback('#/\((\w+)(\s+[^\)]+)?\)\??#', array($this, 'matchCallback'), $route);
+		$route['pattern'] = preg_replace_callback('#/\((\w+)(\s+[^\)]+)?\)\??#', array(self, 'matchCallback'), $route['pattern']);
 
-		if (preg_match('|^'.$route.'$|', $path, $matches)) {
+		if (preg_match('|^'.$route['pattern'].'$|', $path, $matches)) {
 			$return = array(
 				'routing' => array_shift($matches),
-				'parameters' => (array)$settings['defaults'],
-				'settings' => $settings
+				'parameters' => (array)$route['defaults'],
 			);
 
 			foreach ($matches as $name => $value) {
@@ -179,7 +182,7 @@ class Router {
 				foreach ($Method->getParameters() as $Parameter) {
 					$name = $Parameter->getName();
 
-					if ($parameters[$names]) {
+					if ($parameters[$name]) {
 						$all_params[$name] = $params[$name] = $parameters[$name];
 					} else if ($parameters[0]) {
 						$all_params[$name] = $params[$name] = array_shift($parameters);

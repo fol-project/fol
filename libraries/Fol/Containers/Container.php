@@ -21,7 +21,7 @@ class Container {
 	/**
 	 * public function length ()
 	 *
-	 * Returns the length of the parameters
+	 * Returns the total number of parameters
 	 * Returns integer
 	 */
 	public function length () {
@@ -95,6 +95,7 @@ class Container {
 
 
 
+
 	/**
 	 * public function exists (string $name)
 	 *
@@ -108,16 +109,26 @@ class Container {
 
 
 	/**
-	 * public function add (string $name, mixed $value)
+	 * public function replace (array $values)
 	 *
+	 * Replaces recursively some values
 	 * Returns none
 	 */
-	public function add ($name, $value) {
-		if (is_array($value)) {
-			$this->items[$name] = array_replace_recursive((array)$this->items[$name], $value);
-		} else {
-			$this->items[$name] = $value;
-		}
+	public function replace (array $values) {
+		$this->items = array_replace_recursive((array)$this->items, $values);
+	}
+
+
+
+	/**
+	 * public function reset (array $items)
+	 *
+	 * Reset all items with new values
+	 * Returns none
+	 */
+	public function reset (array $items) {
+		$this->clear();
+		$this->set($items);
 	}
 }
 ?>
