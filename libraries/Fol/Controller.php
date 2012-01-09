@@ -2,10 +2,10 @@
 namespace Fol;
 
 abstract class Controller {
-	protected $App;
-	protected $Request;
-	protected $Models;
-	protected $Views;
+	public $App;
+	public $Request;
+	public $Models;
+	public $Views;
 
 
 	/**
@@ -16,8 +16,8 @@ abstract class Controller {
 	public function __construct ($App, Request $Request) {
 		$this->App = $App;
 		$this->Request = $Request;
-		$this->Models = new Models($this->App);
-		$this->Views = new Views($this->App);
+		$this->Models = new Models($this);
+		$this->Views = new Views($this);
 	}
 }
 ?>

@@ -7,12 +7,13 @@ class Models {
 
 
 	/**
-	 * public function __construct (object $App)
+	 * public function __construct (object $Controller)
 	 *
 	 * Returns none
 	 */
-	public function __construct ($App) {
-		$this->App = $App;
+	public function __construct ($Controller) {
+		$this->App = $Controller->App;
+		$this->Controller = $Controller;
 	}
 
 
