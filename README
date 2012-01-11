@@ -57,7 +57,6 @@ CAL É A SITUACIÓN ACTUAL?
 Por agora aínda está en fase alfa (0.1a). Falta por probar cousas e crear outras novas. Paciencia. Varios dos to-dos que quedan por facer:
 
 * Completar a clase Request e Response
-* Clase Services: poder meter unha función onconstruct
 * Pensar como debe funcionar o gardado de cookies (en responses?)
 * Seguridade: protección xss, etc
 * Xerar excepcions variadas (invalid argument, etc)

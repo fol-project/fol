@@ -111,13 +111,19 @@ class Services {
 
 					if ($parameters && $Class->hasMethod('__construct')) {
 						if ($parameters = $this->sortParameters($Class->getMethod('__construct'), $parameters)) {
-							return $Class->newInstanceArgs($parameters);
+							$Instance = $Class->newInstanceArgs($parameters);
+						} else {
+							return false;
 						}
-
-						return false;						
+					} else {
+						$Instance = $Class->newInstance();
 					}
 
-					return $Class->newInstance();
+					if ($data['on_construct'] && is_callable($data['on_construct'])) {
+						$data['on_construct']($this, $Instance);
+					}
+
+					return $Instance;
 				}
 			}
 		}
