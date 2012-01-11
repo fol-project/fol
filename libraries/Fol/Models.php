@@ -2,7 +2,7 @@
 namespace Fol;
 
 class Models {
-	private $App;
+	private $Controller;
 
 
 
@@ -12,7 +12,6 @@ class Models {
 	 * Returns none
 	 */
 	public function __construct ($Controller) {
-		$this->App = $Controller->App;
 		$this->Controller = $Controller;
 	}
 
@@ -24,10 +23,10 @@ class Models {
 	 * Returns object
 	 */
 	public function __get ($name) {
-		$class = 'Apps\\'.$this->App->name.'\\Models\\'.$name;
+		$class = 'Apps\\'.$this->Controller->App->name.'\\Models\\'.$name;
 
 		if (class_exists($class)) {
-			return $this->$name = new $class($this->App);
+			return $this->$name = new $class($this->Controller);
 		}
 	}
 }

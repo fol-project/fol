@@ -20,30 +20,6 @@ function camelCase ($string, $upper_first = false) {
 
 
 /**
- * function explodeTrim (string $delimiter, string $text, [int $limit])
- *
- * Explode a string and returns only the non-empty elements
- * Returns array
- */
-function explodeTrim ($delimiter, $text, $limit = null) {
-	$return = array();
-
-	$explode = is_null($limit) ? explode($delimiter, $text) : explode($delimiter, $text, $limit);
-
-	foreach ($explode as $text_value) {
-		$text_value = trim($text_value);
-
-		if ($text_value !== '') {
-			$return[] = $text_value;
-		}
-	}
-
-	return $return;
-}
-
-
-
-/**
  * function pre ($value)
  *
  * Throw a exception object

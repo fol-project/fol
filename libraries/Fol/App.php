@@ -8,7 +8,7 @@ abstract class App {
 	public $real_http;
 
 	public $Parent;
-	public $Classes;
+	public $Services;
 
 	private $environment;
 
@@ -42,12 +42,11 @@ abstract class App {
 		$this->http = BASE_HTTP.strtolower($this->name).'/';
 		$this->real_http = BASE_HTTP.preg_replace('|^'.BASE_PATH.'|i', '', $this->path);
 
-		$this->Classes = new Containers\Classes;
+		$this->Services = new Services;
 
-		$this->Classes->set(array(
-			array('Config', 'Fol\\Config', array($this->path.'config/')),
-			array('Cache', 'Fol\\Cache')
-		));
+		$this->Services->register('Config', 'Fol\\Config', array($this->path.'config/'));
+		$this->Services->register('Views', 'Fol\\Views');
+		$this->Services->register('Models', 'Fol\\Models');
 	}
 
 
@@ -68,7 +67,7 @@ abstract class App {
 	 * Returns object
 	 */
 	public function __get ($name) {
-		return $this->$name = $this->Classes->getInstance($name);
+		return $this->$name = $this->Services->get($name);
 	}
 
 

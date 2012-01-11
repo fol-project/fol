@@ -7,11 +7,12 @@ use Fol\App;
 
 class Main extends Controller {
 	public function index () {
-		$content = $this->Views->render('html.php', array('variable' => 'mola'));
+		$content = $this->Views->render('html.php', array('variable' => 'molass'));
 
 		$Response = new Response($content);
 
-		$this->App->Cache->File->set($this->Request->getId(), $Response);
+		$CacheFile = $this->App->Services->get('CacheFile');
+		$CacheFile->set($this->Request->getId(), $Response);
 
 		return $Response;
 	}

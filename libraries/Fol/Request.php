@@ -289,5 +289,23 @@ class Request {
 	public function getPort () {
 		return $this->Server->get('x-forwarded-port') ?: $this->Server->get('server-port');
 	}
+
+
+
+	/**
+	 * public function getMethod ()
+	 *
+	 * Gets the request method in uppercase
+	 * Returns string
+	 */
+	public function getMethod () {
+		$method = strtoupper($this->Server->get('REQUEST_METHOD', 'GET'));
+	
+		if ($method === 'POST') {
+			$this->method = strtoupper($this->Server->get('X-HTTP-METHOD-OVERRIDE', 'POST'));
+		}
+
+		return $method;
+	}
 }
 ?>

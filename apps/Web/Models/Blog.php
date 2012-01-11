@@ -3,9 +3,11 @@ namespace Apps\Web\Models;
 
 class Blog {
 	private $App;
+	private $Models;
 
-	public function __construct ($App) {
-		$this->App = $App;
+	public function __construct ($Controller) {
+		$this->Models = $Controller->Models;
+		$this->App = $Controller->App;
 	}
 
 	public function getLoremIpsum () {

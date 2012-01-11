@@ -46,6 +46,14 @@ class Router {
 					);
 				}
 
+				if ($settings['method'] && $Request->getMethod() !== $settings['method']) {
+					continue;
+				}
+
+				if ($settings['scheme'] && $Request->getScheme() !== $settings['scheme']) {
+					continue;
+				}
+
 				if ($match = self::match($path, $settings)) {
 					list($class, $method) = explode(':', $settings['controller'], 2);
 
@@ -60,7 +68,14 @@ class Router {
 			}
 		}
 
-		$path = explodeTrim('/', $path);
+		$explode = explode('/', $path);
+		$path = array();
+
+		foreach ($explode as $val) {
+			if (($val = trim($val)) !== '') {
+				$path[] = $val;
+			}
+		}
 
 		if ($path) {
 			$class = $namespace.camelCase($path[0], true);

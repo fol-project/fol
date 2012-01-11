@@ -6,6 +6,8 @@ use Fol\Request;
 class App extends \Fol\App {
 
 	public function bootstrap () {
+		$this->Services->register('CacheFile', 'Fol\\Cache_File', array($this->path.'cache/'));
+
 		//return $this->runCache();
 
 		$Request = Request::createFromGlobals();
@@ -18,10 +20,9 @@ class App extends \Fol\App {
 
 	private function runCache () {
 		$Request = Request::createFromGlobals();
+		$CacheFile = $this->Services->get('CacheFile');
 
-		$this->Cache->File->setFolder($this->path.'cache/');
-
-		if (!($Response = $this->Cache->File->get($Request->getId()))) {
+		if (!($Response = $CacheFile->get($Request->getId()))) {
 			$Response = $this->execute($Request);
 		}
 

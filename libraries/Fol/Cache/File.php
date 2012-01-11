@@ -49,7 +49,7 @@ class Cache_File {
 	 * Returns boolean
 	 */
 	public function set ($name, $value, $expire = 3600) {
-		$filename = $this->settings['folder'].md5($name);
+		$filename = $this->filename($name);
 
 		if (!is_file($filename) || is_writable($filename)) {
 			file_put_contents($filename, serialize($value));
@@ -71,13 +71,11 @@ class Cache_File {
 	 * Returns mixed
 	 */
 	public function get ($name) {
-		$filename = $this->settings['folder'].md5($name);
-
-		if (!is_file($filename) || (filemtime($filename) < time())) {
-			return null;
+		if (!$this->exists($name)) {
+			return false;
 		}
 
-		return unserialize(file_get_contents($filename));
+		return unserialize(file_get_contents($this->filename($name)));
 	}
 
 
@@ -89,10 +87,15 @@ class Cache_File {
 	 * Returns boolean
 	 */
 	public function exists ($name) {
-		$filename = $this->settings['folder'].md5($name);
+		$filename = $this->filename($name);
 
-		if (!is_file($filename) || (filemtime($filename) < time())) {
-			return null;
+		if (!is_file($filename)) {
+			return false;
+		}
+
+		if (filemtime($filename) < time()) {
+			unlink($filename);
+			return false;
 		}
 
 		return true;
@@ -107,9 +110,21 @@ class Cache_File {
 	 * Returns boolean
 	 */
 	public function delete ($name) {
-		$filename = $this->settings['folder'].md5($name);
+		$filename = $this->filename($name);
 
-		return is_file($filename) ? unlink($filename) : null;
+		return is_file($filename) ? unlink($filename) : true;
+	}
+
+
+
+	/**
+	 * private function filename ($name)
+	 *
+	 * Gets the real name of a cached file
+	 * Returns string
+	 */
+	private function filename ($name) {
+		return $this->folder.md5($name);
 	}
 }
 ?>

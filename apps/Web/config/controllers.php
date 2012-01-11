@@ -19,7 +19,9 @@ return array(
 		'ver_texto' => array(
 			'pattern' => 'ver/(section [0-9]+)/',
 			'controller' => 'Main:show',
-			'defaults' => array('section' => 34)
+			'defaults' => array('section' => 34),
+			'method' => 'GET',
+			'scheme' => 'http'
 		),
 	)
 );

@@ -7,7 +7,6 @@ class Loader {
 	static $classes = array();
 	static $prefixes = array();
 	static $namespaces = array();
-	static $namespaces_paths = array();
 
 
 
@@ -74,9 +73,9 @@ class Loader {
 			$class_name = substr($class_name, $last_pos + 1);
 		}
 
-		foreach (array_keys(self::$namespaces) as $ns) {
+		foreach (self::$namespaces as $ns => $options) {
 			if (strpos($namespace, $ns) === 0) {
-				if ($file = self::filePath(self::$namespaces_paths[$ns], preg_replace('#^'.$ns.'#', '', $namespace), $class_name)) {
+				if ($file = self::filePath(preg_replace('#^'.$ns.'#', '', $namespace), $class_name, $options)) {
 					return $file;
 				}
 
@@ -84,9 +83,9 @@ class Loader {
 			}
 		}
 
-		foreach (self::$prefixes as $prefix => $path) {
+		foreach (self::$prefixes as $prefix => $options) {
 			if (strpos($class_name, $prefix) === 0) {
-				if ($file = self::filePath($path, $namespace, $class_name)) {
+				if ($file = self::filePath($namespace, $class_name, $options)) {
 					return $file;
 				}
 
@@ -94,58 +93,35 @@ class Loader {
 			}
 		}
 
-		return self::filePath(self::$libraries_path, $namespace, $class_name);
+		return self::filePath($namespace, $class_name);
 	}
 
 
 
 	/**
-	 * static private function filePath (string $base_path, string $namespace, string $class_name)
+	 * static private function filePath (string $namespace, string $class_name, [array $options])
 	 *
 	 * Generate the filename and check if it exists
 	 * Returns string/boolean
 	 */
-	static private function filePath ($base_path, $namespace, $class_name) {
-		$file = $base_path;
+	static private function filePath ($namespace, $class_name, array $options = array()) {
+		$file = $options['path'] ?: self::$libraries_path;
 
-		if ($namespace) {
+		if ($namespace && $options['namespace_directories'] !== false) {
 			$file .= str_replace('\\', DIRECTORY_SEPARATOR, $namespace).DIRECTORY_SEPARATOR;
 		}
 
-		$file .= str_replace('_', DIRECTORY_SEPARATOR, $class_name).'.php';
+		if ($options['class_directories'] !== false) {
+			$file .= str_replace('_', DIRECTORY_SEPARATOR, $class_name).'.php';
+		} else {
+			$file .= $class_name.'.php';
+		}
 
 		if (is_file($file)) {
 			return $file;
 		}
 
 		return false;
-	}
-
-
-
-	/**
-	 * static public function registerNamespace (array $namespaces)
-	 * static public function registerNamespace (string $namespace, string $path)
-	 *
-	 * Sets a new base path for an specific namespace
-	 * Returns none
-	 */
-	static public function registerNamespace ($namespace, $path = null) {
-		if (is_array($namespace)) {
-			foreach ($namespace as $key => $value) {
-				self::registerNamespace($key, $value);
-			}
-
-			return;
-		}
-
-		if (!isset(self::$namespaces[$namespace])) {
-			self::$namespaces[$namespace] = substr_count($namespace, '\\');
-
-			arsort(self::$namespaces, SORT_NUMERIC);
-		}
-
-		self::$namespaces_paths[$namespace] = $path;
 	}
 
 
@@ -174,11 +150,12 @@ class Loader {
 	/**
 	 * public function registerPrefix (array $prefixes)
 	 * public function registerPrefix (string $prefix, string $path)
+	 * public function registerPrefix (string $prefix, array $options)
 	 *
 	 * Sets a new path for an specific prefix in class name
 	 * Returns none
 	 */
-	public function registerPrefix ($prefix, $path = null) {
+	public function registerPrefix ($prefix, $options = null) {
 		if (is_array($prefix)) {
 			foreach ($prefix as $key => $value) {
 				self::registerPrefix($key, $value);
@@ -187,7 +164,37 @@ class Loader {
 			return;
 		}
 
-		self::$prefixes[$prefix] = $path;
+		if (!is_array($options)) {
+			$options = array('path' => $options);
+		}
+
+		self::$prefixes[$prefix] = $options;
+	}
+
+
+
+	/**
+	 * static public function registerNamespace (array $namespaces)
+	 * static public function registerNamespace (string $namespace, string $path)
+	 * static public function registerNamespace (string $namespace, array $options)
+	 *
+	 * Sets a new base path for an specific namespace
+	 * Returns none
+	 */
+	static public function registerNamespace ($namespace, $options = null) {
+		if (is_array($namespace)) {
+			foreach ($namespace as $key => $value) {
+				self::registerNamespace($key, $value);
+			}
+
+			return;
+		}
+
+		if (!is_array($options)) {
+			$options = array('path' => $options);
+		}
+
+		self::$namespaces[$namespace] = $options;
 	}
 }
 ?>

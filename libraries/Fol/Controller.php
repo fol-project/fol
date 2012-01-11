@@ -16,8 +16,8 @@ abstract class Controller {
 	public function __construct ($App, Request $Request) {
 		$this->App = $App;
 		$this->Request = $Request;
-		$this->Models = new Models($this);
-		$this->Views = new Views($this);
+		$this->Models = $this->App->Services->get('Models', array($this));
+		$this->Views = $this->App->Services->get('Views', array($this));
 	}
 }
 ?>
