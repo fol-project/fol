@@ -22,22 +22,26 @@ function camelCase ($string, $upper_first = false) {
 /**
  * function pre ($value)
  *
- * Throw a exception object
+ * Prints a debug value in a <pre> html tag
  * Returns false
  */
-function pre ($pre) {
+function pre ($pre, $info = false) {
 	echo '<pre>';
-	
-	echo '<strong>'.gettype($pre)."</strong>\n";
 
-	echo '<em>';
-	debug_print_backtrace();
-	echo '</em>'."\n";
+	if ($info) {
+		echo '<strong>'.gettype($pre)."</strong>\n";
+
+		echo '<em>';
+		debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+		echo '</em>'."\n";
+	}
 
 	if (is_bool($pre)) {
 		echo $pre ? 'TRUE' : 'FALSE';
 	} else {
+		ob_start();
 		print_r($pre);
+		echo htmlspecialchars(ob_get_clean());
 	}
 
 	echo '</pre>';

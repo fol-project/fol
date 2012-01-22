@@ -86,6 +86,25 @@ class Response {
 	}
 
 
+	/**
+	 * public function __toString ()
+	 *
+	 * Converts the current response to a string
+	 */
+	public function __toString () {
+		$text = sprintf('HTTP/1.0 %s %s', $this->status_code, $this->status_text)."\n";
+		$text .= sprintf('Content-Type: %s %s', $this->content_type, $this->charset)."\n";
+
+		foreach ($this->Headers->get() as $key => $value) {
+			$text .= "$key: $value\n";
+		}
+
+		$text .= "\n".$this->content.'</pre>';
+
+		return $text;
+	}
+
+
 
 	/**
 	 * public function setContent (string $content)

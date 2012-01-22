@@ -1,12 +1,13 @@
 <?php
 namespace Fol;
 
-use Fol\Containers\Parameters;
+use Fol\Containers\Container;
+use Fol\Containers\Input;
 use Fol\Containers\Files;
 use Fol\Containers\Server;
 
 class Request {
-	public $Path;
+	public $Parameters;
 	public $Get;
 	public $Post;
 	public $Files;
@@ -108,11 +109,11 @@ class Request {
 	 *
 	 */
 	public function __construct ($path = '', array $parameters = array(), array $get = array(), array $post = array(), array $files = array(), array $cookies = array(), array $server = array()) {
-		$this->Path = new Parameters($parameters);
-		$this->Get = new Parameters($get);
-		$this->Post = new Parameters($post);
+		$this->Parameters = new Container($parameters);
+		$this->Get = new Input($get);
+		$this->Post = new Input($post);
 		$this->Files = new Files($files);
-		$this->Cookies = new Parameters($cookies);
+		$this->Cookies = new Input($cookies);
 		$this->Server = new Server($server);
 
 		$this->setPath($path);
@@ -126,7 +127,7 @@ class Request {
 	 * Magic function to clone the internal objects
 	 */
 	public function __clone () {
-		$this->Path = clone $this->Path;
+		$this->Parameters = clone $this->Parameters;
 		$this->Get = clone $this->Get;
 		$this->Post = clone $this->Post;
 		$this->Files = clone $this->Files;
@@ -145,7 +146,7 @@ class Request {
 	public function getId () {
 		return md5(serialize(array(
 			$this->getPath(),
-			$this->Path->get(),
+			$this->Parameters->get(),
 			$this->Get->get(),
 			$this->Post->get(),
 			$this->Files->get()
@@ -167,6 +168,26 @@ class Request {
 
 
 	/**
+	 * public function getPathSegments ()
+	 *
+	 * Gets the current path in an array of segments
+	 * Returns array
+	 */
+	public function getPathSegments () {
+		$segments = array();
+
+		foreach (explode('/', $this->path) as $segment) {
+			if ($segment !== '') {
+				$segments[] = $segment;
+			}
+		}
+
+		return $segments;
+	}
+
+
+
+	/**
 	 * public function setPath (string $path)
 	 *
 	 * Sets a new current path
@@ -179,7 +200,6 @@ class Request {
 		}
 
 		$this->path = $path;
-		$this->Path->clear();
 	}
 
 
@@ -215,7 +235,7 @@ class Request {
 	 * Returns mixed
 	 */
 	public function get ($name, $default = null) {
-		return $this->Post->get($name, $this->Files->get($name, $this->Get->get($name, $this->Path->get($name, $default))));
+		return $this->Post->get($name, $this->Files->get($name, $this->Get->get($name, $this->Parameters->get($name, $default))));
 	}
 
 
@@ -230,7 +250,7 @@ class Request {
 		$this->Post->remove($name);
 		$this->Files->remove($name);
 		$this->Get->remove($name);
-		$this->Path->remove($name);
+		$this->Parameters->remove($name);
 	}
 
 
@@ -242,7 +262,7 @@ class Request {
 	 * Returns boolean
 	 */
 	public function exists ($name) {
-		return ($this->Post->exists($name) || $this->Files->exists($name) || $this->Get->exists($name) || $this->Path->exists($name)) ? true : false;
+		return ($this->Post->exists($name) || $this->Files->exists($name) || $this->Get->exists($name) || $this->Parameters->exists($name)) ? true : false;
 	}
 
 

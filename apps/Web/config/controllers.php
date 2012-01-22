@@ -9,17 +9,29 @@ return array(
 
 
 	/*
+	 * Mode the controller will be selected
+	 * 1: Only 
+	 */
+	'allow_undefined_routings' => true,
+
+
+	/*
 	 * Controllers to execute if HttpException or ErrorException are throw
 	 */
-	'HttpException' => 'Exception:http',
-	'ErrorException' => 'Exception:error',
+	'exceptions' => array(
+		'HttpException' => 'Exception:http',
+		'ErrorException' => 'Exception:error'
+	),
 
 
+	/*
+	 * Defined routings with controller
+	 */
 	'routing' => array(
 		'ver_texto' => array(
-			'pattern' => 'ver/(section [0-9]+)/',
+			'pattern' => 'ver/(section [0-9]+)',
 			'controller' => 'Main:show',
-			'defaults' => array('section' => 34),
+			'parameters' => array('section' => 34),
 			'method' => 'GET',
 			'scheme' => 'http'
 		),

@@ -6,27 +6,18 @@ use Fol\Request;
 class App extends \Fol\App {
 
 	public function bootstrap () {
-		$this->Services->register('CacheFile', 'Fol\\Cache_File', array($this->path.'cache/'));
+		//Define services to use
+		$this->Services->register('Config', 'Fol\\Config', array($this->path.'config/'));
+		$this->Services->register('Router', 'Fol\\Router', array($this));
+		$this->Services->register('Views', 'Fol\\Views');
+		$this->Services->register('Models', 'Fol\\Models');
 
-		//return $this->runCache();
+		//Config router
+		$this->Router->setNamespace(__NAMESPACE__.'\\Controllers');
+		$this->Router->setConfig($this->Config->get('controllers'));
 
-		$Request = Request::createFromGlobals();
-
-		$Response = $this->execute($Request);
-
-		$Response->send();
-	}
-
-
-	private function runCache () {
-		$Request = Request::createFromGlobals();
-		$CacheFile = $this->Services->get('CacheFile');
-
-		if (!($Response = $CacheFile->get($Request->getId()))) {
-			$Response = $this->execute($Request);
-		}
-
-		$Response->send();
+		//Handle the request
+		$this->Router->handle(Request::createFromGlobals())->send();
 	}
 }
 ?>

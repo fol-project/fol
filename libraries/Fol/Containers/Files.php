@@ -1,7 +1,7 @@
 <?php
 namespace Fol\Containers;
 
-class Files extends Parameters {
+class Files extends Input {
 
 	/**
 	 * public function __construct (array $parameters)

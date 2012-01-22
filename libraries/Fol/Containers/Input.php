@@ -1,7 +1,7 @@
 <?php
 namespace Fol\Containers;
 
-class Parameters extends Container {
+class Input extends Container {
 
 	/**
 	 * public function get ([string $name], [mixed $default])
@@ -32,26 +32,6 @@ class Parameters extends Container {
 		}
 
 		return $default;
-	}
-
-
-
-	/**
-	 * public function getNumerical ()
-	 *
-	 * Gets all numeric parameters
-	 * Returns array
-	 */
-	public function getNumerical () {
-		$parameters = array();
-
-		foreach ($this->items as $name => $value) {
-			if (is_int($name)) {
-				$parameters[$name] = $value;
-			}
-		}
-
-		return $parameters;
 	}
 
 

@@ -9,12 +9,7 @@ class Main extends Controller {
 	public function index () {
 		$content = $this->Views->render('html.php', array('variable' => 'molass'));
 
-		$Response = new Response($content);
-
-		$CacheFile = $this->App->Services->get('CacheFile');
-		$CacheFile->set($this->Request->getId(), $Response);
-
-		return $Response;
+		return new Response($content);
 	}
 
 	public function testSpeed () {
