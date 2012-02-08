@@ -7,13 +7,12 @@ class Container {
 
 
 	/**
-	 * public function __construct (array $parameters)
+	 * public function __construct (array $items)
 	 *
-	 * Detects request info
 	 * Returns none
 	 */
-	public function __construct (array $parameters = array()) {
-		$this->items = $parameters;
+	public function __construct (array $items = array()) {
+		$this->set($items);
 	}
 
 
@@ -116,19 +115,6 @@ class Container {
 	 */
 	public function replace (array $values) {
 		$this->items = array_replace_recursive((array)$this->items, $values);
-	}
-
-
-
-	/**
-	 * public function reset (array $items)
-	 *
-	 * Reset all items with new values
-	 * Returns none
-	 */
-	public function reset (array $items) {
-		$this->clear();
-		$this->set($items);
 	}
 }
 ?>

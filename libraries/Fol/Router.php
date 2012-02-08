@@ -132,7 +132,7 @@ class Router {
 			$controller = array($this->namespace.$this->config['default'], 'index');
 		}
 
-		if ($this->isCallable($controller) && ($parameters = $this->getParameters($controller, $Request, $segments)) !== false) {
+		if ($this->isCallable($controller) && ($parameters = $this->getParameters($controller, $Request, array(), $segments)) !== false) {
 			return array($controller, $parameters);
 		}
 
@@ -142,11 +142,11 @@ class Router {
 
 
 	/**
-	 * private function getParameters ($controller, Fol\Request $Request, array $parameters)
+	 * private function getParameters ($controller, Fol\Request $Request, array $parameters, [array $numeric_parameters])
 	 *
 	 * Returns boolean
 	 */
-	private function getParameters ($controller, Request $Request, array $parameters) {
+	private function getParameters ($controller, Request $Request, array $parameters, array $numeric_parameters = array()) {
 		$new_parameters = array();
 
 		$Method = new \ReflectionMethod($controller[0], $controller[1]);
@@ -160,6 +160,9 @@ class Router {
 				$new_parameters[] = $parameters[$name];
 				$Request->Parameters->set($name, $parameters[$name]);
 				unset($parameters[$name]);
+			} else if (isset($numeric_parameters)) {
+				$Request->Parameters->set($name, array_shift($numeric_parameters));
+				$new_parameters[] = $Request->Parameters->get($name);
 			} else if ($Parameter->isOptional()) {
 				$new_parameters[] = $Parameter->getDefaultValue();
 			} else {

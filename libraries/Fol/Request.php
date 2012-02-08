@@ -5,6 +5,7 @@ use Fol\Containers\Container;
 use Fol\Containers\Input;
 use Fol\Containers\Files;
 use Fol\Containers\Server;
+use Fol\Containers\Headers;
 
 class Request {
 	public $Parameters;
@@ -12,6 +13,7 @@ class Request {
 	public $Post;
 	public $Files;
 	public $Cookies;
+	public $Headers;
 	public $Server;
 
 	private $path;
@@ -114,7 +116,15 @@ class Request {
 		$this->Post = new Input($post);
 		$this->Files = new Files($files);
 		$this->Cookies = new Input($cookies);
-		$this->Server = new Server($server);
+		$this->Server = new Container($server);
+		$this->Headers = new Headers(Headers::getHeadersFromServer($server));
+
+		foreach (array_keys($this->Headers->getParsed('Accept')) as $mimetype) {
+			if ($format = Headers::getFormat($mimetype)) {
+				$this->format = $format;
+				break;
+			}
+		}
 
 		$this->setPath($path);
 	}
@@ -133,6 +143,7 @@ class Request {
 		$this->Files = clone $this->Files;
 		$this->Cookies = clone $this->Cookies;
 		$this->Server = clone $this->Server;
+		$this->Headers = clone $this->Headers;
 	}
 
 
@@ -229,9 +240,33 @@ class Request {
 
 
 	/**
+	 * public function getLanguage ([array $valid_languages])
+	 *
+	 * Gets the preferred language
+	 * Returns none
+	 */
+	public function getLanguage (array $valid_languages = null) {
+		$user_languages = array_keys($this->Headers->getParsed('Accept-Language'));
+
+		if (is_null($valid_languages)) {
+			return $user_languages[0];
+		}
+
+		if (!$user_languages) {
+			return $valid_languages[0];
+		}
+
+		$common_languages = array_values(array_intersect($user_languages, $valid_languages));
+
+		return $common_languages[0] ?: $valid_languages[0];
+	}
+
+
+
+	/**
 	 * public function get ($name, [mixed $default])
 	 *
-	 * Gets one parameter in POST/FILES/GET/PATH order
+	 * Gets one parameter in POST/FILES/GET/parameters order
 	 * Returns mixed
 	 */
 	public function get ($name, $default = null) {
@@ -241,9 +276,25 @@ class Request {
 
 
 	/**
+	 * public function getQueryString ()
+	 *
+	 * Gets the GET variables as a string
+	 * Returns string
+	 */
+	public function getQueryString () {
+		if ($query = $this->Get->get()) {
+			return http_build_query($query);
+		}
+
+		return '';
+	}
+
+
+
+	/**
 	 * public function remove (string $name)
 	 *
-	 * Removes a variable in POST/FILES/GET/PATH
+	 * Removes a variable in POST/FILES/GET/parameters
 	 * Returns none
 	 */
 	public function remove ($name) {
@@ -258,7 +309,7 @@ class Request {
 	/**
 	 * public function exists (string $name)
 	 *
-	 * Check if a variable exists in POST/FILES/GET/PATH
+	 * Check if a variable exists in POST/FILES/GET/parameters
 	 * Returns boolean
 	 */
 	public function exists ($name) {
@@ -273,7 +324,7 @@ class Request {
 	 * Returns string
 	 */
 	public function getIp () {
-		return $this->Server->get('http-client-ip', $this->Server->get('http-x-forwarded-for', $this->Server->get('remote-addr')));
+		return $this->Server->get('HTTP_CLIENT_IP', $this->Server->get('HTTP_X_FORWARDED_FOR', $this->Server->get('REMOTE_ADDR')));
 	}
 
 
@@ -284,7 +335,7 @@ class Request {
 	 * Returns boolean
 	 */
 	public function isAjax () {
-		return (strtolower($this->Server->get('http-x-requested-with')) === 'xmlhttprequest') ? true : false;
+		return (strtolower($this->Server->get('HTTP_X_REQUESTED_WITH')) === 'xmlhttprequest') ? true : false;
 	}
 
 
@@ -295,7 +346,7 @@ class Request {
 	 * Returns string
 	 */
 	public function getScheme () {
-		return ($this->Server->get('https') === 'on') ? 'https' : 'http';
+		return ($this->Server->get('HTTPS') === 'on') ? 'https' : 'http';
 	}
 
 
@@ -307,7 +358,7 @@ class Request {
 	 * Returns string
 	 */
 	public function getPort () {
-		return $this->Server->get('x-forwarded-port') ?: $this->Server->get('server-port');
+		return $this->Server->get('X_FORWARDED_PORT') ?: $this->Server->get('SERVER_PORT');
 	}
 
 
@@ -322,7 +373,7 @@ class Request {
 		$method = strtoupper($this->Server->get('REQUEST_METHOD', 'GET'));
 	
 		if ($method === 'POST') {
-			$this->method = strtoupper($this->Server->get('X-HTTP-METHOD-OVERRIDE', 'POST'));
+			$this->method = strtoupper($this->Server->get('X_HTTP_METHOD_OVERRIDE', 'POST'));
 		}
 
 		return $method;

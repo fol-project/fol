@@ -7,9 +7,40 @@ use Fol\App;
 
 class Main extends Controller {
 	public function index () {
-		$content = $this->Views->render('html.php', array('variable' => 'molass'));
+		$Response = new Response();
+		$Response->Headers->setCache(array(
+			'Expires' => '10-6-2012',
+			'Last-Modified' => 'Sat, 28 Jan 2011 01:48:11 GMT',
+			'max-age' => 3600,
+			'private' => true
+		));
 
-		return new Response($content);
+		$cache = $Response->Headers->getCache();
+		$cache['public'] = false;
+
+		$Response->Headers->setCache($cache);
+		
+		//$Response->Headers->setDateTime('Expires', 'Sat, 28 Jan 2011 01:48:11 GMT');
+		pre((string)$Response);
+		
+		return $Response;
+
+		/*
+		común entre response/request:
+
+		- Cache-Control
+		- Connection
+		- Content-Length
+		- Content-MD5
+		- Content-Type
+		- Date
+		- Pragma
+		- Warning
+
+		relacionados:
+		- Accept-Encoding -> Content-Encoding
+		- Accept-Language -> Content-Language
+		*/
 	}
 
 	public function testSpeed () {
