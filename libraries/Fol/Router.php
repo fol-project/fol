@@ -1,6 +1,10 @@
 <?php
 namespace Fol;
 
+use Fol\Http\Response;
+use Fol\Http\Request;
+use Fol\Http\HttpException;
+
 class Router {
 	private $namespace;
 	private $config = array();
@@ -97,7 +101,7 @@ class Router {
 
 
 	/**
-	 * public function getController (Fol\Request $Request)
+	 * public function getController (Fol\Http\Request $Request)
 	 *
 	 * Returns array/false
 	 */
@@ -112,7 +116,7 @@ class Router {
 
 
 	/**
-	 * public function getPathController (Fol\Request $Request)
+	 * public function getPathController (Fol\Http\Request $Request)
 	 *
 	 * Returns array/false
 	 */
@@ -142,7 +146,7 @@ class Router {
 
 
 	/**
-	 * private function getParameters ($controller, Fol\Request $Request, array $parameters, [array $numeric_parameters])
+	 * private function getParameters ($controller, Fol\Http\Request $Request, array $parameters, [array $numeric_parameters])
 	 *
 	 * Returns boolean
 	 */
@@ -197,7 +201,7 @@ class Router {
 
 
 	/**
-	 * public function getRoutingController (Fol\Request $Request)
+	 * public function getRoutingController (Fol\Http\Request $Request)
 	 *
 	 * Check the route and returns the controller
 	 * Returns array/false
@@ -300,7 +304,7 @@ class Router {
 
 
 	/**
-	 * public function handle (Fol\Request $Request)
+	 * public function handle (Fol\Http\Request $Request)
 	 *
 	 * Executes the controller of the application
 	 * Returns none
@@ -331,7 +335,7 @@ class Router {
 
 
 	/**
-	 * public function executeController ($controller, Fol\Request $Request)
+	 * public function executeController ($controller, Fol\Http\Request $Request)
 	 *
 	 * Executes the controller of the application
 	 * Returns none

@@ -1,5 +1,5 @@
 <?php
-namespace Fol;
+namespace Fol\Http;
 
 class HttpException extends \Exception {
 

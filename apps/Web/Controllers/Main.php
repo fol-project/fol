@@ -1,7 +1,7 @@
 <?php
 namespace Apps\Web\Controllers;
 
-use Fol\Response;
+use Fol\Http\Response;
 use Fol\Controller;
 use Fol\App;
 
@@ -19,6 +19,8 @@ class Main extends Controller {
 		$cache['public'] = false;
 
 		$Response->Headers->setCache($cache);
+
+		$Response->send();
 		
 		//$Response->Headers->setDateTime('Expires', 'Sat, 28 Jan 2011 01:48:11 GMT');
 		pre((string)$Response);

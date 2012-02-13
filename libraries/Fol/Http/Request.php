@@ -1,11 +1,10 @@
 <?php
-namespace Fol;
+namespace Fol\Http;
 
 use Fol\Containers\Container;
 use Fol\Containers\Input;
 use Fol\Containers\Files;
-use Fol\Containers\Server;
-use Fol\Containers\Headers;
+use Fol\Http\Headers;
 
 class Request {
 	public $Parameters;
@@ -144,6 +143,24 @@ class Request {
 		$this->Cookies = clone $this->Cookies;
 		$this->Server = clone $this->Server;
 		$this->Headers = clone $this->Headers;
+	}
+
+
+	/**
+	 * public function __toString ()
+	 *
+	 * Converts the request to a string
+	 */
+	public function __toString () {
+		$text = "Parameters:\n".$this->Parameters;
+		$text .= "\nGet:\n".$this->Get;
+		$text .= "\nPost:\n".$this->Post;
+		$text .= "\nFiles:\n".$this->Files;
+		$text .= "\nCookies:\n".$this->Cookies;
+		$text .= "\nServer:\n".$this->Server;
+		$text .= "\nHeaders:\n".$this->Headers;
+
+		return $text;
 	}
 
 

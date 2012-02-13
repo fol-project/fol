@@ -1,6 +1,8 @@
 <?php
 namespace Fol;
 
+use Fol\Containers\Container;
+
 class Views {
 	public $Templates;
 
@@ -17,7 +19,7 @@ class Views {
 	public function __construct ($Controller) {
 		$this->Controller = $Controller;
 		$this->App = $Controller->App;
-		$this->Templates = new Containers\Container;
+		$this->Templates = new Container;
 		$this->public_http = $this->App->real_http.'public/';
 	}
 

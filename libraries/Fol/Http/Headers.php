@@ -1,5 +1,5 @@
 <?php
-namespace Fol\Containers;
+namespace Fol\Http;
 
 class Headers {
 	private $items = array();
@@ -63,6 +63,29 @@ class Headers {
 		504 => 'Gateway Timeout',
 		505 => 'HTTP Version Not Supported',
 	);
+
+
+	/**
+	 * public function __toString ()
+	 *
+	 * Converts all cookies to a string
+	 */
+	public function __toString () {
+		$text = '';
+
+		foreach ($this->items as $name => $value) {
+			if (is_string($value)) {
+				$text .= "$name: $value\n";
+				continue;
+			}
+
+			foreach ($value as $v) {
+				$text .= "$name: $v\n";
+			}
+		}
+
+		return $text;
+	}
 
 
 
@@ -144,6 +167,33 @@ class Headers {
 	 */
 	public function __construct (array $parameters = array()) {
 		$this->set($parameters);
+	}
+
+
+
+	/**
+	 * public function send ()
+	 *
+	 * Sends the headers if don't have been send by the developer
+	 * Returns boolean
+	 */
+	public function send () {
+		if (headers_sent()) {
+			return false;
+		}
+
+		foreach ($this->items as $name => $value) {
+			if (is_string($value)) {
+				header($name.': '.$value, false);
+				continue;
+			}
+
+			foreach ($value as $v) {
+				header($name.': '.$v, false);
+			}
+		}
+
+		return true;
 	}
 
 

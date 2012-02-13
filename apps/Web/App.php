@@ -1,7 +1,7 @@
 <?php
 namespace Apps\Web;
 
-use Fol\Request;
+use Fol\Http\Request;
 
 class App extends \Fol\App {
 

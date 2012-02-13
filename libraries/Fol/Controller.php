@@ -9,11 +9,11 @@ abstract class Controller {
 
 
 	/**
-	 * public function __construct ($App, Fol\Request $Request)
+	 * public function __construct ($App, Fol\Http\Request $Request)
 	 *
 	 * Returns none
 	 */
-	public function __construct ($App, Request $Request) {
+	public function __construct ($App, Http\Request $Request) {
 		$this->App = $App;
 		$this->Request = $Request;
 		$this->Models = $this->App->Services->get('Models', array($this));

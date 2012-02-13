@@ -1,8 +1,8 @@
 <?php
-namespace Fol;
+namespace Fol\Http;
 
-use Fol\Containers\Headers;
-use Fol\Containers\Cookies;
+use Fol\Http\Headers;
+use Fol\Http\Cookies;
 
 class Response {
 	public $Headers;
@@ -47,20 +47,11 @@ class Response {
 	 * Converts the current response to a string
 	 */
 	public function __toString () {
-		$text = vsprintf('HTTP/1.1 %s %s', $this->status)."\n";
-		$text .= sprintf('Content-Type: %s %s', $this->content_type, $this->charset)."\n";
+		$text = vsprintf('HTTP/1.1 %s %s', $this->status);
+		$text .= "\n".sprintf('Content-Type: %s %s', $this->content_type, $this->charset)."\n";
 
-		foreach ($this->Headers->get() as $name => $value) {
-			if (is_string($value)) {
-				$text .= "$name: $value\n";
-				continue;
-			}
-
-			foreach ($value as $v) {
-				$text .= "$name: $v\n";
-			}
-		}
-
+		$text .= "\n".(string)$this->Headers;
+		$text .= "\n".(string)$this->Cookies;
 		$text .= "\n".$this->content;
 
 		return $text;
@@ -141,6 +132,28 @@ class Response {
 
 
 	/**
+	 * public function setContentType (string $type)
+	 *
+	 * Sets the content type header to output
+	 * Returns none
+	 */
+	public function setContentType ($type) {
+		$this->content_type = Headers::getMimeType($type) ?: $type;
+	}
+
+
+	/**
+	 * public function getContentType ()
+	 *
+	 * Gets the content type header to output
+	 * Returns string
+	 */
+	public function getContentType () {
+		return $this->content_type;
+	}
+
+
+	/**
 	 * public function send ()
 	 *
 	 * Sends the headers and print the content
@@ -167,16 +180,8 @@ class Response {
 		header(vsprintf('HTTP/1.1 %s %s', $this->status));
 		header(sprintf('Content-Type: %s UTF-8', $this->content_type));
 
-		foreach ($this->Headers->get() as $name => $value) {
-			if (is_string($value)) {
-				header($name.': '.$value, false);
-				continue;
-			}
-
-			foreach ($value as $v) {
-				header($name.': '.$v, false);
-			}
-		}
+		$this->Headers->send();
+		$this->Cookies->send();
 
 		return true;
 	}
@@ -191,29 +196,6 @@ class Response {
 	 */
 	public function sendContent () {
 		echo $this->content;
-	}
-
-
-
-	/**
-	 * public function setContentType (string $type)
-	 *
-	 * Sets the content type header to output
-	 * Returns none
-	 */
-	public function setContentType ($type) {
-		$this->content_type = Headers::getMimeType($type) ?: $type;
-	}
-
-
-	/**
-	 * public function getContentType ()
-	 *
-	 * Gets the content type header to output
-	 * Returns string
-	 */
-	public function getContentType () {
-		return $this->content_type;
 	}
 }
 ?>

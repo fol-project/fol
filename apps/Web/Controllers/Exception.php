@@ -1,7 +1,7 @@
 <?php
 namespace Apps\Web\Controllers;
 
-use Fol\Response;
+use Fol\Http\Response;
 
 class Exception {
 	public function http ($Exception) {

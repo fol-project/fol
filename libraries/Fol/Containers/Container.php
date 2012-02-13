@@ -16,6 +16,26 @@ class Container {
 	}
 
 
+	/**
+	 * public function __toString ()
+	 *
+	 * Converts all items to a string
+	 */
+	public function __toString () {
+		$text = '';
+
+		foreach ($this->items as $name => $value) {
+			if (is_array($value)) {
+				$value = json_encode($value);
+			}
+
+			$text .= "$name: $value\n";
+		}
+
+		return $text;
+	}
+
+
 
 	/**
 	 * public function length ()
@@ -71,27 +91,18 @@ class Container {
 
 
 	/**
-	 * public function delete (string $name)
+	 * public function delete ([string $name])
 	 *
 	 * Deletes one parameter
 	 * Returns none
 	 */
-	public function delete ($name) {
-		unset($this->items[$name]);
+	public function delete ($name = null) {
+		if (func_num_args() === 0) {
+			$this->items = array();
+		} else {
+			unset($this->items[$name]);
+		}
 	}
-
-
-
-	/**
-	 * public function clear ()
-	 *
-	 * Deletes all parameters
-	 * Returns none
-	 */
-	public function clear () {
-		$this->items = array();
-	}
-
 
 
 
