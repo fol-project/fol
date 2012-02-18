@@ -1,7 +1,7 @@
 <?php
 namespace Fol;
 
-use Fol\Containers\Container;
+use Fol\Container;
 
 class Views {
 	public $Templates;

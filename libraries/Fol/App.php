@@ -2,6 +2,7 @@
 namespace Fol;
 
 abstract class App {
+	public $namespace;
 	public $name;
 	public $path;
 	public $http;
@@ -33,8 +34,8 @@ abstract class App {
 		$this->Parent = $Parent;
 
 		$Class = new \ReflectionClass($this);
-
-		$this->name = end(explode('\\', $Class->getNameSpaceName()));
+		$this->namespace = $Class->getNameSpaceName();
+		$this->name = end(explode('\\', $this->namespace));
 		$this->path = dirname($Class->getFileName()).'/';
 		$this->http = BASE_HTTP.strtolower($this->name).'/';
 		$this->real_http = BASE_HTTP.preg_replace('|^'.BASE_PATH.'|i', '', $this->path);

@@ -36,7 +36,9 @@ function pre ($pre, $info = false) {
 		echo '</em>'."\n";
 	}
 
-	if (is_bool($pre)) {
+	if (is_null($pre)) {
+		echo 'NULL';
+	} else if (is_bool($pre)) {
 		echo $pre ? 'TRUE' : 'FALSE';
 	} else {
 		ob_start();

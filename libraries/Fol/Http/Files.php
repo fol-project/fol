@@ -1,5 +1,5 @@
 <?php
-namespace Fol\Containers;
+namespace Fol\Http;
 
 class Files extends Input {
 

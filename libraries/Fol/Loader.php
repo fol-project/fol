@@ -127,13 +127,13 @@ class Loader {
 
 
 	/**
-	 * public function registerClass (array $classes)
-	 * public function registerClass (string $class, string $path)
+	 * static public function registerClass (array $classes)
+	 * static public function registerClass (string $class, string $path)
 	 *
 	 * Sets a new path for an specific class
 	 * Returns none
 	 */
-	public function registerClass ($class, $path = null) {
+	static public function registerClass ($class, $path = null) {
 		if (is_array($class)) {
 			foreach ($class as $key => $value) {
 				self::registerClass($key, $value);
@@ -148,14 +148,14 @@ class Loader {
 
 
 	/**
-	 * public function registerPrefix (array $prefixes)
-	 * public function registerPrefix (string $prefix, string $path)
-	 * public function registerPrefix (string $prefix, array $options)
+	 * static public function registerPrefix (array $prefixes)
+	 * static public function registerPrefix (string $prefix, string $path)
+	 * static public function registerPrefix (string $prefix, array $options)
 	 *
 	 * Sets a new path for an specific prefix in class name
 	 * Returns none
 	 */
-	public function registerPrefix ($prefix, $options = null) {
+	static public function registerPrefix ($prefix, $options = null) {
 		if (is_array($prefix)) {
 			foreach ($prefix as $key => $value) {
 				self::registerPrefix($key, $value);

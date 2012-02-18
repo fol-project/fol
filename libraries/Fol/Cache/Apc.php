@@ -1,7 +1,7 @@
 <?php
 namespace Fol;
 
-class Cache_Apc {
+class Cache_Apc implements Cache_Interface {
 
 	/**
 	 * public function __construct ()
@@ -10,7 +10,7 @@ class Cache_Apc {
 	 */
 	public function __construct () {
 		if (!extension_loaded('apc')) {
-			die('apc is not loaded');
+			throw new \ErrorException('APC is not loaded');
 		}
 	}
 
@@ -19,7 +19,7 @@ class Cache_Apc {
 	/**
 	 * public function set ($name, [$value], [int $expire])
 	 *
-	 * Saves a variable in apc cache
+	 * Saves a value
 	 * Returns boolean
 	 */
 	public function set ($name, $value, $expire = 3600) {
@@ -31,7 +31,7 @@ class Cache_Apc {
 	/**
 	 * public function get ($name)
 	 *
-	 * Returns a variable saved in apc
+	 * Returns a saved value
 	 * Returns mixed
 	 */
 	public function get ($name) {
@@ -41,12 +41,12 @@ class Cache_Apc {
 
 
 	/**
-	 * public function exists ($name, [$expire])
+	 * public function exists ($name)
 	 *
-	 * Returns if exists a file
+	 * Returns if exists a value
 	 * Returns boolean
 	 */
-	public function exists ($name, $expire = null) {
+	public function exists ($name) {
 		return apc_exists($name);
 	}
 
@@ -55,7 +55,7 @@ class Cache_Apc {
 	/**
 	 * public function delete ($name)
 	 *
-	 * Deletes a cache file
+	 * Deletes a cached value
 	 * Returns boolean
 	 */
 	public function delete ($name) {

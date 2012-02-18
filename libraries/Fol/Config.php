@@ -1,66 +1,64 @@
 <?php
 namespace Fol;
 
-use Fol\Containers\Container;
+class Config {
+	public $environment;
 
-class Config extends Container {
-	private $basedir;
+	private $folder;
+	private $items = array();
 
 
 
 	/**
-	 * public function __construct ([string $basedir])
+	 * public function __construct ([string $folder])
 	 *
 	 * Returns none
 	 */
-	public function __construct ($basedir = null) {
-		$this->setBaseDir($basedir ? $basedir : BASE_PATH.BASE_DIR);
+	public function __construct ($folder = null) {
+		$this->setFolder($folder ? $folder : BASE_PATH.BASE_DIR);
 	}
 
 
 
 	/**
-	 * public function setBaseDir (string $basedir)
+	 * public function __toString ()
 	 *
-	 * Returns none
+	 * Converts all items to a string
 	 */
-	public function setBaseDir ($basedir) {
-		$this->basedir = $basedir;
+	public function __toString () {
+		$text = '';
+
+		foreach ($this->items as $name => $value) {
+			if (is_array($value)) {
+				$value = json_encode($value);
+			}
+
+			$text .= "$name: $value\n";
+		}
+
+		return $text;
 	}
 
 
 
 	/**
-	 * public function getBaseDir ()
+	 * public function setFolder (string $folder)
+	 *
+	 * Returns none
+	 */
+	public function setFolder ($folder) {
+		$this->folder = $folder;
+	}
+
+
+
+	/**
+	 * public function getFolder ()
 	 *
 	 * Returns string
 	 */
-	public function getBaseDir () {
-		return $this->basedir;
-	}
-
-
-
-	/**
-	 * public function setEnvironment (string $environment)
-	 *
-	 * Sets the environment subdirectory
-	 * Returns none
-	 */
-	public function setEnvironment ($environment) {
-		$this->environment = $environment;
-	}
-
-
-
-	/**
-	 * public function getEnvironment ()
-	 *
-	 * Gets the environment subdirectory
-	 * Returns string
-	 */
-	public function getEnvironment () {
-		return $this->environment;
+	public function getFolder () {
+		return $this->folder;
 	}
 
 
@@ -72,20 +70,20 @@ class Config extends Container {
 	 * Returns mixed
 	 */
 	public function load ($name) {
-		if (!$this->basedir) {
+		if (!$this->folder) {
 			return;
 		}
 
 		$file = $name.'.php';
 
-		if ($this->environment && file_exists($this->basedir.$this->environment.'/'.$name.'.php')) {
-			$config = include($this->basedir.$this->environment.'/'.$name.'.php');
-		} else if ($this->environment && file_exists($this->basedir.$this->environment.'/'.$name.'.ini')) {
-			$config = parse_ini_file($this->basedir.$this->environment.'/'.$name.'.ini', true);
-		} else if (file_exists($this->basedir.$name.'.php')) {
-			$config = include($this->basedir.$name.'.php');
-		} else if (file_exists($this->basedir.$name.'.ini')) {
-			$config = parse_ini_file($this->basedir.$name.'.ini', true);
+		if ($this->environment && file_exists($this->folder.$this->environment.'/'.$name.'.php')) {
+			$config = include($this->folder.$this->environment.'/'.$name.'.php');
+		} else if ($this->environment && file_exists($this->folder.$this->environment.'/'.$name.'.ini')) {
+			$config = parse_ini_file($this->folder.$this->environment.'/'.$name.'.ini', true);
+		} else if (file_exists($this->folder.$name.'.php')) {
+			$config = include($this->folder.$name.'.php');
+		} else if (file_exists($this->folder.$name.'.ini')) {
+			$config = parse_ini_file($this->folder.$name.'.ini', true);
 		}
 
 		$this->set($name, $config);
@@ -96,11 +94,11 @@ class Config extends Container {
 
 
 	/**
-	 * public function get ([string $name], [string $key])
+	 * public function get ([string $name])
 	 *
 	 * Returns mixed
 	 */
-	public function get ($name = null, $key = null) {
+	public function get ($name = null) {
 		if (func_num_args() === 0) {
 			return $this->items;
 		}
@@ -109,22 +107,57 @@ class Config extends Container {
 			$this->load($name);
 		}
 
-		return $key ? $this->items[$name][$key] : $this->items[$name];
+		return $this->items[$name];
 	}
 
 
 
 	/**
-	 * public function remove (string $name, [string $key])
+	 * public function set (string $name, mixed $value)
+	 * public function set (array $values)
 	 *
+	 * Sets one parameter
 	 * Returns none
 	 */
-	public function remove ($name, $key = null) {
+	public function set ($name, $value = null) {
+		if (is_array($name)) {
+			$this->items = array_replace($this->items, $name);
+		} else {
+			$this->items[$name] = $value;
+		}
+	}
+
+
+
+	/**
+	 * public function delete (string $name, [string $key])
+	 *
+	 *
+	 * Deletes a variable
+	 * Returns none
+	 */
+	public function delete ($name, $key = null) {
 		if ($key) {
 			unset($this->items[$name][$key]);
 		} else {
 			unset($this->items[$name]);
 		}
+	}
+
+
+
+	/**
+	 * public function exists (string $name, [string $key])
+	 *
+	 * Checks if a parameter exists
+	 * Returns boolean
+	 */
+	public function exists ($name, $key = null) {
+		if (!array_key_exists($name, $this->items)) {
+			return false;
+		}
+
+		return $key ? array_key_exists($key, $this->items[$name]) : true;
 	}
 }
 ?>

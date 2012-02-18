@@ -1,9 +1,8 @@
 <?php
-namespace Fol\Containers;
+namespace Fol\Http;
 
 class Container {
 	protected $items = array();
-
 
 
 	/**
@@ -78,14 +77,10 @@ class Container {
 	 */
 	public function set ($name, $value = null) {
 		if (is_array($name)) {
-			foreach ($name as $key => $value) {
-				$this->items[$key] = $value;
-			}
-
-			return;
+			$this->items = array_replace($this->items, $name);
+		} else {
+			$this->items[$name] = $value;
 		}
-
-		$this->items[$name] = $value;
 	}
 
 
@@ -114,18 +109,6 @@ class Container {
 	 */
 	public function exists ($name) {
 		return array_key_exists($name, $this->items);
-	}
-
-
-
-	/**
-	 * public function replace (array $values)
-	 *
-	 * Replaces recursively some values
-	 * Returns none
-	 */
-	public function replace (array $values) {
-		$this->items = array_replace_recursive((array)$this->items, $values);
 	}
 }
 ?>

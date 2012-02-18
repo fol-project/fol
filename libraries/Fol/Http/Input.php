@@ -1,9 +1,7 @@
 <?php
-namespace Fol\Containers;
+namespace Fol\Http;
 
 class Input extends Container {
-	private $xss_hash = '';
-
 
 	/**
 	 * public function get ([string $name], [mixed $default])

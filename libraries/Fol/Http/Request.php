@@ -1,9 +1,9 @@
 <?php
 namespace Fol\Http;
 
-use Fol\Containers\Container;
-use Fol\Containers\Input;
-use Fol\Containers\Files;
+use Fol\Http\Container;
+use Fol\Http\Input;
+use Fol\Http\Files;
 use Fol\Http\Headers;
 
 class Request {

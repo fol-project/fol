@@ -1,7 +1,7 @@
 <?php
 namespace Fol;
 
-class Cache_File {
+class Cache_File implements Cache_Interface {
 	private $folder;
 
 
@@ -45,7 +45,7 @@ class Cache_File {
 	/**
 	 * public function set ($name, [$value], [int $expire])
 	 *
-	 * Saves a variable in a file
+	 * Saves a value in a file
 	 * Returns boolean
 	 */
 	public function set ($name, $value, $expire = 3600) {
@@ -67,7 +67,7 @@ class Cache_File {
 	/**
 	 * public function get ($name)
 	 *
-	 * Returns a variable saved in a file
+	 * Returns a value saved in a file
 	 * Returns mixed
 	 */
 	public function get ($name) {
@@ -83,7 +83,7 @@ class Cache_File {
 	/**
 	 * public function exists ($name)
 	 *
-	 * Returns if exists a file
+	 * Returns if a value exists
 	 * Returns boolean
 	 */
 	public function exists ($name) {
@@ -106,7 +106,7 @@ class Cache_File {
 	/**
 	 * public function delete ($name)
 	 *
-	 * Deletes a cache file
+	 * Deletes a value
 	 * Returns boolean
 	 */
 	public function delete ($name) {

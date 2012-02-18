@@ -10,7 +10,7 @@ class Services {
 	/**
 	 * public function getRegister ([string $name])
 	 *
-	 * Gets one or all parameters
+	 * Gets one or all registered services
 	 * Returns array
 	 */
 	public function getRegister ($name = null) {
@@ -113,6 +113,7 @@ class Services {
 						if ($parameters = $this->sortParameters($Class->getMethod('__construct'), $parameters)) {
 							$Instance = $Class->newInstanceArgs($parameters);
 						} else {
+							throw new \BadMethodCallException('The class "'.$data['class'].'" has not __construct so you cannot set parameters for instantialization');
 							return false;
 						}
 					} else {
@@ -124,7 +125,11 @@ class Services {
 					}
 
 					return $Instance;
+				} else {
+					throw new \InvalidArgumentException('The class "'.$data['class'].'" is not instantiable');
 				}
+			} else {
+				throw new \InvalidArgumentException('The class "'.$data['class'].'" does not exists');
 			}
 		}
 

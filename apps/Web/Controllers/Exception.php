@@ -11,5 +11,9 @@ class Exception {
 	public function error ($Exception) {
 		return new Response($Exception->getMessage(), 500);
 	}
+
+	public function notFound ($Exception) {
+		return new Response('non atopada a páxina');
+	}
 }
 ?>

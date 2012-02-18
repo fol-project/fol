@@ -6,6 +6,9 @@ use Fol\Controller;
 use Fol\App;
 
 class Main extends Controller {
+	public function chachi () {
+		echo 'chachi';
+	}
 	public function index () {
 		$Response = new Response();
 		$Response->Headers->setCache(array(

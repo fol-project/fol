@@ -56,8 +56,6 @@ CAL É A SITUACIÓN ACTUAL?
 
 Por agora aínda está en fase alfa (0.1a). Falta por probar cousas e crear outras novas. Paciencia. Varios dos to-dos que quedan por facer:
 
-* Controladores: deberían funcionar con calquera elemento "callable", non só métodos
-* Completar a clase Request e Response (http://en.wikipedia.org/wiki/List_of_HTTP_headers)
 * Estudiar sistemas de cache http (http://tomayko.com/writings/things-caches-do)  (http://www.mnot.net/cache_docs/)
 * Xerar e capturar as excepcions de SPL (http://www.php.net/manual/en/spl.exceptions.php)
 * Poder compartir recursos entre varias aplicacións
