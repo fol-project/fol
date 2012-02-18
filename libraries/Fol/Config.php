@@ -139,6 +139,10 @@ class Config {
 	public function delete ($name, $key = null) {
 		if ($key) {
 			unset($this->items[$name][$key]);
+
+			if (!$this->items[$name]) {
+				unset($this->items[$name]);
+			}
 		} else {
 			unset($this->items[$name]);
 		}
