@@ -4,8 +4,7 @@ AQUI TES O FOL
 
 Que é FOL?
 
-FOL son as iniciais de... bueno, eso mellor déixoo á túa imaxinación.
-Trátase dun framework escrito en PHP por Oscar Otero (http://oscarotero.com) como exercicio de deseño e como ferramenta para desenvolver experimentos e proxectos persoais. A intención non é facer un super framework desos que o teñen todo senón todo o contrario: construír algo manexable, moi flexible e que permita xuntar librerías externas. Vamos, un microframework, pero algo máis completo e moi extensible.
+FOL é framework escrito en PHP por Oscar Otero (http://oscarotero.com) como exercicio de deseño e como ferramenta para desenvolver experimentos e proxectos persoais. A intención non é facer un super framework desos que o teñen todo e cargan tropecentas librarías senón todo o contrario: construír algo manexable, moi flexible e que permita xuntar librerías externas. Vamos, un microframework, pero algo máis completo e extensible.
 
 
 
@@ -31,21 +30,6 @@ Non hai nada máis pesado que andar configurando mil cousas, sobre todo se leva 
 
 
 
-COMPONENTES DE FOL
-
-Todo framework moderno que se preste debe contar coas seguintes utilidades ou componentes:
-
-* Xestión de erros.
-FOL pode xestionar os erros de php lanzando excepcións. Posúe a clase HttpException (para manexar erros relativos a http, como páxina non atopada (404), etc)
-
-* Xestión de carga de clases.
-FOL contén a clase Loader, que autocarga as demáis clases que se precisen, só no momento en que se precisan, permitindo configurar onde e como cargar cada cousa. Ademáis emprega por defecto o estándar PSR-0 (https://gist.github.com/1234504). Tamén é importante ter unha clase que xestione as Inxecións de dependencias (meter clases como parámetros doutras clases).
-
-* Xestión de cache
-A clase Cache permite cachear calquera cousa. Contén dúas subclases: Apc e File, e pode ser ampliada facilmente por outros tipos de cache que se queiran empregar
-
-
-
 FILOSOFÍA E REFERENCIAS
 
 FOL é o produto de todo este tempo mirando como funcionan outros frameworks, lendo artigos sobre PHP e vendo por onde estan indo as cousas e cales son as necesidades da web moderna. Foi tamén produto da experiencia de traballar con outro framework chamado PhpCan (http://idc.anavallasuiza.com) e poder ver os seus puntos fortes e débiles. De todos xeitos, a gran referencia para este proxecto foi Symfony2 (http://symfony.com/), pero cun enfoque máis sinxelo, seguindo un pouco a filosofía do MicroPHP Manifesto (http://funkatron.com/posts/the-microphp-manifesto.html). Tamén me pareceron interesantes outros proxectos como Codeigniter (http://codeigniter.com/) Alloy (http://alloyframework.org/) ou Kohana (http://kohanaframework.org/) asi como varios microframeworks.
@@ -54,32 +38,4 @@ FOL é o produto de todo este tempo mirando como funcionan outros frameworks, le
 
 CAL É A SITUACIÓN ACTUAL?
 
-Por agora aínda está en fase alfa (0.1a). Falta por probar cousas e crear outras novas. Paciencia. Varios dos to-dos que quedan por facer:
-
-* Estudiar sistemas de cache http (http://tomayko.com/writings/things-caches-do)  (http://www.mnot.net/cache_docs/)
-* Xerar e capturar as excepcions de SPL (http://www.php.net/manual/en/spl.exceptions.php)
-* Poder compartir recursos entre varias aplicacións
-
-
-ESQUEMA
-
-- Loader
-- Error
-
-- App
-	- Services
-
-	(bootstrap)
-	- Router
-	- Controller
-		- App
-		- Request
-			- Get
-			- Post
-			- Files
-			- Cookies
-			- Headers
-			- Server
-		- Response
-			- Headers
-			- Cookies (distinta clase)
+Por agora aínda está en fase beta (0.1b). Falta por probar cousas e crear outras novas. Paciencia.

@@ -5,7 +5,7 @@ use Fol\Http\Request;
 
 class App extends \Fol\App {
 
-	public function bootstrap () {
+	public function bootstrap (Request $Request = null) {
 		//Define services to use
 		$this->Services->register('Config', 'Fol\\Config', array($this->path.'config/'));
 		$this->Services->register('Router', 'Fol\\Http\\Router', array($this));
@@ -15,7 +15,7 @@ class App extends \Fol\App {
 		$this->Router->register($this->Config->get('routes'));
 
 		//Handle the request
-		$this->Router->handle(Request::createFromGlobals())->send();
+		$this->Router->handle($Request ?: Request::createFromGlobals())->send();
 	}
 }
 ?>

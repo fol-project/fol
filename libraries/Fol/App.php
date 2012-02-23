@@ -20,7 +20,11 @@ abstract class App {
 	static function create ($name, $Parent = null) {
 		$app = 'Apps\\'.camelCase($name, true).'\\App';
 
-		return new $app($Parent);
+		if (class_exists($app)) {
+			return new $app($Parent);
+		}
+
+		throw new InvalidArgumentException('"'.$app.'" is an invalid app class');
 	}
 
 

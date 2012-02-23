@@ -15,7 +15,7 @@ class Config {
 	 * Returns none
 	 */
 	public function __construct ($folder = null) {
-		$this->setFolder($folder ? $folder : BASE_PATH.BASE_DIR);
+		$this->setFolder($folder);
 	}
 
 
@@ -44,10 +44,16 @@ class Config {
 	/**
 	 * public function setFolder (string $folder)
 	 *
-	 * Returns none
+	 * Returns boolean
 	 */
 	public function setFolder ($folder) {
-		$this->folder = $folder;
+		if (is_dir($folder)) {
+			$this->folder = $folder;
+
+			return true;
+		}
+
+		throw new ErrorException('The folder config "'.$folder.'" does not exists');
 	}
 
 
@@ -71,7 +77,9 @@ class Config {
 	 */
 	public function load ($name) {
 		if (!$this->folder) {
-			return;
+			throw new ErrorException('The folder config is not set');
+
+			return false;
 		}
 
 		$file = $name.'.php';
