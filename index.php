@@ -11,6 +11,7 @@ include(BASE_PATH.'libraries/functions.php');
 include(BASE_PATH.'libraries/Fol/Loader.php');
 
 Loader::register();
+Loader::setLibrariesPath(BASE_PATH.'libraries/');
 Loader::registerNamespace('Apps', BASE_PATH.'apps/');
 
 Errors::register();

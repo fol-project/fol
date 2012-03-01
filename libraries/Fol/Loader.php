@@ -9,6 +9,24 @@ class Loader {
 	static $namespaces = array();
 
 
+	/**
+	 * static public function setLibrariesPath (string $libraries_path)
+	 *
+	 * Sets the base path for load the libraries
+	 */
+	static public function setLibrariesPath ($libraries_path) {
+		if (is_dir($libraries_path)) {
+			if (substr($libraries_path, -1) != '/') {
+				$libraries_path .= '/';
+			}
+
+			self::$libraries_path = $libraries_path;
+		} else {
+			throw new \ErrorException("The folder '$libraries_path' does not exists");
+		}
+	}
+
+
 
 	/**
 	 * static public function register ()
@@ -16,8 +34,6 @@ class Loader {
 	 * Installs this class loader on the SPL autoload stack.
 	 */
 	static public function register () {
-		self::$libraries_path = self::$libraries_path ?: BASE_PATH.'libraries/';
-
 		spl_autoload_register(array(self, 'autoload'));
 	}
 
