@@ -374,6 +374,7 @@ class Router {
 					$Response = $Controller->$method();
 				}
 			} else {
+				array_unshift($controller[1], $Request);
 				$Response = call_user_func_array($controller[0], $controller[1]);
 			}
 

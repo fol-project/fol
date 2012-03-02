@@ -9,6 +9,7 @@ class Main extends Controller {
 	public function chachi () {
 		echo 'chachi';
 	}
+
 	public function index () {
 		$Response = new Response();
 		$Response->Headers->setCache(array(
@@ -17,6 +18,11 @@ class Main extends Controller {
 			'max-age' => 3600,
 			'private' => true
 		));
+
+		return 'pirolas';
+
+		$Response->setContent('ola');
+		return $Response;
 
 		$cache = $Response->Headers->getCache();
 		$cache['public'] = false;

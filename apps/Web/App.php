@@ -6,9 +6,28 @@ use Fol\Http\Request;
 class App extends \Fol\App {
 
 	public function bootstrap (Request $Request = null) {
+
+		$routes = new \Fol\Http\Router();
+
+		$routes->register(array(
+			array(
+				'pattern' => '/ola',
+				'controller' => function ($Request) {
+					echo 'caracola '.$Request->Get->get('nome');
+				}
+			)
+		));
+
+		$routes->handle(Request::createFromGlobals())->send();
+
+		return;
+
+
+		$this->Services->register('Router', 'Fol\\Http\\Router', array($this));
+
 		//Define services to use
 		$this->Services->register('Config', 'Fol\\Config', array($this->path.'config/'));
-		$this->Services->register('Router', 'Fol\\Http\\Router', array($this));
+		
 
 		//Define the routes
 		$this->Router->registerException($this->Config->get('exceptionRoutes'));
