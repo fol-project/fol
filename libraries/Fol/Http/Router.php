@@ -172,8 +172,10 @@ class Router {
 			return false;
 		}
 
-		$controller = array($this->namespace.camelCase(array_shift($segments), true));
-		$controller[1] = $segments ? camelCase(array_shift($segments)) : 'index';
+		$class = str_replace(' ', '', ucwords(strtolower(str_replace('-', ' ', array_shift($segments)))));
+		$fn = $segments ? lcfirst(str_replace(' ', '', ucwords(strtolower(str_replace('-', ' ', array_shift($segments)))))) : 'index';
+
+		$controller = array($this->namespace.$class, $fn);
 
 		if ($this->isCallable($controller) && ($parameters = $this->getParameters($controller, $Request, array(), $segments)) !== false) {
 			return array($controller, $parameters);

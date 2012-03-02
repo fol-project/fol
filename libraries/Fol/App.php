@@ -18,7 +18,9 @@ abstract class App {
 	 * Returns object
 	 */
 	static function create ($name, $Parent = null) {
-		$app = 'Apps\\'.camelCase($name, true).'\\App';
+		$name = str_replace(' ', '', ucwords(strtolower(str_replace('-', ' ', $name))));
+
+		$app = 'Apps\\'.$name.'\\App';
 
 		if (class_exists($app)) {
 			return new $app($Parent);

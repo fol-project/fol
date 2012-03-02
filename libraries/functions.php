@@ -1,24 +1,4 @@
 <?php
-
-/**
- * function camelCase (string $string, [boolean $upper_first], [boolean $dash])
- *
- * Transform a string "my-string" to camelCase: "myString"
- * Returns string
- */
-function camelCase ($string, $upper_first = false, $dash = false) {
-	$string = str_replace('-', ' ', $string);
-	$string = str_replace(' ', ($dash ? '-' : ''), ucwords(strtolower($string)));
-
-	if (!$upper_first) {
-		return lcfirst($string);
-	}
-
-	return $string;
-}
-
-
-
 /**
  * function pre ($value)
  *
@@ -47,4 +27,8 @@ function pre ($pre, $info = false) {
 	}
 
 	echo '</pre>';
+}
+
+function spre ($pre, $info = false) {
+	pre((string)$pre, $info);
 }

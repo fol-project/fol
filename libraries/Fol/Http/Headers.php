@@ -170,6 +170,17 @@ class Headers {
 	}
 
 
+	/**
+	 * private function normalize (string $string)
+	 *
+	 * Normalize the name of the parameters
+	 * Returns string
+	 */
+	private function normalize ($string) {
+		return str_replace(' ', '-', ucwords(strtolower(str_replace('-', ' ', $string))));
+	}
+
+
 
 	/**
 	 * public function send ()
@@ -216,7 +227,7 @@ class Headers {
 			return;
 		}
 
-		$name = camelCase($name, true, true);
+		$name = $this->normalize($name);
 
 		if ($replace || !isset($this->items[$name])) {
 			$this->items[$name] = $value;
@@ -238,7 +249,7 @@ class Headers {
 			return $this->items;
 		}
 
-		$name = camelCase($name, true, true);
+		$name = $this->normalize($name);
 
 		if (is_array($this->items[$name]) && $first) {
 			return $this->items[$name][0];
@@ -318,7 +329,7 @@ class Headers {
 	 * Returns none
 	 */
 	public function delete ($name) {
-		$name = camelCase($name, true, true);
+		$name = $this->normalize($name);
 
 		unset($this->items[$name]);
 	}
@@ -344,7 +355,7 @@ class Headers {
 	 * Returns boolean
 	 */
 	public function exists ($name) {
-		$name = camelCase($name, true, true);
+		$name = $this->normalize($name);
 
 		return array_key_exists($name, $this->items);
 	}
