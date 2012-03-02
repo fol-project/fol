@@ -39,3 +39,146 @@ FOL é o produto de todo este tempo mirando como funcionan outros frameworks, le
 CAL É A SITUACIÓN ACTUAL?
 
 Por agora aínda está en fase beta (0.1b). Falta por probar cousas e crear outras novas. Paciencia.
+
+
+
+DOCUMENTACIÓN RÁPIDA:
+
+No directorio raíz de FOL existen dúas carpetas: apps e libraries.
+A carpeta libraries contén todas as librerías que podes usar, entre elas as propias de FOL. Se queres usar calquera libraría de terceiros (por exemplo para traballar con bases de datos ou con plantillas) deberías gardalas aí.
+En cambio, a carpeta apps contén a aplicación ou aplicacións que forman o sitio web.
+
+-------------------------------------------------------------------
+LOADER
+-------------------------------------------------------------------
+A primeira clase que se carga é a clase Loader que serve para cargar automaticamente o resto de clases.
+Debemos indicar o directorio onde esta as librarías coa función setLibrariesPath para que busque nese directorio as clases que carguemos.
+Deste xeito, se instanciamos unha clase chamada "Utilidades\Matematicas", buscaría esa clase no arquivo libraries/Utilidades/Matematicas.php.
+Ademais podemos rexistrar directorios específicos para calquera namespace. Por exemplo todas as clases que se atopan no namespace App podemos configurar para que as busque na carpeta apps, fora de libraries.
+
+-------------------------------------------------------------------
+ERRORS
+-------------------------------------------------------------------
+A clase Errors rexistra todos os erros que se produzan ao longo da execución do script e lanza unha ErrorException. Deste modo centralízanse nun só lugar todos os erros que se produzan para poder manexalos moito mellor.
+
+-------------------------------------------------------------------
+APPS
+-------------------------------------------------------------------
+As aplicacións manexan o código específico do noso sitio web. Podes meter todo o sitio web nunha soa aplicación ou dividilo en distintas aplicacións (unha para o blog, outra para galeria de fotos, etc). Unha aplicación non é máis que unha clase que se instancia e se executa. Por iso podes usar toda a potencia que trae a POO de php, como extender unha aplicación igual que extendes unha clase, ou executar aplicacións dentro de aplicacións. Aínda que non é obligatorio, as aplicacións deberían ter unha función chamada bootstrap que é a que inicia a execución desa aplicación.
+Para crear unha nova aplicación, debemos crear un directorio dentro da carpeta apps co nome da nosa aplicación e crear dentro un arquivo chamado App.php co seguinte código:
+
+class App extends \Fol\App {
+
+	public function bootstrap () {
+		//Codigo para executar a nosa aplicación
+	}
+}
+
+Para instanciar a nosa aplicación podemos facelo manualmente:
+
+$Aplicacion = new Apps\Blog\App();
+
+ou usando a función estática App::create()
+
+$Aplicacion = Fol\App::create('Blog');
+
+logo xa podemos executar a aplicacion coa función bootstrap():
+
+$Aplicacion->bootstrap();
+
+Unha vez instanciada, dentro da función bootstrap podemos acceder ás seguintes propiedades:
+
+$this->namespace: Namespace donde está aloxada a aplicación (Apps\Blog)
+$this->name: Nome da aplicación (Blog)
+$this->path: Ruta onde está aloxada a aplicación (www/apps/Blog/)
+$this->http: Ruta para acceder á raiz desa aplicación via web (p.e: /blog/)
+$this->real_http: Ruta real para acceder a esa aplicación (p.e: /apps/Blog/)
+
+$this->Services: Ademáis tamén dispoñemos da clase Services que nos proporciona unha ferramenta sinxela e potente para manexar as inxecións de dependencia entre outras cousas. Con esta clase podemos configurar que librería usar para cada utilidade específica. Por exemplo, se queremos usar unha clase para manexar a caché, podemos configurar que clase usar:
+
+$this->Services->register('Cache', 'Fol\\Cache_Apc');
+
+Deste xeito para ter unha instancia desa clase simplemente podemos usar:
+
+$Cache = $this->Services->get('Cache');
+
+A clase Services executase directamente na magic function __get() da nosa aplicación polo que podemos chamar directamente ao obxecto $Cache sen necesidade de instanciala:
+
+$this->Cache->set('nome', 'valor');
+
+Neste exemplo, se $this->Cache non existe, créase automáticamente. Se un día queremos cambiar a clase de cache para, por exemplo "Fol\Cache_Memcache", simplemente teríamos que modificar a liña onde rexistramos esa clase:
+
+$this->Services->register('Cache', 'Fol\\Cache_Memcache');
+
+e xa todos os sitios onde se use este servizo pasarían a usar memcache.
+
+-------------------------------------------------------------------
+HTTP
+-------------------------------------------------------------------
+Aínda que podes usar calquera outro servizo, Fol provén dunha serie de clases para traballar con Http, é dicir: recoller os "request" ou peticións http e todas as súas variables (cabeceiras, get, post, cookies, files, etc) e xerar "responses" ou respostas. Para iso temos a clase Fol\Http\Request e Fol\Http\Response.
+
+-------------------------------------------------------------------
+REQUEST
+-------------------------------------------------------------------
+Con esta clase podemos recoller os datos dunha petición http e acceder a eles. Para crear o obxecto Request, podemos usar a función estática createFromGlobals():
+
+$Request = Fol\Http\Request::createFromGlobals();
+
+Agora xa podemos acceder a todos os datos desta petición:
+
+$Request->Get: Obxecto que contén todos os parámetros enviados por GET. Permite acceder a eses datos, editalos, modificalos, etc:
+$Request->Get->get('nome'): Devolve o parámetro enviado por GET 'nome'
+$Request->Get->set('nome', 'novo-valor'): Modifica o valor do parámetro 'nome'
+etc...
+
+Outros obxectos dentro de Request son:
+$Request->Post: Para os parámetros POST
+$Request->Server: Para as variables do servidor (o equivalente a $_SERVER)
+$Request->Headers: Para as cabeceiras http
+$Request->Cookies: Cookies enviadas
+$Request->Files: Arquivos enviados
+
+-------------------------------------------------------------------
+RESPONSE
+-------------------------------------------------------------------
+Esta clase xenera as respostas que se enviarán ao navegador do usuario:
+
+$Response = new Fol\Http\Response;
+
+A clase Response contén dentro outros obxectos para xestionar partes específicas:
+$Response->Headers: Para enviar cabeceiras
+$Response->Cookies: Para enviar cookies
+
+Tamén podemos engadirlle o contido ou body da resposta:
+$Response->setContent('texto de resposta');
+
+E finalmente para enviar a resposta ao servidor, podemos usar a función "send":
+$Response->send();
+
+-------------------------------------------------------------------
+ROUTER
+-------------------------------------------------------------------
+A clase Router que forma parte do conxunto de clases de Http serve para xestionar un patrón de MVC, é dicir, coller un Request, buscar o controlador equivalente e executalo, devolvendo un obxecto Response co resultado da execución. Primeiro debemos configurar as rutas que queremos "capturar" e o controlador que queremos usar. Para iso usamos a función "register":
+
+$Router = Fol\Http\Router($App);
+
+$Router->register(array(
+	array(
+		'pattern' => '/',
+		'controller' => array('Controlador', 'index')
+	),
+	array(
+		'pattern' => '/seccion',
+		'controller' => array('Controlador', 'seccion')
+	),
+));
+
+Agora simplemente coa función handle, podemos xestionar as peticións:
+
+$Request = Fol\Http\Request::createFromGlobals();
+
+$Response = $Router->handle($Request);
+
+$Response->send();
+
+Metendo isto na función bootstrap da nosa aplicación xa temos unha sinxela e potente implementación de MVC.
