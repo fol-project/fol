@@ -42,7 +42,7 @@ abstract class App {
 		$this->name = end(explode('\\', $this->namespace));
 		$this->path = dirname($Class->getFileName()).'/';
 		$this->http = BASE_HTTP.strtolower($this->name).'/';
-		$this->real_http = BASE_HTTP.preg_replace('|^'.BASE_PATH.'|i', '', $this->path);
+		$this->public_http = BASE_HTTP.'public/';
 
 		$this->Services = new Services;
 	}

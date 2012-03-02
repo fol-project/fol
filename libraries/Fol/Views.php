@@ -4,10 +4,10 @@ namespace Fol;
 use Fol\Container;
 
 class Views {
-	public $Templates;
+	protected $Controller;
 
-	protected $App;
-	protected $public;
+	public $views_path;
+	public $public_http;
 
 
 
@@ -18,9 +18,9 @@ class Views {
 	 */
 	public function __construct ($Controller) {
 		$this->Controller = $Controller;
-		$this->App = $Controller->App;
-		$this->Templates = new Container;
-		$this->public_http = $this->App->real_http.'public/';
+
+		$this->views_path = $Controller->App->path.'views/';
+		$this->public_http = $Controller->App->public_http;
 	}
 
 
@@ -32,14 +32,8 @@ class Views {
 	 * Returns string/false
 	 */
 	public function getFile ($name) {
-		$path = $this->App->path.'views/';
-
-		if (is_file($path.$name)) {
-			return $path.$name;
-		}
-
-		if ($template_file = $this->Templates->get($name) && is_file($path.$template_file)) {
-			return $path.$template_file;
+		if (is_file($this->views_path.$name)) {
+			return $this->views_path.$name;
 		}
 
 		return false;
