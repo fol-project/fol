@@ -42,18 +42,18 @@ class Views {
 
 
 	/**
-	 * private function renderFile (string $file, [array $data])
+	 * private function renderFile (string $_file, [array $_data])
 	 *
 	 * Returns mixed
 	 */
-	protected function renderFile ($file, $data = array()) {
-		if ($data) {
-			extract((array)$data, EXTR_SKIP);
+	protected function renderFile ($_file, $_data = array()) {
+		if ($_data) {
+			extract((array)$_data, EXTR_SKIP);
 		}
 
 		ob_start();
 
-		include($file);
+		include($_file);
 
 		return ob_get_clean();
 	}

@@ -101,7 +101,7 @@ class Router {
 	public function registerException ($name = null, $controller = null, $code = null) {
 		if (is_array($name)) {
 			foreach ($name as $value) {
-				$this->registerException($value['name'], $value['controller'], $value['code']);
+				$this->registerException($value['name'], $value['controller'], isset($value['code']) ? $value['code'] : null);
 			}
 
 			return;
@@ -127,16 +127,19 @@ class Router {
 	 * Returns array/false
 	 */
 	public function getExceptionController ($Exception) {
-		$name = end(explode('\\', get_class($Exception)));
+		$name = explode('\\', get_class($Exception));
+		$name = end($name);
 		$code = $Exception->getCode();
 
-		$controller = $this->exceptionRoutes["$name $code"] ?: $this->exceptionRoutes[$name];
-
-		if (!$controller) {
+		if (isset($this->exceptionRoutes["$name $code"])) {
+			$controller = $this->exceptionRoutes["$name $code"];
+		} else if (isset($this->exceptionRoutes[$name])) {
+			$controller = $this->exceptionRoutes[$name];
+		} else {
 			return false;
 		}
 
-		if ($this->isCallable($controller)) {
+		if ($controller && $this->isCallable($controller)) {
 			return array($controller, array($Exception));
 		}
 
@@ -151,7 +154,7 @@ class Router {
 	 * Returns array/false
 	 */
 	public function getController (Request $Request) {
-		if ($this->unregistered_routes) {
+		if ($this->unregisteredRoutes) {
 			return $this->getRoutingController($Request) ?: $this->getUnregisteredController($Request);
 		}
 
@@ -200,11 +203,11 @@ class Router {
 		$path = '/'.$Request->getPath();
 
 		foreach ($this->routes as $name => $settings) {
-			if ($settings['method'] && ($Request->getMethod() !== $settings['method'])) {
+			if (isset($settings['method']) && ($Request->getMethod() !== $settings['method'])) {
 				continue;
 			}
 
-			if ($settings['scheme'] && ($Request->getScheme() !== $settings['scheme'])) {
+			if (isset($settings['scheme']) && ($Request->getScheme() !== $settings['scheme'])) {
 				continue;
 			}
 
@@ -348,7 +351,8 @@ class Router {
 			if ($controller = $this->getExceptionController($Exception)) {
 				$Response = $this->executeController($controller, $Request);
 			} else {
-				$Response = new Response($Exception->getMessage(), $Exception->getCode());
+				$texto = $Exception->getMessage().'<pre>'.$Exception->getTraceAsString().'</pre>';
+				$Response = new Response($texto, $Exception->getCode());
 			}
 		}
 

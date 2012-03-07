@@ -2,7 +2,7 @@
 namespace Fol;
 
 class Errors {
-	private $level;
+	static private $level;
 
 
 	/**
@@ -12,12 +12,9 @@ class Errors {
 	 * Returns Error instance
 	 */
 	static public function register ($level = null) {
-		$Errors = new static();
-		$Errors->setLevel($level);
+		self::setLevel($level);
 
-		set_error_handler(array($Errors, 'handle'));
-
-		return $Errors;
+		set_error_handler(__NAMESPACE__.'\\Errors::handle');
 	}
 
 
@@ -33,28 +30,28 @@ class Errors {
 
 
 	/**
-	 * public public function setLevel ($level)
+	 * static public public function setLevel ($level)
 	 *
 	 * Sets the error level.
 	 * Returns none
 	 */
-	public function setLevel ($level) {
-		$this->level = is_null($level) ? error_reporting() : $level;
+	static public function setLevel ($level) {
+		self::$level = is_null($level) ? error_reporting() : $level;
 	}
 
 
 	/**
-	 * public function handle (int $level, string $message, string $file, string $line)
+	 * static public function handle (int $level, string $message, string $file, string $line)
 	 *
 	 * throws ErrorException when error_reporting returns error
 	 * Returns false
 	 */
-	public function handle ($level, $message, $file, $line) {
-		if ($this->level === 0) {
+	static public function handle ($level, $message, $file, $line) {
+		if (self::$level === 0) {
 			return false;
 		}
 
-		if (error_reporting() & $level && $this->level & $level) {
+		if (error_reporting() & $level && self::$level & $level) {
 			throw new \ErrorException($message, $level, $level, $file, $line);
 		}
 

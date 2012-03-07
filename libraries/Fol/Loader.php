@@ -34,7 +34,7 @@ class Loader {
 	 * Installs this class loader on the SPL autoload stack.
 	 */
 	static public function register () {
-		spl_autoload_register(array(self, 'autoload'));
+		spl_autoload_register(__NAMESPACE__.'\\Loader::autoload');
 	}
 
 
@@ -44,18 +44,18 @@ class Loader {
 	 * Uninstalls this class loader from the SPL autoloader stack.
 	 */
 	static public function unregister () {
-		spl_autoload_unregister(array(self, 'autoload'));
+		spl_autoload_unregister(__NAMESPACE__.'\\Loader::autoload');
 	}
 
 
 
 	/**
-	 * static private function autoload ($class_name)
+	 * static public function autoload ($class_name)
 	 *
 	 * Basic autoload function
 	 * Returns boolean
 	 */
-	static private function autoload ($class_name) {
+	static public function autoload ($class_name) {
 		if ($file = self::getFile($class_name)) {
 			include_once($file);
 		}
@@ -121,13 +121,13 @@ class Loader {
 	 * Returns string/boolean
 	 */
 	static private function filePath ($namespace, $class_name, array $options = array()) {
-		$file = $options['path'] ?: self::$libraries_path;
+		$file = isset($options['path']) ? $options['path'] : self::$libraries_path;
 
-		if ($namespace && $options['namespace_directories'] !== false) {
+		if ($namespace && (!isset($options['namespace_directories']) || $options['namespace_directories'] !== false)) {
 			$file .= str_replace('\\', DIRECTORY_SEPARATOR, $namespace).DIRECTORY_SEPARATOR;
 		}
 
-		if ($options['class_directories'] !== false) {
+		if (!isset($options['class_directories']) || $options['class_directories'] !== false) {
 			$file .= str_replace('_', DIRECTORY_SEPARATOR, $class_name).'.php';
 		} else {
 			$file .= $class_name.'.php';

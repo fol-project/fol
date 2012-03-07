@@ -41,7 +41,7 @@ abstract class App {
 
 		$Class = new \ReflectionClass($this);
 		$this->namespace = $Class->getNameSpaceName();
-		$this->name = end(explode('\\', $this->namespace));
+		$this->name = substr(strrchr($this->namespace, '\\'), 1);
 		$this->path = dirname($Class->getFileName()).'/';
 		$this->http = BASE_HTTP.strtolower($this->name).'/';
 		$this->public_http = BASE_HTTP.'public/';

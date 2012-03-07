@@ -80,7 +80,7 @@ class Services {
 	 * Returns object/false
 	 */
 	public function get ($service, $arguments = null) {
-		$data = $this->items[$name];
+		$data = $this->items[$service];
 
 		if (!$data['shared']) {
 			return $this->newInstance($service, $arguments);
@@ -120,7 +120,7 @@ class Services {
 						$Instance = $Class->newInstance();
 					}
 
-					if ($data['on_construct'] && is_callable($data['on_construct'])) {
+					if (isset($data['on_construct']) && is_callable($data['on_construct'])) {
 						$data['on_construct']($this, $Instance);
 					}
 

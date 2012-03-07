@@ -114,7 +114,7 @@ class Headers {
 	 * Returns string/false
 	 */
 	public static function getMimetype ($format) {
-		return self::$formats[$format][0] ?: false;
+		return isset(self::$formats[$format][0]) ? self::$formats[$format][0] : false;
 	}
 
 
@@ -126,7 +126,7 @@ class Headers {
 	 * Returns string/false
 	 */
 	public static function getStatusText ($code) {
-		return self::$status[$code] ?: false;
+		return isset(self::$status[$code]) ? self::$status[$code] : false;
 	}
 
 

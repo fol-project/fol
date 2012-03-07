@@ -9,7 +9,9 @@ class Exception {
 	}
 
 	public function error ($Exception) {
-		return new Response($Exception->getMessage(), 500);
+		$texto = $Exception->getMessage().'<pre>'.$Exception->getTraceAsString().'</pre>';
+
+		return new Response($texto, 500);
 	}
 
 	public function notFound ($Exception) {
