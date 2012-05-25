@@ -32,14 +32,6 @@ class Services {
 	 * Returns none
 	 */
 	public function register ($name, $class = null, array $parameters = array(), $shared = false) {
-		if (is_array($name)) {
-			foreach ($name as $class) {
-				$this->register($name, $class[0], $class[1], (array)$class[2], $class[3]);
-			}
-
-			return;
-		}
-
 		$this->items[$name] = array(
 			'class' => $class,
 			'parameters' => $parameters,

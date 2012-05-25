@@ -11,7 +11,9 @@ class Container {
 	 * Returns none
 	 */
 	public function __construct (array $items = array()) {
-		$this->set($items);
+		if ($items) {
+			$this->set($items);
+		}
 	}
 
 

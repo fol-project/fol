@@ -2,11 +2,10 @@
 namespace Fol;
 
 abstract class App {
-	public $namespace;
-	public $name;
-	public $path;
-	public $http;
-	public $real_http;
+	private $namespace;
+	private $name;
+	private $path;
+	private $http;
 
 	public $Parent;
 	public $Services;
@@ -40,11 +39,12 @@ abstract class App {
 		$this->Parent = $Parent;
 
 		$Class = new \ReflectionClass($this);
+
 		$this->namespace = $Class->getNameSpaceName();
 		$this->name = substr(strrchr($this->namespace, '\\'), 1);
 		$this->path = dirname($Class->getFileName()).'/';
-		$this->http = BASE_HTTP.strtolower($this->name).'/';
-		$this->public_http = BASE_HTTP.'public/';
+
+		$this->setHttpPath($this->name);
 
 		$this->Services = new Services;
 	}
@@ -68,6 +68,39 @@ abstract class App {
 	 */
 	public function __get ($name) {
 		return $this->$name = $this->Services->get($name);
+	}
+
+
+	public function getName () {
+		return $this->name;
+	}
+
+
+	public function getNameSpace () {
+		return $this->namespace;
+	}
+
+
+	public function getPath () {
+		return $this->path;
+	}
+
+
+	public function setHttpPath ($http) {
+		if ($http[0] === '/') {
+			$http = BASE_HTTP.$http;
+		}
+		
+		if (substr($http, -1) !== '/') {
+			$http .= '/';
+		}
+
+		$this->http = strtolower($http);
+	}
+
+
+	public function getHttpPath () {
+		return $this->http;
 	}
 }
 ?>

@@ -12,9 +12,8 @@ class Files extends Input {
 	public function __construct (array $parameters = array()) {
 		if ($parameters) {
 			$parameters = $this->fixArray($parameters);
+			$this->items = $parameters;
 		}
-
-		$this->items = $parameters;
 	}
 
 

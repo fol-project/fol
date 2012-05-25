@@ -76,11 +76,10 @@ class Headers {
 		foreach ($this->items as $name => $value) {
 			if (is_string($value)) {
 				$text .= "$name: $value\n";
-				continue;
-			}
-
-			foreach ($value as $v) {
-				$text .= "$name: $v\n";
+			} else {
+				foreach ($value as $value) {
+					$text .= "$name: $value\n";
+				}
 			}
 		}
 
@@ -166,7 +165,9 @@ class Headers {
 	 * Returns none
 	 */
 	public function __construct (array $parameters = array()) {
-		$this->set($parameters);
+		if ($parameters) {
+			$this->set($parameters);
+		}
 	}
 
 
@@ -199,8 +200,8 @@ class Headers {
 				continue;
 			}
 
-			foreach ($value as $v) {
-				header($name.': '.$v, false);
+			foreach ($value as $value) {
+				header($name.': '.$value, false);
 			}
 		}
 
@@ -220,8 +221,8 @@ class Headers {
 		if (is_array($name)) {
 			$replace = $value;
 
-			foreach ($name as $key => $value) {
-				$this->set($key, $value, $replace);
+			foreach ($name as $name => $value) {
+				$this->set($name, $value, $replace);
 			}
 
 			return;

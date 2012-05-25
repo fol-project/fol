@@ -94,8 +94,8 @@ class Cookies {
 	 */
 	public function set ($name, $value = null, $expire = 0, $path = '/', $domain = null, $secure = false, $httponly = true) {
 		if (is_array($name)) {
-			foreach ($name as $key => $value) {
-				$this->set($key, $value);
+			foreach ($name as $name => $value) {
+				$this->set($name, $value);
 			}
 
 			return;

@@ -6,9 +6,6 @@ use Fol\Container;
 class Views {
 	protected $Controller;
 
-	public $views_path;
-	public $public_http;
-
 
 
 	/**
@@ -18,22 +15,21 @@ class Views {
 	 */
 	public function __construct ($Controller) {
 		$this->Controller = $Controller;
-
-		$this->views_path = $Controller->App->path.'views/';
-		$this->public_http = $Controller->App->public_http;
 	}
 
 
 
 	/**
-	 * public function getFile (string $name)
+	 * public function getFile (string $filename)
 	 *
 	 * Gets a template file by name or filename
 	 * Returns string/false
 	 */
-	public function getFile ($name) {
-		if (is_file($this->views_path.$name)) {
-			return $this->views_path.$name;
+	public function getFile ($filename) {
+		$file = $this->Controller->App->getPath().$filename;
+
+		if (is_file($file)) {
+			return $file;
 		}
 
 		return false;

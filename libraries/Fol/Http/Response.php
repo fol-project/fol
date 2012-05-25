@@ -177,7 +177,7 @@ class Response {
 			return false;
 		}
 
-		header(vsprintf('HTTP/1.1 %s %s', $this->status));
+		header(sprintf('HTTP/1.1 %s', $this->status[0], $this->status[1]));
 		header(sprintf('Content-Type: %s UTF-8', $this->content_type));
 
 		$this->Headers->send();

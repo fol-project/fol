@@ -7,117 +7,52 @@ use Fol\Http\Request;
 use Fol\Http\HttpException;
 
 class Router {
-	public $namespace;
-	public $unregisteredRoutes = true;
-
-	private $routes;
-	private $exceptionRoutes;
 	private $App;
+	private $defaultController;
+	private $exceptionControllers = array();
 
 
 	/**
-	 * public function __construct ([Object $App])
+	 * public function __construct (Fol\App $App)
 	 *
 	 * Returns none
 	 */
-	public function __construct ($App = null) {
+	public function __construct (\Fol\App $App, $defaultController = 'Main') {
 		$this->App = $App;
-		$this->namespace = $this->App->namespace.'\\Controllers\\';
+		$this->setDefaultController($defaultController);
+	}
+
+
+	public function setDefaultController ($name) {
+		$class = $this->App->getNameSpace().'\\Controllers\\'.$name;
+
+		if (!class_exists($class)) {
+			throw new InvalidArgumentException('The default controller "'.$class.'" is not a valid class');
+
+			return false;
+		}
+
+		$Class = new \ReflectionClass($class);
+
+		if (!$Class->isInstantiable()) {
+			throw new InvalidArgumentException('The default controller "'.$class.'" is not instantiable');
+
+			return false;
+		}
+
+		$this->defaultController = $Class;
 	}
 
 
 
 	/**
-	 * public function register (string $name, string $pattern, callable $controller, [array $parameters])
-	 * public function register (string $name, array $route)
-	 * public function register (array $routes)
+	 * public function setExceptionsControllers ($controllers)
 	 *
 	 * Returns none
 	 */
-	public function register ($name = null, $route = null, $controller = null, array $parameters = array()) {
-		if (is_array($name)) {
-			foreach ($name as $n => $v) {
-				$this->register($n, $v);
-			}
-
-			return;
-		}
-
-		if (!is_array($route)) {
-			$route = array(
-				'pattern' => $route,
-				'controller' => $controller,
-				'parameters' => $parameters
-			);
-		}
-
-		if (!$route['controller']) {
-			throw new \InvalidArgumentException("You must define a controller for the route '$name'");
-		}
-
-		if (!$route['pattern']) {
-			throw new \InvalidArgumentException("You must define a pattern for the route '$name'");
-		}
-
-		if (!isset($route['parameters'])) {
-			$route['parameters'] = array();
-		}
-
-		$route['pattern'] = $this->preparePattern($route['pattern'], $route['parameters']);
-
-		if (is_array($route['controller'])) {
-			$route['controller'][0] = $this->namespace.$route['controller'][0];
-		}
-
-		$this->routes[$name] = $route;
+	public function setExceptionsControllers (array $controllers) {
+		$this->exceptionControllers = array_replace_recursive($this->exceptionControllers, $controllers);
 	}
-
-
-
-	/**
-	 * private function preparePattern (string $pattern, [array $parameters])
-	 *
-	 * Returns string
-	 */
-	private function preparePattern ($pattern, array $parameters = array()) {
-		if (strpos($pattern, '(') === false) {
-			return $pattern;
-		}
-
-		if ($parameters) {
-			$pattern = preg_replace('#(\('.implode('|', array_keys($parameters)).'(\s+[^\)]+)?\)[^?])#', '\\1?', $pattern);
-		}
-
-		return preg_replace_callback('#/\((\w+)(\s+[^\)]+)?\)\??#', array($this, 'matchCallback'), $pattern);
-	}
-
-
-
-	/**
-	 * public function registerException (string $name, callable $controller, [int $code])
-	 *
-	 * Returns none
-	 */
-	public function registerException ($name = null, $controller = null, $code = null) {
-		if (is_array($name)) {
-			foreach ($name as $value) {
-				$this->registerException($value['name'], $value['controller'], isset($value['code']) ? $value['code'] : null);
-			}
-
-			return;
-		}
-
-		if (!$controller) {
-			throw new \InvalidArgumentException("You must define a controller for the exception route '$name'");
-		}
-
-		if (is_array($controller)) {
-			$controller[0] = $this->namespace.$controller[0];
-		}
-
-		$this->exceptionRoutes["$name $code"] = $controller;
-	}
-
 
 
 
@@ -126,24 +61,38 @@ class Router {
 	 *
 	 * Returns array/false
 	 */
-	public function getExceptionController ($Exception) {
+	public function getExceptionController (Request $Request, \Exception $Exception) {
 		$name = explode('\\', get_class($Exception));
 		$name = end($name);
+
+		if (!isset($this->exceptionControllers[$name])) {
+			if ($name === 'Exception' || !isset($this->exceptionControllers['Exception'])) {
+				return false;
+			}
+
+			$name = 'Exception';
+		}
+
+		$controller = $this->exceptionControllers[$name];
 		$code = $Exception->getCode();
 
-		if (isset($this->exceptionRoutes["$name $code"])) {
-			$controller = $this->exceptionRoutes["$name $code"];
-		} else if (isset($this->exceptionRoutes[$name])) {
-			$controller = $this->exceptionRoutes[$name];
+		if (isset($controller[$code])) {
+			$controller = $controller[$code];
+		} elseif (isset($controller[0])) {
+			$controller = $controller[0];
 		} else {
 			return false;
 		}
 
-		if ($controller && $this->isCallable($controller)) {
-			return array($controller, array($Exception));
+		$class = $this->App->getNameSpace().'\\Controllers\\'.ucwords(strtolower($controller[0]));
+
+		if (!class_exists($class)) {
+			throw new InvalidArgumentException('The exception controller "'.$class.'" is not valid');
+
+			return false;
 		}
 
-		return false;
+		return $this->checkControllerMethod($Request, new \ReflectionClass($class), array($controller[1], $Exception));
 	}
 
 
@@ -154,73 +103,87 @@ class Router {
 	 * Returns array/false
 	 */
 	public function getController (Request $Request) {
-		if ($this->unregisteredRoutes) {
-			return $this->getRoutingController($Request) ?: $this->getUnregisteredController($Request);
-		}
-
-		return $this->getRoutingController($Request);
-	}
-
-
-
-	/**
-	 * public function getUnregisteredController (Fol\Http\Request $Request)
-	 *
-	 * Returns array/false
-	 */
-	public function getUnregisteredController (Request $Request) {
 		$segments = $Request->getPathSegments();
 
-		if (!$segments) {
-			return false;
+		if (($controller = $this->checkControllerMethod($Request, $this->defaultController, $segments)) !== false) {
+			return $controller;
 		}
 
-		$class = str_replace(' ', '', ucwords(strtolower(str_replace('-', ' ', array_shift($segments)))));
-		$fn = $segments ? lcfirst(str_replace(' ', '', ucwords(strtolower(str_replace('-', ' ', array_shift($segments)))))) : 'index';
+		$class = $this->App->getNameSpace().'\\Controllers\\'.str_replace(' ', '', ucwords(strtolower(str_replace('-', ' ', array_shift($segments)))));
 
-		$controller = array($this->namespace.$class, $fn);
-
-		if ($this->isCallable($controller) && ($parameters = $this->getParameters($controller, $Request, array(), $segments)) !== false) {
-			return array($controller, $parameters);
+		if (class_exists($class)) {
+			return $this->checkControllerMethod($Request, new \ReflectionClass($class), $segments);
 		}
 
 		return false;
 	}
 
 
+	private function checkControllerMethod (Request $Request, \ReflectionClass $Class, array $segments) {
+		$method = $segments ? lcfirst(str_replace(' ', '', ucwords(strtolower(str_replace('-', ' ', array_shift($segments)))))) : 'index';
 
-	/**
-	 * public function getRoutingController (Fol\Http\Request $Request)
-	 *
-	 * Check the route and returns the controller
-	 * Returns array/false
-	 */
-	public function getRoutingController (Request $Request) {
-		if (!$this->routes) {
+		if (!$Class->isInstantiable() || !$Class->hasMethod($method)) {
 			return false;
 		}
 
-		$path = '/'.$Request->getPath();
+		$Method = $Class->getMethod($method);
 
-		foreach ($this->routes as $name => $settings) {
-			if (isset($settings['method']) && ($Request->getMethod() !== $settings['method'])) {
+		if (!$Method->isPublic()) {
+			return false;
+		}
+
+		$config = $this->parseComments($Method->getDocComment());
+
+		if (isset($config['method']) && !in_array($Request->getMethod(), $config['method'])) {
+			return false;
+		}
+
+		if (($parameters = $this->getParameters($Method, $Request, array(), $segments)) === false) {
+			return false;
+		}
+
+		return array($Class, $Method, $parameters);
+	}
+
+
+	private function parseComments ($comments) {
+		if (!$comments) {
+			return array();
+		}
+
+		if (preg_match('#^/\*\*(.*)\*/#s', $comments, $comments) === false) {
+			return array();
+		}
+
+		if (preg_match_all('#^\s*\*(.*)#m', trim($comments[1]), $lines) === false) {
+			return array();
+		}
+
+		$docs = array();
+
+		foreach ($lines[1] as $line) {
+			$line = trim($line);
+
+			if ($line === '' || preg_match('/^@([\w]+)\s+(.*)\s*$/', $line, $rule) === false) {
 				continue;
 			}
 
-			if (isset($settings['scheme']) && ($Request->getScheme() !== $settings['scheme'])) {
-				continue;
-			}
+			switch ($rule[2]) {
+				case 'true':
+					$docs[$rule[1]] = true;
+					break;
 
-			if (($parameters = $this->matchParameters($path, $settings)) !== false) {
-				if ($this->isCallable($settings['controller']) && ($parameters = $this->getParameters($settings['controller'], $Request, $parameters)) !== false) {
-					return array($settings['controller'], $parameters);
-				}
+				case 'false':
+					$docs[$rule[1]] = false;
+					break;
 
-				return false;
+				default:
+					$docs[$rule[1]] = explode(',', str_replace(' ', '', $rule[2]));
+					break;
 			}
 		}
 
-		return false;
+		return $docs;
 	}
 
 
@@ -230,14 +193,8 @@ class Router {
 	 *
 	 * Returns boolean
 	 */
-	private function getParameters ($controller, Request $Request, array $parameters, array $numeric_parameters = array()) {
+	private function getParameters (\ReflectionMethod $Method, Request $Request, array $parameters, array $numeric_parameters = array()) {
 		$new_parameters = array();
-
-		if (is_array($controller)) {
-			$Method = new \ReflectionMethod($controller[0], $controller[1]);
-		} else {
-			$Method = new \ReflectionFunction($controller);
-		}
 
 		foreach ($Method->getParameters() as $Parameter) {
 			$name = $Parameter->getName();
@@ -264,72 +221,6 @@ class Router {
 
 
 	/**
-	 * private function isCallable ($controller)
-	 *
-	 * Returns boolean
-	 */
-	private function isCallable ($controller) {
-		if (is_callable($controller)) {
-			return true;
-		}
-
-		if (class_exists($controller[0])) {
-			$Class = new \ReflectionClass($controller[0]);
-
-			if ($Class->isInstantiable() && $Class->hasMethod($controller[1]) && $Class->getMethod($controller[1])->isPublic()) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-
-
-	/**
-	 * private function matchParameters (string $path, array $route)
-	 *
-	 * Returns boolean
-	 */
-	private function matchParameters ($path, array $route) {
-		if (preg_match('#^'.$route['pattern'].'$#', $path, $matches)) {
-			$return = $route['parameters'];
-
-			foreach ($matches as $name => $value) {
-				if (is_string($name)) {
-					$return[$name] = $value;
-					next($matches);
-				}
-			}
-
-			return $return;
-		}
-
-		return false;
-	}
-
-
-
-	/**
-	 * private function matchCallback (array $matches)
-	 *
-	 * Returns string
-	 */
-	private function matchCallback ($matches) {
-		if (!$matches[2]) {
-			$matches[2] = '[^/]+';
-		}
-
-		if (substr($matches[0], -1) === '?') {
-			return '/?(?P<'.$matches[1].'>'.trim($matches[2]).')?';
-		}
-
-		return '/(?P<'.$matches[1].'>'.trim($matches[2]).')';
-	}
-
-
-
-	/**
 	 * public function handle (Fol\Http\Request $Request)
 	 *
 	 * Executes the controller of the application
@@ -337,18 +228,15 @@ class Router {
 	 */
 	public function handle (Request $Request) {
 		try {
-			if ($controller = $this->getController($Request)) {
-				$Response = $this->executeController($controller, $Request);
-			} else {
+			$controller = $this->getController($Request);
+
+			if ($controller === false) {
 				throw new HttpException(Headers::$status[404], 404);
+			} else {
+				$Response = $this->executeController($controller, $Request);
 			}
-		}
-
-		catch (HttpException $Exception) {}
-		catch (\ErrorException $Exception) {}
-
-		if (isset($Exception)) {
-			if ($controller = $this->getExceptionController($Exception)) {
+		} catch (\Exception $Exception) {
+			if ($controller = $this->getExceptionController($Request, $Exception)) {
 				$Response = $this->executeController($controller, $Request);
 			} else {
 				$texto = $Exception->getMessage().'<pre>'.$Exception->getTraceAsString().'</pre>';
@@ -368,30 +256,23 @@ class Router {
 	 * Returns none
 	 */
 	public function executeController (array $controller, Request $Request) {
-		if ($controller) {
-			if (is_array($controller[0])) {
-				list($class, $method) = $controller[0];
+		ob_start();
 
-				$Controller = new $class($this->App, $Request);
+		list($Class, $Method, $parameters) = $controller;
 
-				if ($controller[1]) {
-					$Response = call_user_func_array(array($Controller, $method), $controller[1]);
-				} else {
-					$Response = $Controller->$method();
-				}
-			} else {
-				array_unshift($controller[1], $Request);
-				$Response = call_user_func_array($controller[0], $controller[1]);
-			}
+		$Controller = $Class->newInstance();
+		$Controller->App = $this->App;
+		$Controller->Request = $Request;
 
-			if (!($Response instanceof Response)) {
-				$Response = new Response($Response);
-			}
+		$Response = $Method->invokeArgs($Controller, $parameters);
 
-			return $Response;
+		if (!($Response instanceof Response)) {
+			$Response = new Response($Response);
 		}
 
-		return false;
+		$Response->appendContent(ob_get_clean());
+
+		return $Response;
 	}
 }
 ?>
