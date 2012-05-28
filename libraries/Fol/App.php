@@ -8,7 +8,6 @@ abstract class App {
 	private $http;
 
 	public $Parent;
-	public $Services;
 
 
 	/**
@@ -45,29 +44,6 @@ abstract class App {
 		$this->path = dirname($Class->getFileName()).'/';
 
 		$this->setHttpPath($this->name);
-
-		$this->Services = new Services;
-	}
-
-
-
-	/**
-	 * abstract public function bootstrap ()
-	 *
-	 * Runs the application
-	 * Returns none
-	 */
-	abstract public function bootstrap ();
-
-
-
-	/**
-	 * public function __get (string $name)
-	 *
-	 * Returns object
-	 */
-	public function __get ($name) {
-		return $this->$name = $this->Services->get($name);
 	}
 
 

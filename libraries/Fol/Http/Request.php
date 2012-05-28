@@ -423,10 +423,10 @@ class Request {
 	 * Returns string
 	 */
 	public function getMethod () {
-		$method = strtoupper($this->Server->get('REQUEST_METHOD', 'GET'));
+		$method = strtolower($this->Server->get('REQUEST_METHOD', 'get'));
 	
-		if ($method === 'POST') {
-			$this->method = strtoupper($this->Server->get('X_HTTP_METHOD_OVERRIDE', 'POST'));
+		if ($method === 'post') {
+			$this->method = strtoupper($this->Server->get('X_HTTP_METHOD_OVERRIDE', 'post'));
 		}
 
 		return $method;

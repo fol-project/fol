@@ -1,36 +1,15 @@
 AQUI TES O FOL
 (o resto da gaita xa é cousa túa)
 
+FOL é framework escrito en PHP por Oscar Otero (http://oscarotero.com) como exercicio de deseño e como ferramenta para desenvolver experimentos e proxectos persoais. A intención é ter algo manexable, moi flexible e que permita xuntar librerías externas. Vamos, un microframework
 
-Que é FOL?
-
-FOL é framework escrito en PHP por Oscar Otero (http://oscarotero.com) como exercicio de deseño e como ferramenta para desenvolver experimentos e proxectos persoais. A intención non é facer un super framework desos que o teñen todo e cargan tropecentas librarías senón todo o contrario: construír algo manexable, moi flexible e que permita xuntar librerías externas. Vamos, un microframework, pero un pouco máis completo e extensible.
-
-
-
-Existen 6 factores que considerei indispensables á hora de crealo:
-
-1. Debe ser extremadamente rápido e lixeiro.
-Só carga as cousas que precisa en cada momento.
-
-2. Debe estar orientado a obxectos e explotar as vantaxes que ofrecen as últimas versións de PHP.
-Sempre é moito mellor e máis divertido traballar con versións novas que antigas. Por iso precisa dun entorno con PHP 5.4.
-
-3. Debe ser moi intuitivo e fácil de entender.
-A lóxica ten que ser moi sinxela, evitando facer cousas demasiado "máxicas" para que todo sexa entendible. Un framework sen demasiadas cousas complexas.
-
-4. Debe levarse ben con librarías externas.
-Un framework que se leve ben con librarías de terceiros ten moitas máis posibilidades. Por iso, calquera libraría que utilice o estándar PSR-0 para autoloader non debería dar problemas.
-
-5. Debe poder funcionar sen ter que configurar demasiadas cousas
-Non hai nada máis pesado que andar configurando mil cousas, sobre todo se leva menos tempo e resulta menos complicado e máis entendible facer as cousas directamente.
-
-
+* Rápido e lixeiro: Só carga as cousas que precisa en cada momento.
+* Escrito en PHP 5.4. (Sempre é moito mellor e máis divertido traballar con versións novas que antigas)
+* Lóxica sinxela e fácil de entender.
+* Lévase ben con librarías externas: Calquera libraría que use o estándar PSR-0 para o autoloader non debería dar problemas.
 
 CAL É A SITUACIÓN ACTUAL?
-
 Por agora aínda está en fase beta (0.1b). Falta por probar cousas e crear outras novas. Paciencia.
-
 
 
 DOCUMENTACIÓN RÁPIDA (para saber por onde van os tiros):
@@ -43,9 +22,8 @@ En cambio, a carpeta apps contén a aplicación ou aplicacións que forman o sit
 LOADER
 -------------------------------------------------------------------
 A primeira clase que se carga é a clase Loader que serve para cargar automaticamente o resto de clases empregando o estándar PSR-0.
-Debemos indicar o directorio onde esta as librarías coa función setLibrariesPath para que busque nese directorio as clases que carguemos.
 Deste xeito, se instanciamos unha clase chamada "Utilidades\Matematicas", buscaría esa clase no arquivo libraries/Utilidades/Matematicas.php.
-Ademais podemos rexistrar directorios específicos para calquera namespace ou para unha clase concreta. Por exemplo todas as clases que se atopan no namespace App podemos configurar para que as busque na carpeta apps, fora de libraries.
+Ademais podemos rexistrar directorios específicos para calquera namespace ou clase concreta. Por exemplo todas as clases que se atopan no namespace App podemos configurar para que as busque na carpeta apps, fora de libraries.
 
 -------------------------------------------------------------------
 ERRORS
@@ -57,6 +35,8 @@ APPS
 -------------------------------------------------------------------
 As aplicacións manexan o código específico do noso sitio web. Podes meter todo o sitio web nunha soa aplicación ou dividilo en distintas aplicacións (unha para o blog, outra para galeria de fotos, etc). Unha aplicación non é máis que unha clase que se instancia e se executa. Isto permite executar aplicacións unha dentro doutra, extendelas, etc. As aplicacións deben ter unha función chamada bootstrap que é a que inicia a execución desa aplicación, ademáis deben extender á clase Fol\App.
 Para crear unha nova aplicación, debemos crear un directorio dentro da carpeta apps co nome da nosa aplicación e crear dentro un arquivo chamado App.php co seguinte código:
+
+namespace Apps\Blog;
 
 class App extends \Fol\App {
 
@@ -85,23 +65,6 @@ $Aplicacion->getPath(): Devolve a ruta onde está aloxada a aplicación no servi
 $Aplicacion->getHttpPath(): Devolve a para acceder á raiz desa aplicación via web (p.e: /blog/)
 $Aplicacion->setHttpPath($path): Usa esta función se queres cambiar a ruta web da aplicación
 
-$this->Services: Ademáis tamén dispoñemos da clase Services que nos proporciona unha ferramenta sinxela e potente para manexar as inxecións de dependencia entre outras cousas. Con esta clase podemos configurar que librería usar para cada utilidade específica. Por exemplo, se queremos usar unha clase para manexar a caché, podemos configurar que clase usar:
-
-$this->Services->register('Cache', 'Fol\\Cache_Apc');
-
-Deste xeito para ter unha instancia desa clase simplemente podemos usar:
-
-$Cache = $this->Services->get('Cache');
-
-A clase Services executase directamente na magic function __get() da nosa aplicación polo que podemos chamar directamente ao obxecto $Cache sen necesidade de instanciala:
-
-$this->Cache->set('nome', 'valor');
-
-Neste exemplo, se $this->Cache non existe, créase automáticamente. Se un día queremos cambiar a clase de cache para, por exemplo "Fol\Cache_Memcache", simplemente teríamos que modificar a liña onde rexistramos esa clase:
-
-$this->Services->register('Cache', 'Fol\\Cache_Memcache');
-
-e xa todos os sitios onde se use este servizo pasarían a usar memcache.
 
 -------------------------------------------------------------------
 HTTP
@@ -153,7 +116,7 @@ ROUTER
 A clase Router sirve para buscar a función (ou controladores) que se ten que executar por cada url.
 
 A maioría dos frameworks MVC requiren que teñas que especificar que controladores usar en cada url, usando expresións regulares, etc.
-Neste caso non sería asi. Fixen un sistema moito máis sinxelo, que busca directamente o controlador apropiado dependendo da url actual.
+Neste caso non sería asi. O sistema é moito máis sinxelo, que busca directamente o controlador apropiado dependendo da url actual, sen necesidade de definir nada.
 
 Por exemplo, se a url actual é "/blog/post/23", buscará a clase "Apps\NomeDaAplicacion\Controllers\Blog" e executará a función "post" pasándolle como parámetro "23".
 
@@ -181,3 +144,30 @@ class App extends \Fol\App {
 		$this->Router->handle(Request::createFromGlobals())->send();
 	}
 }
+
+A clase Router tamén analiza a documentación de cada controlador para poder afinar máis cando executar ese controlador ou non. Fíxate neste código:
+
+namespace Apps\Web\Controllers;
+
+/**
+* @method GET
+*/
+class Saudo {
+
+	/**
+	* @method GET, POST
+	* @scheme http
+	* @ajax true
+	*/
+	public function ola () {
+		echo 'Ola mundo';
+	}
+
+	public function adeus () {
+		echo 'Adeus mundo';
+	}
+}
+
+Este exemplo define un controlador chamado Saudo con dous métodos: ola e adeus. A url "saudo/ola" executará o primeiro método e "saudo/adeus" o segundo.
+Os comentarios que aparecen xusto antes do método "ola" definen que só se executará se estamos chamando a páxina co método GET ou POST, o scheme "http" e por ajax. Se non se cumple algunha desas condicións (chamamos a ese controlador sen ser por ajax, ou usamos https) xeneraríase un erro 404 de páxina non atopada.
+Podes meter comentarios que afecten a todos os métodos metendo comentarios encima da clase. No exemplo definimos que esa clase só funcionan co método GET, polo que nin "ola" nin "adeus" se executarán chamándoos por POST (aínda que "ola" sí permite POST, a clase non o permite polo que non se executa)

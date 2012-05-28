@@ -126,15 +126,17 @@ class Router {
 			return false;
 		}
 
+		if ($this->checkRulesComments($Request, $Class->getDocComment()) === false) {
+			return false;
+		}
+
 		$Method = $Class->getMethod($method);
 
 		if (!$Method->isPublic()) {
 			return false;
 		}
 
-		$config = $this->parseComments($Method->getDocComment());
-
-		if (isset($config['method']) && !in_array($Request->getMethod(), $config['method'])) {
+		if ($this->checkRulesComments($Request, $Method->getDocComment()) === false) {
 			return false;
 		}
 
@@ -148,42 +150,66 @@ class Router {
 
 	private function parseComments ($comments) {
 		if (!$comments) {
-			return array();
+			return false;
 		}
 
 		if (preg_match('#^/\*\*(.*)\*/#s', $comments, $comments) === false) {
-			return array();
+			return false;
 		}
 
-		if (preg_match_all('#^\s*\*(.*)#m', trim($comments[1]), $lines) === false) {
-			return array();
+		if (preg_match_all('#^[\s\*]+(.*)#m', $comments[1], $comments) === false) {
+			return false;
 		}
 
-		$docs = array();
+		$info = array();
 
-		foreach ($lines[1] as $line) {
-			$line = trim($line);
-
-			if ($line === '' || preg_match('/^@([\w]+)\s+(.*)\s*$/', $line, $rule) === false) {
+		foreach ($comments[1] as $line) {
+			if (!preg_match('/^@([\w]+)\s+(.*)\s*$/', $line, $line)) {
 				continue;
 			}
 
-			switch ($rule[2]) {
-				case 'true':
-					$docs[$rule[1]] = true;
-					break;
+			$name = $line[1];
+			$value = $line[2];
 
-				case 'false':
-					$docs[$rule[1]] = false;
-					break;
-
-				default:
-					$docs[$rule[1]] = explode(',', str_replace(' ', '', $rule[2]));
-					break;
+			if (!isset($info[$name])) {
+				$info[$name] = array($value);
+			} else {
+				$info[$name][] = $value;
 			}
 		}
 
-		return $docs;
+		return $info;
+	}
+
+
+	private function checkRulesComments (Request $Request, $comments) {
+		if (!($comments = $this->parseComments($comments))) {
+			return true;
+		}
+
+		if (isset($comments['method'])) {
+			$value = explode(',', str_replace(' ', '', strtolower($comments['method'][0])));
+
+			if (!in_array($Request->getMethod(), $value)) {
+				return false;
+			}
+		}
+
+		if (isset($comments['scheme'])) {
+			$value = explode(',', str_replace(' ', '', strtolower($comments['scheme'][0])));
+
+			if (!in_array($Request->getScheme(), $value)) {
+				return false;
+			}
+		}
+
+		if (isset($comments['ajax'])) {
+			$value = strtolower($comments['method'][0]);
+
+			if (($value === 'true' && $Request->isAjax() === false) || ($value === 'false' && $Request->isAjax() === true)) {
+				return false;
+			}
+		}
 	}
 
 
