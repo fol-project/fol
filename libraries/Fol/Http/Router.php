@@ -149,7 +149,7 @@ class Router {
 
 
 	private function parseComments ($comments) {
-		if (!$comments) {
+		if (empty($comments)) {
 			return false;
 		}
 
@@ -183,30 +183,45 @@ class Router {
 
 
 	private function checkRulesComments (Request $Request, $comments) {
-		if (!($comments = $this->parseComments($comments))) {
+		if (!($comments = $this->parseComments($comments)) || !isset($comments['router'])) {
 			return true;
 		}
 
-		if (isset($comments['method'])) {
-			$value = explode(',', str_replace(' ', '', strtolower($comments['method'][0])));
+		foreach ($comments['router'] as $rule) {
+			$rule = explode(' ', strtolower($rule), 2);
 
-			if (!in_array($Request->getMethod(), $value)) {
-				return false;
+			if (!isset($rule[1])) {
+				continue;
 			}
-		}
 
-		if (isset($comments['scheme'])) {
-			$value = explode(',', str_replace(' ', '', strtolower($comments['scheme'][0])));
+			$values = explode(' ', $rule[1]);
 
-			if (!in_array($Request->getScheme(), $value)) {
-				return false;
+			switch ($rule[0]) {
+				case 'method':
+					$value = $Request->getMethod();
+					break;
+
+				case 'scheme':
+					$value = $Request->getScheme();
+					break;
+
+				case 'port':
+					$value = $Request->getPort();
+					break;
+
+				case 'ip':
+					$value = $Request->getIp();
+					break;
+
+				case 'ajax':
+					$value = ($Request->isAjax() === true) ? 'true' : 'false';
+					break;
+
+				default:
+					continue 2;
 			}
-		}
 
-		if (isset($comments['ajax'])) {
-			$value = strtolower($comments['method'][0]);
-
-			if (($value === 'true' && $Request->isAjax() === false) || ($value === 'false' && $Request->isAjax() === true)) {
+			if (!in_array($value, $values)) {
 				return false;
 			}
 		}

@@ -150,15 +150,15 @@ A clase Router tamén analiza a documentación de cada controlador para poder af
 namespace Apps\Web\Controllers;
 
 /**
-* @method GET
-*/
+ * @router method get
+ */
 class Saudo {
 
 	/**
-	* @method GET, POST
-	* @scheme http
-	* @ajax true
-	*/
+	 * @router method get post
+	 * @router scheme http
+	 * @router ajax true
+	 */
 	public function ola () {
 		echo 'Ola mundo';
 	}
@@ -171,3 +171,4 @@ class Saudo {
 Este exemplo define un controlador chamado Saudo con dous métodos: ola e adeus. A url "saudo/ola" executará o primeiro método e "saudo/adeus" o segundo.
 Os comentarios que aparecen xusto antes do método "ola" definen que só se executará se estamos chamando a páxina co método GET ou POST, o scheme "http" e por ajax. Se non se cumple algunha desas condicións (chamamos a ese controlador sen ser por ajax, ou usamos https) xeneraríase un erro 404 de páxina non atopada.
 Podes meter comentarios que afecten a todos os métodos metendo comentarios encima da clase. No exemplo definimos que esa clase só funcionan co método GET, polo que nin "ola" nin "adeus" se executarán chamándoos por POST (aínda que "ola" sí permite POST, a clase non o permite polo que non se executa)
+A maneira de facer anotacións nos controladores sempre é igual: comezando polo tag @router seguido do nome da propiedade (method, scheme, ajax, port, ip) e o valor ou valores separados por un espazo

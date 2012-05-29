@@ -5,14 +5,13 @@ use Fol\Http\Response;
 
 /**
 *
-* @method GET
+* @router method get
 */
 class Main {
 
 	/**
-	* @method GET, POST
-	* @scheme http
-	* @ajax true
+	* @router method get post
+	* @router scheme http
 	*/
 	public function index () {
 		return new Response('Ola mundo');
