@@ -196,62 +196,6 @@ class Request {
 
 
 	/**
-	 * public function getPathSegments ()
-	 *
-	 * Gets the current path in an array of segments
-	 * Returns array
-	 */
-	public function getPathSegments () {
-		$segments = array();
-
-		foreach (explode('/', $this->path) as $segment) {
-			if ($segment !== '') {
-				$segments[] = $segment;
-			}
-		}
-
-		return $segments;
-	}
-
-
-
-	/**
-	 * public function shiftPath ()
-	 *
-	 * Shift the first element of the path
-	 * Returns the shifted value
-	 */
-	public function shiftPath () {
-		$segments = $this->getPathSegments();
-
-		$value = array_shift($segments);
-
-		$this->setPath(implode('/', $segments));
-
-		return $value;
-	}
-
-
-
-	/**
-	 * public function unshiftPath ()
-	 *
-	 * Unshift the first element of the path
-	 * Returns the new number of elements
-	 */
-	public function unshiftPath ($segment) {
-		$segments = $this->getPathSegments();
-
-		$value = array_unshift($segments, $segment);
-
-		$this->setPath(implode('/', $segments));
-
-		return $value;
-	}
-
-
-
-	/**
 	 * public function setPath (string $path)
 	 *
 	 * Sets a new current path

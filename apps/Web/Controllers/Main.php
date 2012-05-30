@@ -20,5 +20,11 @@ class Main {
 	public function adios () {
 		return new Response('Adeus mundo');
 	}
+
+	public function subapp () {
+		$App = \Fol\App::create('Web2', $this->App, 'subapp');
+
+		$App->bootstrap();
+	}
 }
 ?>

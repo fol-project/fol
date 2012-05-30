@@ -103,7 +103,20 @@ class Router {
 	 * Returns array/false
 	 */
 	public function getController (Request $Request) {
-		$segments = $Request->getPathSegments();
+		$path = $Request->getPath().'/';
+		$basePath = $this->App->getHttpPath();
+
+		if ($basePath !== '') {
+			$path = preg_replace('|^'.preg_quote($basePath).'|', '', $path);
+		}
+
+		$segments = array();
+
+		foreach (explode('/', $path) as $segment) {
+			if ($segment !== '') {
+				$segments[] = $segment;
+			}
+		}
 
 		if (($controller = $this->checkControllerMethod($Request, $this->defaultController, $segments)) !== false) {
 			return $controller;

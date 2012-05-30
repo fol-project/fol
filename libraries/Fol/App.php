@@ -15,13 +15,13 @@ abstract class App {
 	 *
 	 * Returns object
 	 */
-	static function create ($name, $Parent = null) {
+	static function create ($name, App $Parent = null, $httpPath = null) {
 		$name = str_replace(' ', '', ucwords(strtolower(str_replace('-', ' ', $name))));
 
 		$app = 'Apps\\'.$name.'\\App';
 
 		if (class_exists($app)) {
-			return new $app($Parent);
+			return new $app($Parent, $httpPath);
 		}
 
 		throw new InvalidArgumentException('"'.$app.'" is an invalid app class');
@@ -34,16 +34,19 @@ abstract class App {
 	 *
 	 * Returns none
 	 */
-	public function __construct ($Parent = null) {
-		$this->Parent = $Parent;
-
+	public function __construct (App $Parent = null, $httpPath = null) {
 		$Class = new \ReflectionClass($this);
 
 		$this->namespace = $Class->getNameSpaceName();
 		$this->name = substr(strrchr($this->namespace, '\\'), 1);
 		$this->path = dirname($Class->getFileName()).'/';
 
-		$this->setHttpPath($this->name);
+		if (isset($Parent)) {
+			$this->Parent = $Parent;
+			$httpPath = $Parent->getHttpPath().$httpPath;
+		}
+
+		$this->setHttpPath($httpPath);
 	}
 
 
@@ -63,11 +66,7 @@ abstract class App {
 
 
 	public function setHttpPath ($http) {
-		if ($http[0] === '/') {
-			$http = BASE_HTTP.$http;
-		}
-		
-		if (substr($http, -1) !== '/') {
+		if (!empty($http) && substr($http, -1) !== '/') {
 			$http .= '/';
 		}
 
