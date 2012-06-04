@@ -4,7 +4,7 @@
 	"description": "PHP framework",
 	"keywords": ["framework"],
 	"homepage": "https://github.com/oscarotero/fol",
-	"license": "GNU",
+	"license": "AGPL-3.0",
 	"authors": [
 		{
 			"name": "Oscar Otero",
@@ -18,10 +18,5 @@
 	},
 	"config": {
 		"vendor-dir": "libraries"
-	},
-	"autoload": {
-		"psr-0": {
-			"Fol": ""
-		}
 	}
 }
