@@ -1,8 +1,4 @@
 {
-	"config": {
-		"vendor-dir": "libraries",
-		"bin-dir": "libraries/bin"
-	},
 	"name": "fol/fol",
 	"type": "library",
 	"description": "PHP framework",
@@ -18,6 +14,14 @@
 		}
 	],
 	"require": {
-		"php": ">=5.4.0",
+		"php": ">=5.4.0"
+	},
+	"config": {
+		"vendor-dir": "libraries"
+	},
+	"autoload": {
+		"psr-0": {
+			"Fol": ""
+		}
 	}
 }
