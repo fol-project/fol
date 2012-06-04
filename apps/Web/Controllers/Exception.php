@@ -11,9 +11,5 @@ class Exception {
 	public function notFound ($Exception) {
 		return new Response('Non atopada a páxina', 404);
 	}
-
-	public function http ($Exception) {
-		return new Response('Erro descoñecido');
-	}
 }
 ?>

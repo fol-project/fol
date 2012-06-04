@@ -56,7 +56,7 @@ class Loader {
 	static public function autoload ($class_name) {
 		$file = self::getFile($class_name);
 
-		if ($file && is_file($file)) {
+		if ($file && is_readable($file)) {
 			include_once($file);
 		}
 	}

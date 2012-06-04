@@ -10,7 +10,6 @@ class App extends \Fol\App {
 		$this->Router->setExceptionsControllers(array(
 			'HttpException' => array(
 				404 => array('Exception', 'notFound'),
-				0 => array('Exception', 'http')
 			),
 			'Exception' => array(
 				0 => array('Exception', 'error')

@@ -1,0 +1,23 @@
+{
+	"config": {
+		"vendor-dir": "libraries",
+		"bin-dir": "libraries/bin"
+	},
+	"name": "fol/fol",
+	"type": "library",
+	"description": "PHP framework",
+	"keywords": ["framework"],
+	"homepage": "https://github.com/oscarotero/fol",
+	"license": "GNU",
+	"authors": [
+		{
+			"name": "Oscar Otero",
+			"email": "oom@oscarotero.com",
+			"homepage": "http://oscarotero.com",
+			"role": "Developer"
+		}
+	],
+	"require": {
+		"php": ">=5.4.0",
+	}
+}
