@@ -151,5 +151,29 @@ class Loader {
 
 		self::$namespaces[$namespace] = $path;
 	}
+
+
+
+	/**
+	 * static public function registerComposer ()
+	 *
+	 * Register the classes installed by composer
+	 * Returns none
+	 */
+	static function registerComposer () {
+		$file = self::$libraries_path.'composer/autoload_classmap.php';
+
+		if (is_file($file)) {
+			self::registerClass(include($file));
+		}
+
+		$file = self::$libraries_path.'composer/autoload_namespaces.php';
+
+		if (is_file($file)) {
+			foreach (include($file) as $namespace => $path) {
+				self::registerNamespace($namespace, $path.$namespace.'/');
+			}
+		}
+	}
 }
 ?>
