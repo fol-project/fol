@@ -14,15 +14,15 @@ Por agora aínda está en fase beta (0.1b). Falta por probar cousas e crear outr
 
 DOCUMENTACIÓN RÁPIDA (para saber por onde van os tiros):
 
-No directorio raíz de FOL existen dúas carpetas: apps e libraries.
-A carpeta libraries contén todas as librerías que podes usar, entre elas as propias de FOL. Se queres usar calquera libraría de terceiros (por exemplo para traballar con bases de datos ou con plantillas) deberías gardalas aí.
+No directorio raíz de FOL existen dúas carpetas: apps e libs.
+A carpeta libs contén todas as bibliotecas que podes usar, entre elas as propias de FOL. Se queres usar calquera biblioteca de terceiros (por exemplo para traballar con bases de datos ou con plantillas) deberías gardalas aí.
 En cambio, a carpeta apps contén a aplicación ou aplicacións que forman o sitio web.
 
 -------------------------------------------------------------------
 LOADER
 -------------------------------------------------------------------
 A primeira clase que se carga é a clase Loader que serve para cargar automaticamente o resto de clases empregando o estándar PSR-0.
-Deste xeito, se instanciamos unha clase chamada "Utilidades\Matematicas", buscaría esa clase no arquivo libraries/Utilidades/Matematicas.php.
+Deste xeito, se instanciamos unha clase chamada "Utilidades\Matematicas", buscaría esa clase no arquivo libs/Utilidades/Matematicas.php.
 Ademais podemos rexistrar directorios específicos para calquera namespace ou clase concreta. Por exemplo todas as clases que se atopan no namespace App podemos configurar para que as busque na carpeta apps, fora de libraries.
 
 -------------------------------------------------------------------

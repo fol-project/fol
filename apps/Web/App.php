@@ -16,7 +16,10 @@ class App extends \Fol\App {
 			)
 		));
 
+		$this->session = 'on';
+
 		$this->Router->handle(Request::createFromGlobals())->send();
+
 	}
 }
 ?>

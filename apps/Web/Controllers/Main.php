@@ -14,6 +14,7 @@ class Main {
 	* @router scheme http
 	*/
 	public function index () {
+		var_dump($this->App->session);
 		return new Response('Ola mundo');
 	}
 

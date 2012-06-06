@@ -7,10 +7,10 @@ define('FOL_VERSION', '0.1a');
 define('BASE_PATH', __DIR__.'/');
 define('BASE_HTTP', preg_replace('|/+|', '/', '/'.preg_replace('|^'.realpath($_SERVER['DOCUMENT_ROOT']).'|i', '', BASE_PATH)));
 
-include(BASE_PATH.'libraries/Fol/Loader.php');
+include(BASE_PATH.'libs/Fol/Loader.php');
 
 Loader::register();
-Loader::setLibrariesPath(BASE_PATH.'libraries/');
+Loader::setLibrariesPath(BASE_PATH.'libs/');
 Loader::registerNamespace('Apps', BASE_PATH.'apps/');
 Loader::registerComposer();
 
