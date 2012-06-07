@@ -9,7 +9,7 @@ use Fol\Http\HttpException;
 class Router {
 	private $App;
 	private $defaultController;
-	private $exceptionControllers = array();
+	private $errorControllers = array();
 
 
 	/**
@@ -17,7 +17,7 @@ class Router {
 	 *
 	 * Returns none
 	 */
-	public function __construct (\Fol\App $App, $defaultController = 'Main') {
+	public function __construct (\Fol\App $App, $defaultController = 'Index') {
 		$this->App = $App;
 		$this->setDefaultController($defaultController);
 	}
@@ -27,7 +27,7 @@ class Router {
 		$class = $this->App->getNameSpace().'\\Controllers\\'.$name;
 
 		if (!class_exists($class)) {
-			throw new InvalidArgumentException('The default controller "'.$class.'" is not a valid class');
+			throw new \InvalidArgumentException('The default controller "'.$class.'" is not a valid class');
 
 			return false;
 		}
@@ -35,7 +35,7 @@ class Router {
 		$Class = new \ReflectionClass($class);
 
 		if (!$Class->isInstantiable()) {
-			throw new InvalidArgumentException('The default controller "'.$class.'" is not instantiable');
+			throw new \InvalidArgumentException('The default controller "'.$class.'" is not instantiable');
 
 			return false;
 		}
@@ -46,34 +46,38 @@ class Router {
 
 
 	/**
-	 * public function setExceptionsControllers ($controllers)
+	 * public function setErrorController ($controller, [$exception], [$code])
 	 *
 	 * Returns none
 	 */
-	public function setExceptionsControllers (array $controllers) {
-		$this->exceptionControllers = array_replace_recursive($this->exceptionControllers, $controllers);
+	public function setErrorController ($controller, $exception = 'Exception', $code = 0) {
+		if (!isset($this->errorControllers[$exception])) {
+			$this->errorControllers[$exception] = array($code => $controller);
+		} else {
+			$this->errorControllers[$exception][$code] = $controller;
+		}
 	}
 
 
 
 	/**
-	 * public function getExceptionController (Exception $Exception)
+	 * public function getErrorController (Exception $Exception)
 	 *
 	 * Returns array/false
 	 */
-	public function getExceptionController (Request $Request, \Exception $Exception) {
+	public function getErrorController (Request $Request, \Exception $Exception) {
 		$name = explode('\\', get_class($Exception));
 		$name = end($name);
 
-		if (!isset($this->exceptionControllers[$name])) {
-			if ($name === 'Exception' || !isset($this->exceptionControllers['Exception'])) {
+		if (!isset($this->errorControllers[$name])) {
+			if ($name === 'Exception' || !isset($this->errorControllers['Exception'])) {
 				return false;
 			}
 
 			$name = 'Exception';
 		}
 
-		$controller = $this->exceptionControllers[$name];
+		$controller = $this->errorControllers[$name];
 		$code = $Exception->getCode();
 
 		if (isset($controller[$code])) {
@@ -84,30 +88,46 @@ class Router {
 			return false;
 		}
 
-		$class = $this->App->getNameSpace().'\\Controllers\\'.ucwords(strtolower($controller[0]));
+		if (is_array($controller) === false) {
+			$controller = explode('::', $controller);
+		}
 
-		if (!class_exists($class)) {
-			throw new InvalidArgumentException('The exception controller "'.$class.'" is not valid');
+		if (count($controller) !== 2) {
+			throw new Exception('Controller not configurated correctly');
 
 			return false;
 		}
 
-		return $this->checkControllerMethod($Request, new \ReflectionClass($class), array($controller[1], $Exception));
+		$class = $this->App->getNameSpace().'\\Controllers\\'.ucwords(strtolower($controller[0]));
+
+		$segments = $this->getParametersFromPath($Request->getPath());
+
+		array_unshift($segments, $controller[1]);
+
+		if (class_exists($class) && ($controller = $this->checkControllerMethod($Request, new \ReflectionClass($class), $segments))) {
+			$controller[] = array(
+				'App' => $this->App,
+				'Request' => $Request,
+				'Exception' => $Exception
+			);
+
+			return $controller;
+		}
+
+		return false;
 	}
 
 
-
 	/**
-	 * public function getController (Fol\Http\Request $Request)
+	 * public function getParametersFromPath ($path)
 	 *
-	 * Returns array/false
+	 * Returns array
 	 */
-	public function getController (Request $Request) {
-		$path = $Request->getPath().'/';
+	private function getParametersFromPath ($path) {
 		$basePath = $this->App->getHttpPath();
 
 		if ($basePath !== '') {
-			$path = preg_replace('|^'.preg_quote($basePath).'|', '', $path);
+			$path = preg_replace('|^'.preg_quote($basePath).'|', '', $path.'/');
 		}
 
 		$segments = array();
@@ -118,14 +138,37 @@ class Router {
 			}
 		}
 
+		return $segments;
+	}
+
+
+
+	/**
+	 * public function getController (Fol\Http\Request $Request)
+	 *
+	 * Returns array/false
+	 */
+	public function getController (Request $Request) {
+		$segments = $this->getParametersFromPath($Request->getPath());
+
 		if (($controller = $this->checkControllerMethod($Request, $this->defaultController, $segments)) !== false) {
+			$controller[] = array(
+				'App' => $this->App,
+				'Request' => $Request
+			);
+
 			return $controller;
 		}
 
 		$class = $this->App->getNameSpace().'\\Controllers\\'.str_replace(' ', '', ucwords(strtolower(str_replace('-', ' ', array_shift($segments)))));
 
-		if (class_exists($class)) {
-			return $this->checkControllerMethod($Request, new \ReflectionClass($class), $segments);
+		if (class_exists($class) && ($controller = $this->checkControllerMethod($Request, new \ReflectionClass($class), $segments))) {
+			$controller[] = array(
+				'App' => $this->App,
+				'Request' => $Request
+			);
+
+			return $controller;
 		}
 
 		return false;
@@ -290,7 +333,7 @@ class Router {
 				$Response = $this->executeController($controller, $Request);
 			}
 		} catch (\Exception $Exception) {
-			if ($controller = $this->getExceptionController($Request, $Exception)) {
+			if ($controller = $this->getErrorController($Request, $Exception)) {
 				$Response = $this->executeController($controller, $Request);
 			} else {
 				$texto = $Exception->getMessage().'<pre>'.$Exception->getTraceAsString().'</pre>';
@@ -312,11 +355,13 @@ class Router {
 	public function executeController (array $controller, Request $Request) {
 		ob_start();
 
-		list($Class, $Method, $parameters) = $controller;
+		list($Class, $Method, $parameters, $this_parameter) = $controller;
 
 		$Controller = $Class->newInstance();
-		$Controller->App = $this->App;
-		$Controller->Request = $Request;
+
+		foreach ($this_parameter as $name => $this_parameter) {
+			$Controller->$name = $this_parameter;
+		}
 
 		$Response = $Method->invokeArgs($Controller, $parameters);
 

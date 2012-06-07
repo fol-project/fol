@@ -3,22 +3,17 @@ namespace Apps\Web\Controllers;
 
 use Fol\Http\Response;
 
-/**
-*
-* @router method get
-*/
-class Main {
+class Index {
 
 	/**
 	* @router method get post
 	* @router scheme http
 	*/
 	public function index () {
-		var_dump($this->App->session);
 		return new Response('Ola mundo');
 	}
 
-	public function adios () {
+	public function adeus () {
 		return new Response('Adeus mundo');
 	}
 
