@@ -220,12 +220,12 @@ class Router {
 		$info = array();
 
 		foreach ($comments[1] as $line) {
-			if (!preg_match('/^@([\w]+)\s+(.*)\s*$/', $line, $line)) {
+			if (!preg_match('/^@([\w]+)\s+(.*)$/', $line, $line)) {
 				continue;
 			}
 
 			$name = $line[1];
-			$value = $line[2];
+			$value = trim($line[2]);
 
 			if (!isset($info[$name])) {
 				$info[$name] = array($value);
@@ -276,6 +276,8 @@ class Router {
 				default:
 					continue 2;
 			}
+
+
 
 			if (!in_array($value, $values)) {
 				return false;
