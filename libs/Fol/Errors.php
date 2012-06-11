@@ -51,7 +51,7 @@ class Errors {
 			return false;
 		}
 
-		if (error_reporting() & $level && self::$level & $level) {
+		if ((error_reporting() & $level) && (self::$level & $level)) {
 			throw new \ErrorException($message, $level, $level, $file, $line);
 		}
 
