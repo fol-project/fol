@@ -47,14 +47,7 @@ class Response {
 	 * Converts the current response to a string
 	 */
 	public function __toString () {
-		$text = vsprintf('HTTP/1.1 %s %s', $this->status);
-		$text .= "\n".sprintf('Content-Type: %s %s', $this->content_type, $this->charset)."\n";
-
-		$text .= "\n".(string)$this->Headers;
-		$text .= "\n".(string)$this->Cookies;
-		$text .= "\n".$this->content;
-
-		return $text;
+		return (string)$this->content;
 	}
 
 

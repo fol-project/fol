@@ -60,7 +60,19 @@ abstract class App {
 	}
 
 
-	public function getPath () {
+	public function getPath ($subpath = null) {
+		if (!empty($subpath)) {
+			if (substr($subpath, -1) !== '/') {
+				$subpath .= '/';
+			}
+
+			if ($subpath[0] === '/') {
+				$subpath = substr($subpath, 1);
+			}
+
+			return $this->path.$subpath;
+		}
+
 		return $this->path;
 	}
 
@@ -74,7 +86,11 @@ abstract class App {
 	}
 
 
-	public function getHttpPath () {
+	public function getHttpPath ($subpath = null) {
+		if (!empty($subpath)) {
+			return $this->http.$subpath;
+		}
+
 		return $this->http;
 	}
 }
