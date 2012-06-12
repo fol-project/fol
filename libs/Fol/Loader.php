@@ -78,7 +78,7 @@ class Loader {
 
 		$namespace = '';
 
-		if ($last_pos = strripos($class_name, '\\')) {
+		if (($last_pos = strripos($class_name, '\\')) !== false) {
 			$namespace = substr($class_name, 0, $last_pos);
 			$class_name = substr($class_name, $last_pos + 1);
 		}
@@ -104,10 +104,10 @@ class Loader {
 		$file = isset($libraries_path) ? $libraries_path : self::$libraries_path;
 
 		if (!empty($namespace)) {
-			$file .= str_replace('\\', DIRECTORY_SEPARATOR, $namespace).DIRECTORY_SEPARATOR;
+			$file .= str_replace('\\', '/', $namespace).'/';
 		}
 
-		return $file.str_replace('_', DIRECTORY_SEPARATOR, $class_name).'.php';
+		return $file.str_replace('_', '/', $class_name).'.php';
 	}
 
 
@@ -122,7 +122,7 @@ class Loader {
 	static public function registerClass ($class, $path = null) {
 		if (is_array($class)) {
 			foreach ($class as $class => $path) {
-				self::registerClass($class, $path);
+				self::$classes[$class] = $path;
 			}
 
 			return;
@@ -143,7 +143,7 @@ class Loader {
 	static public function registerNamespace ($namespace, $path = null) {
 		if (is_array($namespace)) {
 			foreach ($namespace as $namespace => $path) {
-				self::registerNamespace($namespace, $path);
+				self::$namespaces[$namespace] = $path;
 			}
 
 			return;

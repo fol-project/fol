@@ -91,7 +91,10 @@ class Templates {
 
 
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 84eaf38c8ae111829e1f27b0fa2ce8db31f36d97
 	/**
 	 * private function renderFile (string $_file, [array $_data])
 	 *
@@ -140,4 +143,8 @@ class Templates {
 		return $this->renderFile($template, $data);
 	}
 }
+<<<<<<< HEAD
 ?>
+=======
+?>
+>>>>>>> 84eaf38c8ae111829e1f27b0fa2ce8db31f36d97
