@@ -1,0 +1,21 @@
+{{selectors.wrapper}} {
+	max-width: {{wrapper.max-width}};
+	width: {{wrapper.width}};
+}
+{{selectors.main}} {
+	margin-bottom: 20px;
+}
+
+@media (min-width: {{breaks.break.min-width}}) {
+	{{selectors.wrapper}} {
+		float: left;
+	}
+	{{selectors.main}} {
+		float: left;
+		width: {{breaks.break.Main_width}};
+		margin-right: 20px;
+	}
+	{{selectors.aside}} {
+		overflow: hidden;
+	}
+}

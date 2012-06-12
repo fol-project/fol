@@ -1,0 +1,21 @@
+<?php echo $selectors['wrapper']; ?> {
+	max-width: <?php echo $wrapper['max-width']; ?>;
+	width: <?php echo $wrapper['width']; ?>;
+}
+<?php echo $selectors['main']; ?> {
+	margin-bottom: 20px;
+}
+
+@media (min-width: <?php echo $breaks['break']['min-width']; ?>) {
+	<?php echo $selectors['wrapper']; ?> {
+		float: left;
+	}
+	<?php echo $selectors['main']; ?> {
+		float: left;
+		width: <?php echo $breaks['break']['Main width']; ?>;
+		margin-right: 20px;
+	}
+	<?php echo $selectors['aside']; ?> {
+		overflow: hidden;
+	}
+}

@@ -10,14 +10,14 @@ class Headers {
 		'html' => array('text/html', 'application/xhtml+xml'),
 		'gif' => array('image/gif'),
 		'jpg' => array('image/jpeg', 'image/jpg'),
-		'js'  => array('application/javascript', 'application/x-javascript', 'text/javascript'),
-		'json' => array('application/json', 'application/x-json', 'text/json'),
+		'js'  => array('text/javascript', 'application/javascript', 'application/x-javascript'),
+		'json' => array('text/json', 'application/json', 'application/x-json'),
 		'png' => array('image/png',  'image/x-png'),
 		'pdf' => array('application/pdf', 'application/x-download'),
 		'rdf' => array('application/rdf+xml'),
 		'txt' => array('text/plain'),
 		'xml' => array('text/xml', 'application/xml', 'application/x-xml'),
-		'zip' => array('application/x-zip', 'application/zip', 'application/x-zip-compressed'),
+		'zip' => array('application/zip', 'application/x-zip', 'application/x-zip-compressed')
 	);
 
 	static public $status = array(

@@ -359,10 +359,14 @@ class Router {
 
 		list($Class, $Method, $parameters, $this_parameter) = $controller;
 
-		$Controller = $Class->newInstance();
+		$Controller = $Class->newInstanceWithoutConstructor();
 
 		foreach ($this_parameter as $name => $this_parameter) {
 			$Controller->$name = $this_parameter;
+		}
+
+		if ($Class->hasMethod('__construct')) {
+			$Controller->__construct();
 		}
 
 		$Response = $Method->invokeArgs($Controller, $parameters);
