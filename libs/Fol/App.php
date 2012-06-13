@@ -39,7 +39,7 @@ abstract class App {
 
 		$this->namespace = $Class->getNameSpaceName();
 		$this->name = substr(strrchr($this->namespace, '\\'), 1);
-		$this->path = dirname($Class->getFileName()).'/';
+		$this->path = str_replace('\\', '/', dirname($Class->getFileName())).'/';
 
 		if (isset($Parent)) {
 			$this->Parent = $Parent;
@@ -88,6 +88,10 @@ abstract class App {
 
 	public function getHttpPath ($subpath = null) {
 		if (!empty($subpath)) {
+			if ($subpath[0] === '/') {
+				$subpath = substr($subpath, 1);
+			}
+
 			return $this->http.$subpath;
 		}
 
