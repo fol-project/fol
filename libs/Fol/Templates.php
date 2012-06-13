@@ -78,13 +78,11 @@ class Templates {
 			$template = $this->templates[$template];
 		}
 
-		$template = (strpos($template, BASE_PATH) === 0) ? $template : $this->templatesPath.$template;
+		$template = $this->templatesPath.$template;
 
 		if (is_file($template)) {
 			return $template;
 		}
-
-		echo $template.'<br>';
 
 		return false;
 	}
@@ -118,7 +116,7 @@ class Templates {
 	 * return string/boolean
 	 */
 	public function render ($template, array $data = null) {
-		if (is_array($data) && (!$data || preg_match('/^[0-9]+$/', implode(array_keys($data))))) {
+		if (isset($data) && (!$data || isset($data[0]))) {
 			$result = '';
 			$total = count($data);
 

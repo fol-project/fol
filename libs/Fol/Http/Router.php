@@ -124,7 +124,7 @@ class Router {
 	 * Returns array
 	 */
 	private function getParametersFromPath ($path) {
-		$basePath = $this->App->getHttpPath();
+		$basePath = $this->App->getUrl();
 
 		if ($basePath !== '') {
 			$path = preg_replace('|^'.preg_quote($basePath).'|', '', $path.'/');

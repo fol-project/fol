@@ -4,10 +4,15 @@ namespace Fol;
 abstract class App {
 	private $namespace;
 	private $name;
+
 	private $path;
-	private $http;
+	private $url;
+
+	private $publicPath;
+	private $publicUrl;
 
 	public $Parent;
+
 
 
 	/**
@@ -15,13 +20,13 @@ abstract class App {
 	 *
 	 * Returns object
 	 */
-	static function create ($name, App $Parent = null, $httpPath = null) {
+	static function create ($name, App $Parent = null, $url = null, $public = 'public') {
 		$name = str_replace(' ', '', ucwords(strtolower(str_replace('-', ' ', $name))));
 
 		$app = 'Apps\\'.$name.'\\App';
 
 		if (class_exists($app)) {
-			return new $app($Parent, $httpPath);
+			return new $app($Parent, $url, $public);
 		}
 
 		throw new InvalidArgumentException('"'.$app.'" is an invalid app class');
@@ -34,7 +39,7 @@ abstract class App {
 	 *
 	 * Returns none
 	 */
-	public function __construct (App $Parent = null, $httpPath = null) {
+	public function __construct (App $Parent = null, $url = null, $public = 'public') {
 		$Class = new \ReflectionClass($this);
 
 		$this->namespace = $Class->getNameSpaceName();
@@ -43,10 +48,17 @@ abstract class App {
 
 		if (isset($Parent)) {
 			$this->Parent = $Parent;
-			$httpPath = $Parent->getHttpPath().$httpPath;
+			$this->url = $Parent->getUrl($url);
+		} else {
+			$this->url = BASE_URL.$url;
 		}
 
-		$this->setHttpPath($httpPath);
+		if (substr($this->url, -1) !== '/') {
+			$this->url .= '/';
+		}
+
+		$this->publicPath = BASE_PATH.$public.'/';
+		$this->publicUrl = BASE_URL.$public.'/';
 	}
 
 
@@ -60,42 +72,43 @@ abstract class App {
 	}
 
 
-	public function getPath ($subpath = null) {
-		if (!empty($subpath)) {
-			if (substr($subpath, -1) !== '/') {
-				$subpath .= '/';
-			}
-
-			if ($subpath[0] === '/') {
-				$subpath = substr($subpath, 1);
-			}
-
-			return $this->path.$subpath;
+	public function getPath ($path = null) {
+		if (!empty($path) && $path[0] === '/') {
+			$path = substr($path, 1);
 		}
 
-		return $this->path;
+		return $this->path.$path;
 	}
 
 
-	public function setHttpPath ($http) {
-		if (!empty($http) && substr($http, -1) !== '/') {
-			$http .= '/';
+	public function getUrl ($path = null, array $get = null) {
+		if (!empty($path) && $path[0] === '/') {
+			$path = substr($path, 1);
 		}
 
-		$this->http = strtolower($http);
+		if (isset($get)) {
+			return $this->url.$path.((strpos($path, '?') === false) ? '?' : '&').http_build_query($get);
+		}
+
+		return $this->url.$path;
 	}
 
 
-	public function getHttpPath ($subpath = null) {
-		if (!empty($subpath)) {
-			if ($subpath[0] === '/') {
-				$subpath = substr($subpath, 1);
-			}
-
-			return $this->http.$subpath;
+	public function getPublicPath ($path = null) {
+		if (!empty($path) && $path[0] === '/') {
+			$path = substr($path, 1);
 		}
 
-		return $this->http;
+		return $this->publicPath.$path;
+	}
+
+
+	public function getPublicUrl ($path = null) {
+		if (!empty($path) && $path[0] === '/') {
+			$path = substr($path, 1);
+		}
+
+		return $this->publicUrl.$path;
 	}
 }
 ?>

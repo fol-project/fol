@@ -62,8 +62,9 @@ Unha vez instanciada temos varias funcións útiles
 $Aplicacion->getNameSpace(): Devolve o namespace donde está aloxada a aplicación (Apps\Blog)
 $Aplicacion->getName(): Devolve o nome da aplicación (Blog)
 $Aplicacion->getPath(): Devolve a ruta onde está aloxada a aplicación no servidor (www/apps/Blog/)
-$Aplicacion->getHttpPath(): Devolve a para acceder á raiz desa aplicación via web (p.e: /blog/)
-$Aplicacion->setHttpPath($path): Usa esta función se queres cambiar a ruta web da aplicación
+$Aplicacion->getUrl(): Devolve a url para acceder á raiz desa aplicación (p.e: /blog/)
+$Aplicacion->getPublicPath(): Devolve a ruta onde está aloxada a carpeta pública no servidor (www/public/)
+$Aplicacion->getPublicUrl(): Devolve a url onde está aloxada a carpeta pública no servidor (/public/)
 
 
 -------------------------------------------------------------------

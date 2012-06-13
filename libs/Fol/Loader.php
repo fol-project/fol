@@ -14,10 +14,6 @@ class Loader {
 	 */
 	static public function setLibrariesPath ($libraries_path) {
 		if (is_dir($libraries_path)) {
-			if (substr($libraries_path, -1) != '/') {
-				$libraries_path .= '/';
-			}
-
 			self::$libraries_path = $libraries_path;
 		} else {
 			throw new \ErrorException("The folder '$libraries_path' does not exists");
@@ -104,10 +100,10 @@ class Loader {
 		$file = isset($libraries_path) ? $libraries_path : self::$libraries_path;
 
 		if (!empty($namespace)) {
-			$file .= str_replace('\\', '/', $namespace).'/';
+			$file .= '/'.str_replace('\\', '/', $namespace);
 		}
 
-		return $file.str_replace('_', '/', $class_name).'.php';
+		return $file.'/'.str_replace('_', '/', $class_name).'.php';
 	}
 
 
