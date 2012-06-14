@@ -5,7 +5,7 @@ use Fol\App;
 
 define('FOL_VERSION', '0.0.1-alpha1');
 define('BASE_PATH', str_replace('\\', '/', __DIR__).'/');
-define('BASE_URL', preg_replace('|/+|', '/', '/'.preg_replace('|^'.str_replace('\\', '/', realpath($_SERVER['DOCUMENT_ROOT'])).'|i', '', BASE_PATH)));
+define('BASE_URL', preg_replace('|/+|', '/', '/'.strtolower(preg_replace('|^'.str_replace('\\', '/', realpath($_SERVER['DOCUMENT_ROOT'])).'|i', '', BASE_PATH))));
 
 include(BASE_PATH.'libs/Fol/Loader.php');
 
