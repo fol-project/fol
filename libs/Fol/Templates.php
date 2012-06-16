@@ -4,7 +4,6 @@ namespace Fol;
 use Fol\Container;
 
 class Templates {
-	protected $Controller;
 	protected $templates;
 	protected $templatesPath;
 

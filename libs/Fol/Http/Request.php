@@ -27,8 +27,8 @@ class Request {
 	 * Returns object
 	 */
 	static public function createFromGlobals () {
-		$path = parse_url(preg_replace('|^'.preg_quote(BASE_URL).'|', '', $_SERVER['REQUEST_URI']), PHP_URL_PATH);
-
+		$path = parse_url(preg_replace('|^'.preg_quote(BASE_URL).'|', '', strtolower($_SERVER['REQUEST_URI'])), PHP_URL_PATH);
+		
 		return new static($path, array(), (array)filter_input_array(INPUT_GET), (array)filter_input_array(INPUT_POST), $_FILES, (array)filter_input_array(INPUT_COOKIE), (array)filter_input_array(INPUT_SERVER));
 	}
 
