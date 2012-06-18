@@ -171,7 +171,7 @@ class Response {
 		}
 
 		header(sprintf('HTTP/1.1 %s', $this->status[0], $this->status[1]));
-		header(sprintf('Content-Type: %s UTF-8', $this->content_type));
+		header(sprintf('Content-Type:%s;charset=utf-8', $this->content_type));
 
 		$this->Headers->send();
 		$this->Cookies->send();
