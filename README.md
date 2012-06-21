@@ -1,4 +1,5 @@
-AQUI TES O FOL
+Aqui tes o FOL
+==============
 (o resto da gaita xa é cousa túa)
 
 FOL é framework escrito en PHP por Oscar Otero (http://oscarotero.com) como exercicio de deseño e como ferramenta para desenvolver experimentos e proxectos persoais. A intención é ter algo manexable, moi flexible e que permita xuntar librerías externas. Vamos, un microframework
@@ -6,114 +7,132 @@ FOL é framework escrito en PHP por Oscar Otero (http://oscarotero.com) como exe
 * Rápido e lixeiro: Só carga as cousas que precisa en cada momento.
 * Escrito en PHP 5.4. (Sempre é moito mellor e máis divertido traballar con versións novas que antigas)
 * Lóxica sinxela e fácil de entender.
-* Lévase ben con librarías externas: Calquera libraría que use o estándar PSR-0 para o autoloader non debería dar problemas.
+* Lévase ben con librarías externas: Calquera libraría que use o estándar PSR-0 para o autoloader non debería dar problemas. Ademáis é compatible con Composer
 
-CAL É A SITUACIÓN ACTUAL?
+Cal é a situación actual?
+-------------------------
+
 Por agora aínda está en fase beta (0.1b). Falta por probar cousas e crear outras novas. Paciencia.
 
 
-DOCUMENTACIÓN RÁPIDA (para saber por onde van os tiros):
+Documentación rápida (para saber por onde van os tiros):
+========================================================
 
 No directorio raíz de FOL existen dúas carpetas: apps e libs.
 A carpeta libs contén todas as bibliotecas que podes usar, entre elas as propias de FOL. Se queres usar calquera biblioteca de terceiros (por exemplo para traballar con bases de datos ou con plantillas) deberías gardalas aí.
 En cambio, a carpeta apps contén a aplicación ou aplicacións que forman o sitio web.
 
--------------------------------------------------------------------
-LOADER
--------------------------------------------------------------------
-A primeira clase que se carga é a clase Loader que serve para cargar automaticamente o resto de clases empregando o estándar PSR-0.
+Loader
+------
+
+A primeira clase que se carga é a clase Loader que serve para cargar automaticamente o resto de clases empregando o estándar PSR-0. Tamén é compatible co sistema de autoloader de Composer.
 Deste xeito, se instanciamos unha clase chamada "Utilidades\Matematicas", buscaría esa clase no arquivo libs/Utilidades/Matematicas.php.
 Ademais podemos rexistrar directorios específicos para calquera namespace ou clase concreta. Por exemplo todas as clases que se atopan no namespace App podemos configurar para que as busque na carpeta apps, fora de libraries.
 
--------------------------------------------------------------------
-ERRORS
--------------------------------------------------------------------
+#### Exemplo
+
+	include(BASE_PATH.'libs/Fol/Loader.php');
+
+	Loader::register(); //Carga o autoload
+	Loader::setLibrariesPath(BASE_PATH.'libs'); //Define o directorio onde se gardan as bibliotecas
+	Loader::registerComposer(); //Detecta as bibliotecas descargadas con Composer
+
+Errors
+------
 A clase Errors rexistra todos os erros que se produzan ao longo da execución do script e lanza unha ErrorException. Deste modo centralízanse nun só lugar todos os erros que se produzan para poder manexalos moito mellor.
 
--------------------------------------------------------------------
-APPS
--------------------------------------------------------------------
+
+Apps
+----
+
 As aplicacións manexan o código específico do noso sitio web. Podes meter todo o sitio web nunha soa aplicación ou dividilo en distintas aplicacións (unha para o blog, outra para galeria de fotos, etc). Unha aplicación non é máis que unha clase que se instancia e se executa. Isto permite executar aplicacións unha dentro doutra, extendelas, etc. As aplicacións deben ter unha función chamada bootstrap que é a que inicia a execución desa aplicación, ademáis deben extender á clase Fol\App.
 Para crear unha nova aplicación, debemos crear un directorio dentro da carpeta apps co nome da nosa aplicación e crear dentro un arquivo chamado App.php co seguinte código:
 
-namespace Apps\Blog;
+#### Exemplo de App para un blog:
 
-class App extends \Fol\App {
+	namespace Apps\Blog;
 
-	public function bootstrap () {
-		//Codigo para executar a nosa aplicación
+	class App extends \Fol\App {
+
+		public function bootstrap () {
+			//Codigo para executar a nosa aplicación
+		}
 	}
-}
 
-Para instanciar a nosa aplicación podemos facelo manualmente:
+	//Agora instanciamos a aplicación manualmente:
+	$Aplicacion = new Apps\Blog\App();
 
-$Aplicacion = new Apps\Blog\App();
+	//ou usando unha función estática
+	$Aplicacion = Fol\App::create('Blog');
 
-ou usando a función estática App::create()
-
-$Aplicacion = Fol\App::create('Blog');
-
-logo xa podemos executar a aplicacion coa función bootstrap():
-
-$Aplicacion->bootstrap();
-
-Unha vez instanciada temos varias funcións útiles
-
-$Aplicacion->getNameSpace(): Devolve o namespace donde está aloxada a aplicación (Apps\Blog)
-$Aplicacion->getName(): Devolve o nome da aplicación (Blog)
-$Aplicacion->getPath(): Devolve a ruta onde está aloxada a aplicación no servidor (www/apps/Blog/)
-$Aplicacion->getUrl(): Devolve a url para acceder á raiz desa aplicación (p.e: /blog/)
-$Aplicacion->getPublicPath(): Devolve a ruta onde está aloxada a carpeta pública no servidor (www/public/)
-$Aplicacion->getPublicUrl(): Devolve a url onde está aloxada a carpeta pública no servidor (/public/)
+	//E executamos a aplicación
+	$Aplicacion->bootstrap();
 
 
--------------------------------------------------------------------
+Unha vez instanciada a aplicación temos varias funcións útiles
+
+* $Aplicacion->getNameSpace(): Devolve o namespace donde está aloxada a aplicación (Apps\Blog)
+* $Aplicacion->getName(): Devolve o nome da aplicación (Blog)
+* $Aplicacion->getPath(): Devolve a ruta onde está aloxada a aplicación no servidor (www/apps/Blog/)
+* $Aplicacion->getUrl(): Devolve a url para acceder á raiz desa aplicación (p.e: /blog/)
+* $Aplicacion->getPublicPath(): Devolve a ruta onde está aloxada a carpeta pública no servidor (www/public/)
+* $Aplicacion->getPublicUrl(): Devolve a url onde está aloxada a carpeta pública no servidor (/public/)
+
+
 HTTP
--------------------------------------------------------------------
+----
+
 Aínda que podes usar calquera outro servizo, Fol contén dunha serie de clases para traballar con Http, é dicir: recoller os "request" ou peticións http e todas as súas variables (cabeceiras, get, post, cookies, files, etc) e xerar "responses" ou respostas. Para iso temos a clase Fol\Http\Request e Fol\Http\Response.
 
--------------------------------------------------------------------
-REQUEST
--------------------------------------------------------------------
+Request
+-------
+
 Con esta clase podemos recoller os datos dunha petición http e acceder a eles. Para crear o obxecto Request, podemos usar a función estática createFromGlobals():
 
-$Request = Fol\Http\Request::createFromGlobals();
+#### Exemplo
 
-Agora xa podemos acceder a todos os datos desta petición:
+	$Request = Fol\Http\Request::createFromGlobals();
 
-$Request->Get: Obxecto que contén todos os parámetros enviados por GET. Permite acceder a eses datos, editalos, modificalos, etc:
-$Request->Get->get('nome'): Devolve o parámetro enviado por GET 'nome'
-$Request->Get->set('nome', 'novo-valor'): Modifica o valor do parámetro 'nome'
-etc...
+	//Agora xa podemos acceder a todos os datos desta petición:
 
-Outros obxectos dentro de Request son:
-$Request->Post: Para os parámetros POST
-$Request->Server: Para as variables do servidor (o equivalente a $_SERVER)
-$Request->Headers: Para as cabeceiras http
-$Request->Cookies: Cookies enviadas
-$Request->Files: Arquivos enviados
-$Request->Parameters: Para gardar parámetros manualmente
+	$Request->Get; //Obxecto que contén todos os parámetros enviados por GET
+	$Request->Get->get('nome'); //Devolve o parámetro enviado por GET 'nome'
+	$Request->Get->set('nome', 'novo-valor'); //Modifica o valor do parámetro 'nome'
 
--------------------------------------------------------------------
-RESPONSE
--------------------------------------------------------------------
+	//Outros obxectos dentro de Request son:
+	
+	$Request->Post; //Para os parámetros POST
+	$Request->Server; //Para as variables do servidor (o equivalente a $_SERVER)
+	$Request->Headers; //Para as cabeceiras http
+	$Request->Cookies; //Cookies enviadas
+	$Request->Files; //Arquivos enviados
+	$Request->Parameters; //Para gardar parámetros manualmente
+
+
+Response
+--------
+
 Esta clase xenera as respostas que se enviarán ao navegador do usuario:
 
-$Response = new Fol\Http\Response;
+#### Exemplo
 
-A clase Response contén dentro outros obxectos para xestionar partes específicas:
-$Response->Headers: Para enviar cabeceiras
-$Response->Cookies: Para enviar cookies
+	$Response = new Fol\Http\Response;
 
-Tamén podemos engadirlle o contido ou body da resposta:
-$Response->setContent('texto de resposta');
+	//A clase Response contén dentro outros obxectos para xestionar partes específicas:
 
-E finalmente para enviar a resposta ao servidor, podemos usar a función "send":
-$Response->send();
+	$Response->Headers; //Para enviar cabeceiras
+	$Response->Cookies; //Para enviar cookies
 
--------------------------------------------------------------------
-ROUTER
--------------------------------------------------------------------
+	//Tamén podemos engadirlle o contido ou body da resposta:
+	$Response->setContent('texto de resposta');
+
+	//E finalmente para enviar a resposta ao servidor, podemos usar a función "send":
+	$Response->send();
+
+
+Router
+------
+
 A clase Router sirve para buscar a función (ou controladores) que se ten que executar por cada url.
 
 A maioría dos frameworks MVC requiren que teñas que especificar que controladores usar en cada url, usando expresións regulares, etc.
@@ -125,49 +144,53 @@ A clase Router xa se encarga de examinar o controlador e ver se se pode usar ou 
 
 Coa función handle, podemos xestionar as peticións:
 
-$Request = Fol\Http\Request::createFromGlobals();
+#### Exemplo
 
-$Response = $Router->handle($Request);
+	$Request = Fol\Http\Request::createFromGlobals();
 
-$Response->send();
+	$Response = $Router->handle($Request);
+
+	$Response->send();
 
 Metendo isto na función bootstrap da nosa aplicación xa temos unha sinxela e potente implementación de MVC:
 
-namespace Apps\Web;
+	namespace Apps\Web;
 
-use Fol\Http\Router;
-use Fol\Http\Request;
+	use Fol\Http\Router;
+	use Fol\Http\Request;
 
-class App extends \Fol\App {
+	class App extends \Fol\App {
 
-	public function bootstrap () {
-		$this->Router = new Router;
-		$this->Router->handle(Request::createFromGlobals())->send();
+		public function bootstrap () {
+			$this->Router = new Router;
+			$this->Router->handle(Request::createFromGlobals())->send();
+		}
 	}
-}
 
-A clase Router tamén analiza a documentación de cada controlador para poder afinar máis cando executar ese controlador ou non. Fíxate neste código:
+A clase Router tamén analiza a documentación de cada controlador para poder afinar máis cando executar ese controlador ou non.
 
-namespace Apps\Web\Controllers;
+#### Configuración dos controladores usando os DocComments
 
-/**
- * @router method get
- */
-class Saudo {
+	namespace Apps\Web\Controllers;
 
 	/**
-	 * @router method get post
-	 * @router scheme http
-	 * @router ajax true
+	 * @router method get
 	 */
-	public function ola () {
-		echo 'Ola mundo';
-	}
+	class Saudo {
 
-	public function adeus () {
-		echo 'Adeus mundo';
+		/**
+		 * @router method get post
+		 * @router scheme http
+		 * @router ajax true
+		 */
+		public function ola () {
+			echo 'Ola mundo';
+		}
+
+		public function adeus () {
+			echo 'Adeus mundo';
+		}
 	}
-}
 
 Este exemplo define un controlador chamado Saudo con dous métodos: ola e adeus. A url "saudo/ola" executará o primeiro método e "saudo/adeus" o segundo.
 Os comentarios que aparecen xusto antes do método "ola" definen que só se executará se estamos chamando a páxina co método GET ou POST, o scheme "http" e por ajax. Se non se cumple algunha desas condicións (chamamos a ese controlador sen ser por ajax, ou usamos https) xeneraríase un erro 404 de páxina non atopada.
