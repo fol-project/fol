@@ -152,7 +152,9 @@ class Request {
 	 * Converts the request to a string
 	 */
 	public function __toString () {
-		$text = "Parameters:\n".$this->Parameters;
+		$text = "Path: ".$this->getPath();
+		$text .= "\nFormat: ".$this->getFormat();
+		$text .= "\nParameters:\n".$this->Parameters;
 		$text .= "\nGet:\n".$this->Get;
 		$text .= "\nPost:\n".$this->Post;
 		$text .= "\nFiles:\n".$this->Files;

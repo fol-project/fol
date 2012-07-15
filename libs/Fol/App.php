@@ -29,7 +29,7 @@ abstract class App {
 			return new $app($Parent, $url, $public);
 		}
 
-		throw new InvalidArgumentException('"'.$app.'" is an invalid app class');
+		throw new \InvalidArgumentException('"'.$app.'" is an invalid app class');
 	}
 
 

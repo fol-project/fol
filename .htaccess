@@ -8,7 +8,5 @@ Options -Indexes
 <IfModule mod_rewrite.c>
 	RewriteEngine On
 
-	RewriteCond %{REQUEST_FILENAME} -f
-	RewriteRule . - [S=2]
 	RewriteRule ^.*$ index.php [L,QSA]
 </IfModule>
