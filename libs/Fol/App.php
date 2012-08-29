@@ -1,114 +1,78 @@
 <?php
+/**
+ * Fol\App
+ * 
+ * This is the abstract class that all apps must extend. Provides the basic functionality parameters (paths, urls, namespace, parent, etc)
+ */
+
 namespace Fol;
 
 abstract class App {
-	private $namespace;
-	private $name;
-
-	private $path;
-	private $url;
-
-	private $publicPath;
-	private $publicUrl;
-
 	public $Parent;
 
 
+	/**
+	 * Creates a new App instance
+	 * 
+	 * @param string $name The name of the app (for example 'web')
+	 *
+	 * @throws a InvalidArgumentException if the app doesn't exist
+	 * 
+	 * @return object The app instance or null if app doesn't exists
+	 */
+	static function create ($name) {
+		$class = 'Apps\\'.str_replace(' ', '', ucwords(strtolower(str_replace('-', ' ', $name)))).'\\App';
+
+		if (class_exists($class)) {
+			return new $class();
+		}
+
+		throw new \InvalidArgumentException('"'.$class.'" is an invalid app class');
+	}
+
 
 	/**
-	 * static function create (string $name, [Object $Parent])
-	 *
-	 * Returns object
+	 * Magic function to get some special properties.
+	 * Instead calculate this on the __constructor, is better use __get to do not obligate to call this constructor in the extensions of this class
+	 * 
+	 * @param string $name The name of the property
+	 * 
+	 * @return string The property value or null
 	 */
-	static function create ($name, App $Parent = null, $url = null, $public = 'public') {
-		$name = str_replace(' ', '', ucwords(strtolower(str_replace('-', ' ', $name))));
-
-		$app = 'Apps\\'.$name.'\\App';
-
-		if (class_exists($app)) {
-			return new $app($Parent, $url, $public);
+	public function __get ($name) {
+		if ($name === 'name') {
+			return $this->name = substr(strrchr($this->namespace, '\\'), 1);
 		}
 
-		throw new \InvalidArgumentException('"'.$app.'" is an invalid app class');
-	}
+		if ($name === 'namespace') {
+			return $this->namespace = (new \ReflectionClass($this))->getNameSpaceName();
+		}
 
+		if ($name === 'path') {
+			return $this->path = str_replace('\\', '/', dirname((new \ReflectionClass($this))->getFileName())).'/';
+		}
+
+		if ($name === 'url') {
+			return $this->url = BASE_URL;
+		}
+
+		if ($name === 'assetsPath') {
+			return $this->assetsPath = BASE_PATH.'assets/';
+		}
+
+		if ($name === 'assetsUrl') {
+			return $this->assetsUrl = BASE_URL.'assets/';
+		}
+	}
 
 
 	/**
-	 * public function __construct ([Object $Parent])
-	 *
-	 * Returns none
+	 * Define a Parent property (the app that contain this app)
+	 * 
+	 * @param Fol\App $Parent An App instance
 	 */
-	public function __construct (App $Parent = null, $url = null, $public = 'public') {
-		$Class = new \ReflectionClass($this);
-
-		$this->namespace = $Class->getNameSpaceName();
-		$this->name = substr(strrchr($this->namespace, '\\'), 1);
-		$this->path = str_replace('\\', '/', dirname($Class->getFileName())).'/';
-
-		if (isset($Parent)) {
-			$this->Parent = $Parent;
-			$this->url = $Parent->getUrl($url);
-		} else {
-			$this->url = BASE_URL.$url;
-		}
-
-		if (substr($this->url, -1) !== '/') {
-			$this->url .= '/';
-		}
-
-		$this->publicPath = BASE_PATH.$public.'/';
-		$this->publicUrl = BASE_URL.$public.'/';
-	}
-
-
-	public function getName () {
-		return $this->name;
-	}
-
-
-	public function getNameSpace () {
-		return $this->namespace;
-	}
-
-
-	public function getPath ($path = null) {
-		if (!empty($path) && $path[0] === '/') {
-			$path = substr($path, 1);
-		}
-
-		return $this->path.$path;
-	}
-
-
-	public function getUrl ($path = null, array $get = null) {
-		if (!empty($path) && $path[0] === '/') {
-			$path = substr($path, 1);
-		}
-
-		if (isset($get)) {
-			return $this->url.$path.((strpos($path, '?') === false) ? '?' : '&').http_build_query($get);
-		}
-
-		return $this->url.$path;
-	}
-
-
-	public function getPublicPath ($path = null) {
-		if (!empty($path) && $path[0] === '/') {
-			$path = substr($path, 1);
-		}
-
-		return $this->publicPath.$path;
-	}
-
-
-	public function getPublicUrl ($path = null) {
-		if (!empty($path) && $path[0] === '/') {
-			$path = substr($path, 1);
-		}
-
-		return $this->publicUrl.$path;
+	public function setParent (App $Parent) {
+		$this->Parent = $Parent;
 	}
 }
 ?>

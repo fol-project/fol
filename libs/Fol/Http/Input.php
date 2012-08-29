@@ -1,13 +1,23 @@
 <?php
+/**
+ * Fol\Http\Input
+ * 
+ * Class to store all input variables ($_GET, $_POST)
+ */
 namespace Fol\Http;
 
 class Input extends Container {
 
 	/**
-	 * public function get ([string $name], [mixed $default])
-	 *
-	 * Gets one or all parameters
-	 * Returns mixed
+	 * Gets one or all parameters. You can gets the subvalues using brackets:
+	 * 
+	 * $input->get('user') Returns, for example: array('name' => 'xan', 'age' => 34)
+	 * $input->get('user[age]') Returns 34
+	 * 
+	 * @param string $name The parameter name
+	 * @param mixed $default A default value to return if the name does not exist
+	 * 
+	 * @return mixed The value or default value
 	 */
 	public function get ($name = null, $default = null) {
 		if (func_num_args() === 0) {
@@ -37,10 +47,16 @@ class Input extends Container {
 
 
 	/**
-	 * public function filter (string $name, int $filter, [mixed $options])
-	 *
-	 * Filters a value or an array of values
-	 * Returns mixed
+	 * Returns a value filtered using the filter_var php function
+	 * 
+	 * For example:
+	 * $input->filter('email', FILTER_VALIDATE_EMAIL)
+	 * 
+	 * @param string $name The variable name
+	 * @param integer $filter One of the available filters provided by php (http://www.php.net/manual/en/filter.filters.php)
+	 * @param integer $options Options for the filter
+	 * 
+	 * @return mixed The filtered value
 	 */
 	public function filter ($name, $filter, $options = null) {
 		$value = $this->get($name);
@@ -49,7 +65,7 @@ class Input extends Container {
 			return $value;
 		}
 
-		return is_null($options) ? filter_var($value, $filter) : filter_var($value, $filter, $options);
+		return isset($options) ? filter_var($value, $filter) : filter_var($value, $filter, $options);
 	}
 }
 ?>

@@ -1,4 +1,9 @@
 <?php
+/**
+ * Fol\Templates
+ * 
+ * A simple class to manage template files 
+ */
 namespace Fol;
 
 use Fol\Container;
@@ -10,9 +15,9 @@ class Templates {
 
 
 	/**
-	 * public function __construct (string $path)
-	 *
-	 * Returns none
+	 * Constructor method. You must define the base folder where the templates file are stored
+	 * 
+	 * @param string $path The base folder path
 	 */
 	public function __construct ($path) {
 		$this->setFolder($path);
@@ -21,10 +26,9 @@ class Templates {
 
 
 	/**
-	 * public function unregister (string $name)
-	 *
-	 * Deletes a service
-	 * Returns none
+	 * Defines the base folder where the templates files are stored
+	 * 
+	 * @param string $path The base folder path
 	 */
 	public function setFolder ($path) {
 		if (substr($path, -1) !== '/') {
@@ -37,10 +41,11 @@ class Templates {
 
 
 	/**
-	 * public function register (string $name, string $file)
-	 *
-	 * Register a new template
-	 * Returns none
+	 * Register a new template file with a name
+	 * You can define an array of name => file
+	 * 
+	 * @param string $name The template name (for example: menu)
+	 * @param string $file The file path of the template (for example: menu.php)
 	 */
 	public function register ($name, $file = null) {
 		if (is_array($name)) {
@@ -55,10 +60,9 @@ class Templates {
 
 
 	/**
-	 * public function unregister (string $name)
-	 *
-	 * Deletes a service
-	 * Returns none
+	 * Unregister a template file
+	 * 
+	 * @param string $name The template name
 	 */
 	public function unregister ($name) {
 		unset($this->templates[$name]);
@@ -67,10 +71,14 @@ class Templates {
 
 
 	/**
-	 * public function getFile (string $template)
-	 *
 	 * Gets a template file by name or filename
-	 * Returns string/false
+	 * 
+	 * $templates->getFile('menu');
+	 * $templates->getFile('menu.php');
+	 * 
+	 * @param string $template The template name or file
+	 * 
+	 * Returns string The template file path or false if does not exists
 	 */
 	public function getFile ($template) {
 		if (isset($this->templates[$template])) {
@@ -89,9 +97,12 @@ class Templates {
 
 
 	/**
-	 * private function renderFile (string $_file, [array $_data])
+	 * Private function that renders a template file and returns its content
+	 * 
+	 * @param string $_file The file path
+	 * @param array $_data An array of variables used in the template.
 	 *
-	 * Returns mixed
+	 * @return string The file content
 	 */
 	protected function renderFile ($_file, array $_data = null) {
 		if (isset($_data)) {
@@ -108,11 +119,12 @@ class Templates {
 
 
 	/**
-	 * public function render (string $template, [array $data])
+	 * Render a template and return its content
+	 * 
+	 * @param string $template The template name or file path
+	 * @param array $data An optional array of data used in the template. If the array is numerical, renders the template once for each item
 	 *
-	 * Render a template
-	 *
-	 * return string/boolean
+	 * @return string The template rendered
 	 */
 	public function render ($template, array $data = null) {
 		if (isset($data) && (!$data || isset($data[0]))) {

@@ -1,9 +1,17 @@
 <?php
+/**
+ * Fol\Http\Headers
+ * 
+ * Manage http headers
+ */
 namespace Fol\Http;
 
 class Headers {
 	private $items = array();
 
+	/**
+	 * list of standard mime-types used
+	 */
 	static public $formats = array(
 		'atom' => array('application/atom+xml'),
 		'css' => array('text/css'),
@@ -20,6 +28,9 @@ class Headers {
 		'zip' => array('application/zip', 'application/x-zip', 'application/x-zip-compressed')
 	);
 
+	/**
+	 * List of standard http status codes
+	 */
 	static public $status = array(
 		100 => 'Continue',
 		101 => 'Switching Protocols',
@@ -66,9 +77,7 @@ class Headers {
 
 
 	/**
-	 * public function __toString ()
-	 *
-	 * Converts all cookies to a string
+	 * Magic function to convert all headers to a string
 	 */
 	public function __toString () {
 		$text = '';
@@ -89,10 +98,13 @@ class Headers {
 
 
 	/**
-	 * public static function getFormat ($mimetype)
-	 *
-	 * Gets the format related with a mimetype
-	 * Returns string/false
+	 * Gets the format related with a mimetype. Search in self::$formats array.
+	 * 
+	 * $headers->getFormat('text/css') Returns "css"
+	 * 
+	 * @param string $mimetype The mimetype to search
+	 * 
+	 * @return string The extension of the mimetype or false
 	 */
 	public static function getFormat ($mimetype) {
 		foreach (self::$formats as $format => $mimetypes) {
@@ -107,10 +119,13 @@ class Headers {
 
 
 	/**
-	 * public static function getMimetype ($format)
-	 *
-	 * Gets the mimetype related with a format
-	 * Returns string/false
+	 * Gets the mimetype related with a format. This is the opposite of getFormat()
+	 * 
+	 * $headers->getMimetype('css') Returns "text/css"
+	 * 
+	 * @param string $format The format to search
+	 * 
+	 * @return string The mimetype code or false
 	 */
 	public static function getMimetype ($format) {
 		return isset(self::$formats[$format][0]) ? self::$formats[$format][0] : false;
@@ -119,27 +134,32 @@ class Headers {
 
 
 	/**
-	 * public static function getStatusText ($code)
-	 *
-	 * Gets the status text related with a status code
-	 * Returns string/false
+	 * Gets the status text related with a status code. Search in self::$status array
+	 * 
+	 * $headers->getStatusText(404) Returns "Not Found"
+	 * 
+	 * @param integer $code The Http code
+	 * 
+	 * @return string The status text or false
 	 */
 	public static function getStatusText ($code) {
 		return isset(self::$status[$code]) ? self::$status[$code] : false;
 	}
 
 
+
 	/**
-	 * public function getHeadersFromServer (array $server)
-	 *
-	 * Detects header from $_SERVER array
-	 * Returns array
+	 * Detects http header from a $_SERVER array
+	 * 
+	 * @param array $server The $_SERVER array
+	 * 
+	 * @return array The headers found
 	 */
 	public static function getHeadersFromServer (array $server) {
 		$headers = array();
 
 		foreach ($server as $name => $value) {
-			if (substr($name, 0, 5) === 'HTTP_') {
+			if (strpos($name, 'HTTP_') === 0) {
 				$headers[str_replace('_', '-', substr($name, 5))] = $value;
 				continue;
 			}
@@ -159,10 +179,9 @@ class Headers {
 
 
 	/**
-	 * public function __construct (array $parameters)
-	 *
-	 * Detects request info
-	 * Returns none
+	 * Constructor function. You can set parameters
+	 * 
+	 * @param $parameters Data to save
 	 */
 	public function __construct (array $parameters = array()) {
 		if ($parameters) {
@@ -172,10 +191,12 @@ class Headers {
 
 
 	/**
-	 * private function normalize (string $string)
-	 *
-	 * Normalize the name of the parameters
-	 * Returns string
+	 * Normalize the name of the parameters.
+	 * $headers->normalize('CONTENT type') Returns "Content-Type"
+	 * 
+	 * @param string $string The text to normalize
+	 * 
+	 * @return string The normalized text
 	 */
 	private function normalize ($string) {
 		return str_replace(' ', '-', ucwords(strtolower(str_replace('-', ' ', $string))));
@@ -184,10 +205,9 @@ class Headers {
 
 
 	/**
-	 * public function send ()
-	 *
 	 * Sends the headers if don't have been send by the developer
-	 * Returns boolean
+	 * 
+	 * @return boolean True if headers has been sent and false if headers had been sent before
 	 */
 	public function send () {
 		if (headers_sent()) {
@@ -211,11 +231,11 @@ class Headers {
 
 
 	/**
-	 * public function set (string $name, mixed $value, [boolean $replace])
-	 * public function set (array $values, [boolean $replace])
-	 *
-	 * Sets one parameter
-	 * Returns none
+	 * Stores new headers. You can define an array to store more than one at the same time
+	 * 
+	 * @param string $name The header name
+	 * @param string $value The header value
+	 * @param boolean $replace True to replace a previous header with the same name
 	 */
 	public function set ($name, $value = true, $replace = true) {
 		if (is_array($name)) {
@@ -240,10 +260,12 @@ class Headers {
 
 
 	/**
-	 * public function get (string $name, boolean $first)
-	 *
 	 * Gets one or all parameters
-	 * Returns mixed
+	 * 
+	 * @param string $name The header name
+	 * @param boolean $first Set true to return just the value of the first header with this name. False to return an array with all values. 
+	 * 
+	 * @return string The header value or an array with all values
 	 */
 	public function get ($name = null, $first = true) {
 		if (func_num_args() === 0) {
@@ -262,10 +284,20 @@ class Headers {
 
 
 	/**
-	 * public function getParsed (string $name)
-	 *
-	 * Gets one parameter parsed
-	 * Returns array
+	 * Gets the value of an header parsed.
+	 * 
+	 * $header->get('Accept') Returns: text/html,application/xhtml+xml,application/xml;q=0.9,* /*;q=0.8
+	 * $header->getParsed('Accept')
+	 * Array (
+	 *     [text/html] => Array()
+	 *     [application/xhtml+xml] => Array()
+	 *     [application/xml] => Array([q] => 0.9)
+	 *     [* /*] => Array([q] => 0.8)
+	 * )
+	 * 
+	 * @param string $name The header name
+	 * 
+	 * @return array The parsed value
 	 */
 	public function getParsed ($name) {
 		return $this->toArray($this->get($name));
@@ -273,10 +305,10 @@ class Headers {
 
 
 	/**
-	 * public function setParsed (string $name, array $value)
-	 *
-	 * Sets one parameter parsed
-	 * Returns array
+	 * It's the opposite of getParsed: saves a header defining the value as array
+	 * 
+	 * @param string $name The header name
+	 * @param array $value The parsed value
 	 */
 	public function setParsed ($name, array $value) {
 		$this->set($name, $this->toString($value));
@@ -285,10 +317,13 @@ class Headers {
 
 
 	/**
-	 * public function getDateTime (string $name, [string $default])
-	 *
-	 * Gets one parameter as getDateTime object
-	 * Returns object/false
+	 * Gets one parameter as a getDateTime object
+	 * Useful for datetime values (Expires, Last-Modification, etc)
+	 * 
+	 * @param string $name The header name
+	 * @param string $default The default value if the header does not exists
+	 * 
+	 * @return Datetime The value in a datetime object or false
 	 */
 	public function getDateTime ($name, $default = 'now') {
 		if ($date = $this->get($name) ?: $default) {
@@ -301,18 +336,16 @@ class Headers {
 
 
 	/**
-	 * public function setDateTime (string $name, DateTime/int/string $Datetime)
-	 *
-	 * Sets one parameter as Datetime object and returns it
-	 * Returns object
+	 * Define a header using a Datetime object and returns it
+	 * 
+	 * @param string $name The header name
+	 * @param Datetime|string $Datetime The datetime object. You can define also an string so the Datetime object will be created
+	 * 
+	 * @return Datetime The datetime object
 	 */
 	public function setDateTime ($name, $Datetime) {
 		if (is_string($Datetime)) {
 			$Datetime = new \DateTime($Datetime);
-		} else if (is_int($Datetime)) {
-			$timestamp = $Datetime;
-			$Datetime = new \DateTime();
-			$Datetime->setTimestamp($timestamp);
 		}
 
 		$Datetime->setTimezone(new \DateTimeZone('UTC'));
@@ -324,10 +357,9 @@ class Headers {
 
 
 	/**
-	 * public function delete (string $name)
-	 *
-	 * Deletes one parameter
-	 * Returns none
+	 * Deletes a header
+	 * 
+	 * @param $name The header name
 	 */
 	public function delete ($name) {
 		$name = $this->normalize($name);
@@ -338,10 +370,7 @@ class Headers {
 
 
 	/**
-	 * public function clear ()
-	 *
-	 * Deletes all parameters
-	 * Returns none
+	 * Deletes all headers
 	 */
 	public function clear () {
 		$this->items = array();
@@ -350,10 +379,11 @@ class Headers {
 
 
 	/**
-	 * public function exists (string $name)
-	 *
-	 * Checks if a parameter exists
-	 * Returns boolean
+	 * Checks if a header exists
+	 * 
+	 * @param string $name The header name
+	 * 
+	 * @return boolean True if the header exists, false if not
 	 */
 	public function exists ($name) {
 		$name = $this->normalize($name);
@@ -363,10 +393,9 @@ class Headers {
 
 
 	/**
-	 * public function reset (array $items)
-	 *
 	 * Reset all items with new values
-	 * Returns none
+	 * 
+	 * @param array $items An array with the new values
 	 */
 	public function reset (array $items) {
 		$this->clear();
@@ -375,10 +404,11 @@ class Headers {
 
 
 	/**
-	 * private function toArray (string $value)
-	 *
-	 * Parse and return http values
-	 * Returns array
+	 * Private function to parse and return http values
+	 * 
+	 * @param string $value The string to parse
+	 * 
+	 * @return array The parsed value
 	 */
 	private function toArray ($value) {
 		if (!$value) {
@@ -418,10 +448,11 @@ class Headers {
 
 
 	/**
-	 * private function toString (array $values)
-	 *
-	 * Converts a parsed http value to string
-	 * Returns string
+	 * Private function to convert a parsed http value to string
+	 * 
+	 * @param array $values The parsed value
+	 * 
+	 * @return string The value in string format
 	 */
 	private function toString (array $values) {
 		if (!$values) {
@@ -458,10 +489,16 @@ class Headers {
 
 
 	/**
-	 * private function setCache (array $options)
-	 *
-	 * Set cache configuration
-	 * Returns none
+	 * Define the cache headers to send
+	 * 
+	 * Example:
+	 * $headers->setCache(array(
+	 *     'Last-Modified' => 'now',
+	 *     'Expires' => 'tomorrow'
+	 *     'public' => true
+	 * ));
+	 * 
+	 * @param array $options The cache options
 	 */
 	public function setCache (array $options) {
 		if (isset($options['ETag'])) {
@@ -558,10 +595,9 @@ class Headers {
 
 
 	/**
-	 * private function getCache ()
-	 *
-	 * Returns the cache configuration
-	 * Returns array
+	 * Returns the current cache configuration
+	 * 
+	 * @return array The key => value array with the cache configuration
 	 */
 	public function getCache () {
 		$cache = current($this->getParsed('Cache-Control'));

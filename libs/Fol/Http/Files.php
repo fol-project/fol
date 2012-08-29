@@ -1,13 +1,17 @@
 <?php
+/**
+ * Fol\Http\Files
+ * 
+ * Class to store the files variables ($_FILES)
+ */
 namespace Fol\Http;
 
 class Files extends Input {
 
 	/**
-	 * public function __construct (array $parameters)
-	 *
-	 * Detects request info
-	 * Returns none
+	 * Constructor class. You can define the items directly
+	 * 
+	 * @param array $items The items to store
 	 */
 	public function __construct (array $parameters = array()) {
 		if ($parameters) {
@@ -19,13 +23,14 @@ class Files extends Input {
 
 	
 	/**
-	 * private function fixArray (array $files)
-	 *
 	 * Fix the $files order by converting from default wierd schema
 	 * [first][name][second][0], [first][error][second][0]...
 	 * to a more straightforward one.
 	 * [first][second][0][name], [first][second][0][error]...
-	 * Returns array
+	 * 
+	 * @param array $files An array with all files values
+	 * 
+	 * @return array The files values fixed
 	 */
 	private function fixArray ($files) {
 		if (isset($files['name'], $files['tmp_name'], $files['size'], $files['type'], $files['error'])) {
@@ -42,10 +47,11 @@ class Files extends Input {
 
 
 	/**
-	 * private function moveToRight (array $files)
-	 *
 	 * Private function used by fixArray
-	 * Returns array
+	 * 
+	 * @param array $files An array with all files values
+	 * 
+	 * @return array The files values fixed
 	 */
 	private function moveToRight ($files) {
 		$results = array();

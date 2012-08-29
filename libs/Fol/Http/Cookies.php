@@ -1,4 +1,9 @@
 <?php
+/**
+ * Fol\Http\Cookies
+ * 
+ * Class to manage cookies
+ */
 namespace Fol\Http;
 
 class Cookies {
@@ -6,9 +11,7 @@ class Cookies {
 
 
 	/**
-	 * public function __toString ()
-	 *
-	 * Converts all cookies to a string
+	 * Magic function to converts all cookies to a string
 	 */
 	public function __toString () {
 		$text = '';
@@ -48,10 +51,9 @@ class Cookies {
 
 
 	/**
-	 * public function send ()
-	 *
-	 * Sends the cookies
-	 * Returns boolean
+	 * Send the cookies to the browser
+	 * 
+	 * @return boolean True if all cookies have sent or false on error or if headers have been sent before
 	 */
 	public function send () {
 		if (headers_sent()) {
@@ -70,10 +72,13 @@ class Cookies {
 
 
 	/**
-	 * public function get ([string $name], [string $path], [string $domain])
-	 *
-	 * Gets one or all parameters
-	 * Returns mixed
+	 * Gets one or all cookies
+	 * 
+	 * @param string $name The cookie name
+	 * @param string $path The cookie path
+	 * @param string $domain The cookie domain
+	 * 
+	 * @return array The cookie data or null
 	 */
 	public function get ($name = null, $path = '/', $domain = null) {
 		if (func_num_args() === 0) {
@@ -86,11 +91,14 @@ class Cookies {
 
 
 	/**
-	 * public function set (string $name, [mixed $value], [int $expire], [string $path], [string $domain], [boolean $secure], [boolean $httponly])
-	 * public function set (array $values)
-	 *
-	 * Sets one parameter
-	 * Returns none
+	 * Sets a new cookie
+	 * 
+	 * @param string $name The cookie name
+	 * @param string $value The cookie value
+	 * @param mixed $expire The cookie expiration time. It can be a number or a DateTime instance
+	 * @param string $domain The cookie domain
+	 * @param boolean $secure If the cookie is secure, only will be send in secure connection (https)
+	 * @param boolean $httponly If is set true, the cookie only will be accessed via http, so javascript cannot access to it.
 	 */
 	public function set ($name, $value = null, $expire = 0, $path = '/', $domain = null, $secure = false, $httponly = true) {
 		if (is_array($name)) {
@@ -123,10 +131,11 @@ class Cookies {
 
 
 	/**
-	 * public function delete ([string $name], [string $path], [string $domain])
-	 *
 	 * Deletes one or all cookies
-	 * Returns none
+	 * 
+	 * @param string $name The cookie name
+	 * @param string $path The cookie path
+	 * @param string $domain The cookie domain
 	 */
 	public function delete ($name = null, $path = '/', $domain = null) {
 		if (func_num_args() === 0) {
@@ -141,10 +150,11 @@ class Cookies {
 
 
 	/**
-	 * public function clear ([string $name], [string $path], [string $domain])
-	 *
 	 * Clear one or all cookies in the object (not in the browser)
-	 * Returns none
+	 * 
+	 * @param string $name The cookie name
+	 * @param string $path The cookie path
+	 * @param string $domain The cookie domain
 	 */
 	public function clear ($name = null, $path = '/', $domain = null) {
 		if (func_num_args() === 0) {

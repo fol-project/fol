@@ -1,4 +1,9 @@
 <?php
+/**
+ * Fol\Http\Response
+ * 
+ * Class to manage the http response data
+ */
 namespace Fol\Http;
 
 use Fol\Http\Headers;
@@ -15,8 +20,11 @@ class Response {
 
 
 	/**
-	 * public function __construct ([string $content], [int $status], [array $headers])
-	 *
+	 * Constructor
+	 * 
+	 * @param string $content The body of the response
+	 * @param integer $status The status code (200 by default)
+	 * @param array $headers The headers to send in the response 
 	 */
 	public function __construct ($content = '', $status = 200, array $headers = array()) {
 		$this->setContent($content);
@@ -30,8 +38,6 @@ class Response {
 
 
 	/**
-	 * public function __clone ()
-	 *
 	 * Magic function to clone the internal objects
 	 */
 	public function __clone () {
@@ -42,9 +48,7 @@ class Response {
 
 
 	/**
-	 * public function __toString ()
-	 *
-	 * Converts the current response to a string
+	 * Magic function to converts the current response to a string
 	 */
 	public function __toString () {
 		return (string)$this->content;
@@ -53,10 +57,9 @@ class Response {
 
 
 	/**
-	 * public function setContent (string $content)
-	 *
-	 * Sets content
-	 * Returns none
+	 * Sets the content of the response body
+	 * 
+	 * @param string $content The text content
 	 */
 	public function setContent ($content) {
 		$this->content = (string)$content;
@@ -65,10 +68,9 @@ class Response {
 
 
 	/**
-	 * public function appendContent (string $content)
-	 *
-	 * Appends content
-	 * Returns none
+	 * Appends more content to the response body
+	 * 
+	 * @param string $content The text content to append
 	 */
 	public function appendContent ($content) {
 		$this->content .= (string)$content;
@@ -77,10 +79,9 @@ class Response {
 
 
 	/**
-	 * public function prependContent (string $content)
-	 *
-	 * Prepends content
-	 * Returns none
+	 * Prepends content to the response body
+	 * 
+	 * @param string $content The text content to prepend
 	 */
 	public function prependContent ($content) {
 		$this->content = (string)$content.$this->content;
@@ -89,10 +90,9 @@ class Response {
 
 
 	/**
-	 * public function getContent (string $content)
-	 *
-	 * Gets content
-	 * Returns string
+	 * Gets the body content
+	 * 
+	 * @return string The body of the response
 	 */
 	public function getContent () {
 		return $this->content;
@@ -101,10 +101,10 @@ class Response {
 
 
 	/**
-	 * public function setStatus (int $code, [string $text])
-	 *
 	 * Sets the status code
-	 * Returns none
+	 * 
+	 * @param integer $code The status code (for example 404)
+	 * @param string $text The status text. If it's not defined, the text will be the defined in the Fol\Http\Headers:$status array
 	 */
 	public function setStatus ($code, $text = null) {
 		$this->status = array($code, ($text ?: Headers::getStatusText($code)));
@@ -113,10 +113,11 @@ class Response {
 
 
 	/**
-	 * public function getStatus ([int $text])
-	 *
 	 * Gets current status
-	 * Returns string
+	 * 
+	 * @param string $text Set to TRUE to return the status text instead the status code
+	 * 
+	 * @return integer The status code or the status text if $text parameter is true
 	 */
 	public function getStatus ($text = false) {
 		return $text ? $this->status[1] : $this->status[0];
@@ -125,10 +126,9 @@ class Response {
 
 
 	/**
-	 * public function setContentType (string $type)
-	 *
 	 * Sets the content type header to output
-	 * Returns none
+	 * 
+	 * @param string $type The mimetype or format of the output (for example "css" or "text/css")
 	 */
 	public function setContentType ($type) {
 		$this->content_type = Headers::getMimeType($type) ?: $type;
@@ -136,10 +136,9 @@ class Response {
 
 
 	/**
-	 * public function getContentType ()
-	 *
 	 * Gets the content type header to output
-	 * Returns string
+	 * 
+	 * @return string The mime type
 	 */
 	public function getContentType () {
 		return $this->content_type;
@@ -147,10 +146,7 @@ class Response {
 
 
 	/**
-	 * public function send ()
-	 *
-	 * Sends the headers and print the content
-	 * Returns none
+	 * Sends the headers and the content
 	 */
 	public function send () {
 		$this->sendHeaders();
@@ -158,12 +154,10 @@ class Response {
 	}
 
 
-
 	/**
-	 * public function sendHeaders ()
-	 *
-	 * Sends the headers if don't have been send by the developer
-	 * Returns boolean
+	 * Sends the headers if don't have been sent before
+	 * 
+	 * @return boolean TRUE if the headers are sent and false if headers had been sent before
 	 */
 	public function sendHeaders () {
 		if (headers_sent()) {
@@ -180,12 +174,8 @@ class Response {
 	}
 
 
-
 	/**
-	 * public function sendContent ()
-	 *
 	 * Sends the content
-	 * Returns none
 	 */
 	public function sendContent () {
 		echo $this->content;

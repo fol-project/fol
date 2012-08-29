@@ -1,4 +1,9 @@
 <?php
+/**
+ * Fol\Http\Container
+ * 
+ * Simple class used to store variables (GET, POST, FILES, etc)
+ */
 namespace Fol\Http;
 
 class Container {
@@ -6,20 +11,18 @@ class Container {
 
 
 	/**
-	 * public function __construct (array $items)
-	 *
-	 * Returns none
+	 * Constructor class. You can define the items directly
+	 * 
+	 * @param array $items The items to store
 	 */
-	public function __construct (array $items = array()) {
-		if ($items) {
+	public function __construct (array $items = null) {
+		if (isset($items)) {
 			$this->set($items);
 		}
 	}
 
 
 	/**
-	 * public function __toString ()
-	 *
 	 * Converts all items to a string
 	 */
 	public function __toString () {
@@ -39,10 +42,9 @@ class Container {
 
 
 	/**
-	 * public function length ()
+	 * Counts all stored parameteres
 	 *
-	 * Returns the total number of parameters
-	 * Returns integer
+	 * @return int The total number of parameters
 	 */
 	public function length () {
 		return count($this->items);
@@ -51,10 +53,15 @@ class Container {
 
 
 	/**
-	 * public function get ([string $name], [mixed $default])
-	 *
-	 * Gets one or all parameters
-	 * Returns mixed
+	 * Gets one or all parameters.
+	 * 
+	 * $params->get() Returns all parameters
+	 * $params->get('name') Returns just this parameter
+	 * 
+	 * @param string $name The parameter name
+	 * @param mixed $default The default value if the parameter is not set
+	 * 
+	 * @return mixed The parameter value or the default
 	 */
 	public function get ($name = null, $default = null) {
 		if (func_num_args() === 0) {
@@ -71,11 +78,10 @@ class Container {
 
 
 	/**
-	 * public function set (string $name, mixed $value)
-	 * public function set (array $values)
-	 *
-	 * Sets one parameter
-	 * Returns none
+	 * Sets one parameter or various new parameters
+	 * 
+	 * @param string $name The parameter name. You can define an array with name => value to insert various parameters
+	 * @param mixed $value The parameter value.
 	 */
 	public function set ($name, $value = null) {
 		if (is_array($name)) {
@@ -88,10 +94,12 @@ class Container {
 
 
 	/**
-	 * public function delete ([string $name])
-	 *
-	 * Deletes one parameter
-	 * Returns none
+	 * Deletes one or all parameters
+	 * 
+	 * $params->delete('name') Deletes one parameter
+	 * $params->delete() Deletes all parameter
+	 * 
+	 * @param string $name The parameter name
 	 */
 	public function delete ($name = null) {
 		if (func_num_args() === 0) {
@@ -104,10 +112,11 @@ class Container {
 
 
 	/**
-	 * public function exists (string $name)
-	 *
 	 * Checks if a parameter exists
-	 * Returns boolean
+	 * 
+	 * @param string $name The parameter name
+	 * 
+	 * @return boolean True if the parameter exists (even if it's null) or false if not
 	 */
 	public function exists ($name) {
 		return array_key_exists($name, $this->items);

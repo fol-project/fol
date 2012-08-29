@@ -1,12 +1,18 @@
 <?php
+/**
+ * Fol\Http\HttpException
+ * 
+ * Exception to throw if an http error happens (for example 404, 500, etc)
+ */
 namespace Fol\Http;
 
 class HttpException extends \Exception {
 
 	/**
-	 * public function __construct (string $message, [int $code])
-	 *
-	 * Returns none
+	 * Constructor.
+	 * 
+	 * @param string $message The http message
+	 * @param integer $code The http error code. By default is 500
 	 */
 	public function __construct ($message, $code = 500) {
 		parent::__construct($message, $code);

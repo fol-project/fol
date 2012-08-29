@@ -1,4 +1,9 @@
 <?php
+/**
+ * Fol\Loader
+ * 
+ * A class to autoload all classes using the PSR-0 standard
+ */
 namespace Fol;
 
 class Loader {
@@ -8,9 +13,14 @@ class Loader {
 
 
 	/**
-	 * static public function setLibrariesPath (string $libraries_path)
-	 *
-	 * Sets the base path for load the libraries
+	 * Sets the base path where the libraries are stored
+	 * 
+	 * Example:
+	 * Fol\Loader::setLibrariesPath('my_web/vendor')
+	 * 
+	 * @param string $libraries_path The path of the folder where the libraries are stored
+	 * 
+	 * @throws an ErrorException if the folder does not exists
 	 */
 	static public function setLibrariesPath ($libraries_path) {
 		if (is_dir($libraries_path)) {
@@ -23,8 +33,6 @@ class Loader {
 
 
 	/**
-	 * static public function register ()
-	 *
 	 * Installs this class loader on the SPL autoload stack.
 	 */
 	static public function register () {
@@ -33,8 +41,6 @@ class Loader {
 
 
 	/**
-	 * static public function unregister ()
-	 *
 	 * Uninstalls this class loader from the SPL autoloader stack.
 	 */
 	static public function unregister () {
@@ -44,10 +50,9 @@ class Loader {
 
 
 	/**
-	 * static public function autoload ($class_name)
-	 *
-	 * Basic autoload function
-	 * Returns boolean
+	 * Basic autoload function. Executed automatically when a class needs to be loaded.
+	 * 
+	 * @param string $class_name The class to be loaded (for example: Fol\Http\Request)
 	 */
 	static public function autoload ($class_name) {
 		$file = self::getFile($class_name);
@@ -60,10 +65,11 @@ class Loader {
 
 
 	/**
-	 * static public function getFile ($class_name)
-	 *
-	 * Find a class file
-	 * Returns string/false
+	 * Returns the path of a class
+	 * 
+	 * @param string $class_name The class name (for example: Fol\Http\Request)
+	 * 
+	 * @return string The file path of the class
 	 */
 	static public function getFile ($class_name) {
 		$class_name = ltrim($class_name, '\\');
@@ -91,10 +97,14 @@ class Loader {
 
 
 	/**
-	 * static private function filePath (string $namespace, string $class_name, [array $options])
-	 *
-	 * Generate the filename
-	 * Returns string/boolean
+	 * Private function to generate the file path of a class.
+	 * 
+	 * @param string $namespace The namespace of the class (for example: Fol\Http)
+	 * @param string $class_name The name of the class (for example: Request)
+	 * @param string $libraries_path The custom libraries path. If it's not defined, uses the default libraries path
+	 * 
+	 * @return string The file path
+	 * 
 	 */
 	static private function filePath ($namespace, $class_name, $libraries_path = null) {
 		$file = isset($libraries_path) ? $libraries_path : self::$libraries_path;
@@ -109,11 +119,10 @@ class Loader {
 
 
 	/**
-	 * static public function registerClass (array $classes)
-	 * static public function registerClass (string $class, string $path)
-	 *
-	 * Sets a new path for an specific class
-	 * Returns none
+	 * Sets a custom path for an specific class.
+	 * 
+	 * @param string $class The class name
+	 * @param string $path The custom path for this class
 	 */
 	static public function registerClass ($class, $path = null) {
 		if (is_array($class)) {
@@ -130,11 +139,10 @@ class Loader {
 
 
 	/**
-	 * static public function registerNamespace (array $namespaces)
-	 * static public function registerNamespace (string $namespace, string $path)
-	 *
 	 * Sets a new base path for an specific namespace
-	 * Returns none
+	 * 
+	 * @param string $namespace The namespace to register (for example Fol\Http). You can define also an array of namespace => path values
+	 * @param string $path The custom path for this namespace.
 	 */
 	static public function registerNamespace ($namespace, $path = null) {
 		if (is_array($namespace)) {
@@ -151,10 +159,8 @@ class Loader {
 
 
 	/**
-	 * static public function registerComposer ()
-	 *
-	 * Register the classes installed by composer
-	 * Returns none
+	 * Register the classes installed by composer.
+	 * Search in the libraries path for the composer directory and loads the classmap and namespaces registered.
 	 */
 	static function registerComposer () {
 		$file = self::$libraries_path.'composer/autoload_classmap.php';

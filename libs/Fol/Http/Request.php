@@ -1,4 +1,9 @@
 <?php
+/**
+ * Fol\Http\Request
+ * 
+ * Class to manage the http request data
+ */
 namespace Fol\Http;
 
 use Fol\Http\Container;
@@ -21,10 +26,9 @@ class Request {
 
 
 	/**
-	 * static function createFromGlobals (void)
-	 *
 	 * Creates a new request object from global values
-	 * Returns object
+	 * 
+	 * @return Fol\Http\Request The object with the global data
 	 */
 	static public function createFromGlobals () {
 		$path = parse_url(preg_replace('|^'.preg_quote(BASE_URL).'|', '', strtolower($_SERVER['REQUEST_URI'])), PHP_URL_PATH);
@@ -34,10 +38,13 @@ class Request {
 
 
 	/**
-	 * static function create (string $url, [string $method], [array $parameters])
-	 *
 	 * Creates a new request object from specified values
-	 * Returns object
+	 * 
+	 * @param string $url The url request
+	 * @param string $method The method of the request (GET, POST, PUT, DELETE)
+	 * @param array $parameters The parameters of the request (GET, POST, etc)
+	 * 
+	 * @return Fol\Http\Request The object with the specified data
 	 */
 	static public function create ($url, $method = 'GET', array $parameters = array()) {
 		$defaults = array(
@@ -106,8 +113,15 @@ class Request {
 
 
 	/**
-	 * public function __construct ([string $path], [array $parameters], [array $get], [array $post], [array $files], [array $cookies], [array $server])
-	 *
+	 * Constructor
+	 * 
+	 * @param string $path The request path
+	 * @param array $parameters Custom parameters of the request
+	 * @param array $get The GET parameters
+	 * @param array $post The POST parameters
+	 * @param array $files The FILES parameters
+	 * @param array $cookies The cookies of the request
+	 * @param array $server The SERVER parameters
 	 */
 	public function __construct ($path = '', array $parameters = array(), array $get = array(), array $post = array(), array $files = array(), array $cookies = array(), array $server = array()) {
 		$this->Parameters = new Container($parameters);
@@ -131,8 +145,6 @@ class Request {
 
 
 	/**
-	 * public function __clone ()
-	 *
 	 * Magic function to clone the internal objects
 	 */
 	public function __clone () {
@@ -147,9 +159,7 @@ class Request {
 
 
 	/**
-	 * public function __toString ()
-	 *
-	 * Converts the request to a string
+	 * Magic function to convert the request to a string
 	 */
 	public function __toString () {
 		$text = "Path: ".$this->getPath();
@@ -168,10 +178,9 @@ class Request {
 
 
 	/**
-	 * public function getId ()
-	 *
-	 * Gets an unique id for the request (for cache purposes)
-	 * Returns string
+	 * Gets an unique id for the request (for example for cache purposes)
+	 * 
+	 * @return string The id
 	 */
 	public function getId () {
 		return md5(serialize(array(
@@ -186,10 +195,9 @@ class Request {
 
 
 	/**
-	 * public function getPath ()
-	 *
 	 * Gets the current path
-	 * Returns string
+	 * 
+	 * @return string The path
 	 */
 	public function getPath () {
 		return $this->path;
@@ -198,10 +206,39 @@ class Request {
 
 
 	/**
-	 * public function setPath (string $path)
-	 *
+	 * Gets the current path in separated segments
+	 * 
+	 * Example:
+	 * $request->getPath() Returns 'post/view/34'
+	 * $request->getPathSegments() Returns array('post', 'view', '34')
+	 * $request->getPathSegments('post/view') Returns array('34')
+	 * 
+	 * @param string $basepath The base path ignored for the current path
+	 * 
+	 * @return array The segments
+	 */
+	public function getPathSegments ($basepath = '') {
+		if ($basepath !== '') {
+			$path = preg_replace('|^'.preg_quote($basepath).'|', '', $this->getPath().'/');
+		}
+
+		$segments = array();
+
+		foreach (explode('/', $path) as $segment) {
+			if ($segment !== '') {
+				$segments[] = $segment;
+			}
+		}
+
+		return $segments;
+	}
+
+
+
+	/**
 	 * Sets a new current path
-	 * Returns none
+	 * 
+	 * @param string $path The new path
 	 */
 	public function setPath ($path) {
 		if (preg_match('/\.([\w]+)$/', $path, $match)) {
@@ -215,10 +252,10 @@ class Request {
 
 
 	/**
-	 * public function getFormat ()
-	 *
-	 * Gets the requested format
-	 * Returns string/false
+	 * Gets the requested format.
+	 * The format is get from the path (the extension of the requested file), or from the Accept http header
+	 * 
+	 * @return string The current format (html, xml, css, etc) or false
 	 */
 	public function getFormat () {
 		return $this->format ?: false;
@@ -227,10 +264,9 @@ class Request {
 
 
 	/**
-	 * public function setFormat (string $format)
-	 *
 	 * Sets the a new format
-	 * Returns none
+	 * 
+	 * @param string $format The new format value
 	 */
 	public function setFormat ($format) {
 		$this->format = strtolower($format);
@@ -239,10 +275,15 @@ class Request {
 
 
 	/**
-	 * public function getLanguage ([array $valid_languages])
-	 *
-	 * Gets the preferred language
-	 * Returns none
+	 * Gets the preferred language according with the Accept-Language http header
+	 * 
+	 * Example:
+	 * $request->getLanguage() Returns, for example gl
+	 * $request->getLanguage(array('es', 'en')); Returns, for example, es
+	 * 
+	 * @param array $valid_languages You can define a list of valid languages, so if an accept language is in the list, returns that language. If doesn't exists, returns the first accept language.
+	 * 
+	 * @return string The preferred language
 	 */
 	public function getLanguage (array $valid_languages = null) {
 		$user_languages = array_keys($this->Headers->getParsed('Accept-Language'));
@@ -263,10 +304,12 @@ class Request {
 
 
 	/**
-	 * public function get ($name, [mixed $default])
-	 *
 	 * Gets one parameter in POST/FILES/GET/parameters order
-	 * Returns mixed
+	 * 
+	 * @param string $name The variable name
+	 * @param mixed $default The default value if the variable does not exists in POST, FILES or GET values
+	 * 
+	 * @return mixed The value of the variable or the default value
 	 */
 	public function get ($name, $default = null) {
 		return $this->Post->get($name, $this->Files->get($name, $this->Get->get($name, $this->Parameters->get($name, $default))));
@@ -275,13 +318,16 @@ class Request {
 
 
 	/**
-	 * public function getQueryString ()
-	 *
 	 * Gets the GET variables as a string
-	 * Returns string
+	 * 
+	 * Example:
+	 * $request->Get->get() Returns array('page' => 1, 'sort' => 'title')
+	 * $request->getQueryString() Returns page=1&sort=title
+	 * 
+	 * @return string The GET query string or an empty string
 	 */
 	public function getQueryString () {
-		if ($query = $this->Get->get()) {
+		if (($query = $this->Get->get())) {
 			return http_build_query($query);
 		}
 
@@ -291,10 +337,9 @@ class Request {
 
 
 	/**
-	 * public function remove (string $name)
-	 *
 	 * Removes a variable in POST/FILES/GET/parameters
-	 * Returns none
+	 * 
+	 * @param string $name The variable name to remove
 	 */
 	public function remove ($name) {
 		$this->Post->remove($name);
@@ -306,10 +351,11 @@ class Request {
 
 
 	/**
-	 * public function exists (string $name)
-	 *
 	 * Check if a variable exists in POST/FILES/GET/parameters
-	 * Returns boolean
+	 * 
+	 * @param string $name The variable name to check
+	 * 
+	 * @return boolean TRUE if the variable exists in any of the parameters and FALSE if doesn't
 	 */
 	public function exists ($name) {
 		return ($this->Post->exists($name) || $this->Files->exists($name) || $this->Get->exists($name) || $this->Parameters->exists($name)) ? true : false;
@@ -317,10 +363,9 @@ class Request {
 
 
 	/**
-	 * public function getIp ()
-	 *
 	 * Returns the real client IP
-	 * Returns string
+	 * 
+	 * @return string The client IP
 	 */
 	public function getIp () {
 		return $this->Server->get('HTTP_CLIENT_IP', $this->Server->get('HTTP_X_FORWARDED_FOR', $this->Server->get('REMOTE_ADDR')));
@@ -328,10 +373,9 @@ class Request {
 
 
 	/**
-	 * public function isAjax ()
-	 *
 	 * Detects if the request has been made by ajax or not
-	 * Returns boolean
+	 * 
+	 * @return boolean TRUE if the request if ajax, FALSE if not
 	 */
 	public function isAjax () {
 		return (strtolower($this->Server->get('HTTP_X_REQUESTED_WITH')) === 'xmlhttprequest') ? true : false;
@@ -339,10 +383,9 @@ class Request {
 
 
 	/**
-	 * public function getScheme ()
-	 *
 	 * Gets the request scheme
-	 * Returns string
+	 * 
+	 * @return string The request scheme (http or https)
 	 */
 	public function getScheme () {
 		return ($this->Server->get('HTTPS') === 'on') ? 'https' : 'http';
@@ -351,10 +394,9 @@ class Request {
 
 	
 	/**
-	 * public function getPort ()
-	 *
 	 * Gets the port on which the request is made
-	 * Returns string
+	 * 
+	 * @return string The port number
 	 */
 	public function getPort () {
 		return $this->Server->get('X_FORWARDED_PORT') ?: $this->Server->get('SERVER_PORT');
@@ -363,10 +405,9 @@ class Request {
 
 
 	/**
-	 * public function getMethod ()
-	 *
-	 * Gets the request method in uppercase
-	 * Returns string
+	 * Gets the request method
+	 * 
+	 * @return string The request method (in uppercase: GET, POST, etc)
 	 */
 	public function getMethod () {
 		$method = strtolower($this->Server->get('REQUEST_METHOD', 'get'));
