@@ -15,6 +15,9 @@ class Index {
 	public function txts () {
 		echo 'ola';
 	}
+	public function txtsc () {
+		echo 'formato molon';
+	}
 
 	public function notFound () {
 		return new Response('Format not defined', 404);
