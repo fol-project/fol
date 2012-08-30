@@ -7,8 +7,8 @@ use Fol\Templates;
 class Index {
 
 	public function __construct ($App, $Request) {
-		echo '<pre>'.$Request->Headers;
-		echo '<pre>'.print_r($Request->Headers->getParsed('accept'), true);
+		$this->App = $App;
+		$this->Request = $Request;
 	}
 
 	public function index () {
