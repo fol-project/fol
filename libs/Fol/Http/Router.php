@@ -281,7 +281,7 @@ class Router {
 		}
 
 		if (!($Response instanceof Response)) {
-			$Response = new Response($response);
+			$Response = new Response($Response);
 		}
 
 		$Response->appendContent(ob_get_clean());
