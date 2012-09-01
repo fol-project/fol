@@ -357,23 +357,21 @@ class Headers {
 
 
 	/**
-	 * Deletes a header
+	 * Deletes one or all headers
+	 * 
+	 * $headers->delete('content-type') Deletes one header
+	 * $headers->delete() Deletes all headers
 	 * 
 	 * @param $name The header name
 	 */
-	public function delete ($name) {
-		$name = $this->normalize($name);
+	public function delete ($name = null) {
+		if (func_num_args() === 0) {
+			$this->items = array();
+		} else {
+			$name = $this->normalize($name);
 
-		unset($this->items[$name]);
-	}
-
-
-
-	/**
-	 * Deletes all headers
-	 */
-	public function clear () {
-		$this->items = array();
+			unset($this->items[$name]);
+		}
 	}
 
 
@@ -391,16 +389,6 @@ class Headers {
 		return array_key_exists($name, $this->items);
 	}
 
-
-	/**
-	 * Reset all items with new values
-	 * 
-	 * @param array $items An array with the new values
-	 */
-	public function reset (array $items) {
-		$this->clear();
-		$this->set($items);
-	}
 
 
 	/**

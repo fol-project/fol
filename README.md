@@ -89,9 +89,6 @@ class App extends \Fol\App {
 //Agora instanciamos a aplicación manualmente:
 $Aplicacion = new Apps\Blog\App();
 
-//ou usando unha función estática
-$Aplicacion = Fol\App::create('Blog');
-
 //E executamos a aplicación
 $Aplicacion->handle('/blog/view/34');
 ```

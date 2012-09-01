@@ -9,15 +9,14 @@ class Index {
 	public function __construct () {
 	}
 
-	public function index () {
-		return new Response('Ola mundo');
-	}
-	public function txts () {
-		echo 'ola';
-	}
+	private function cachePath ($file) {
+		$path = dirname($file);
 
-	public function notFound () {
-		return new Response('Format not defined', 404);
+		if (!is_dir($this->App->assetsPath.'cache/'.$path)) {
+			mkdir($this->App->assetsPath.'cache/'.$path, 0777, true);
+		}
+
+		return $this->App->assetsPath.'cache/'.$file;
 	}
 }
 ?>

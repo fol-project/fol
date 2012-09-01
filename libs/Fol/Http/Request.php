@@ -31,7 +31,7 @@ class Request {
 	 * @return Fol\Http\Request The object with the global data
 	 */
 	static public function createFromGlobals () {
-		$path = parse_url(preg_replace('|^'.preg_quote(BASE_URL).'|', '', strtolower($_SERVER['REQUEST_URI'])), PHP_URL_PATH);
+		$path = parse_url(preg_replace('|^'.preg_quote(BASE_URL).'|i', '', urldecode($_SERVER['REQUEST_URI'])), PHP_URL_PATH);
 
 		return new static($path, array(), (array)filter_input_array(INPUT_GET), (array)filter_input_array(INPUT_POST), $_FILES, (array)filter_input_array(INPUT_COOKIE), (array)filter_input_array(INPUT_SERVER));
 	}
@@ -190,6 +190,22 @@ class Request {
 			$this->Post->get(),
 			$this->Files->get()
 		)));
+	}
+
+
+	/**
+	 * Gets the current path in full version (with BASE_URL included and optional format)
+	 * 
+	 * @param boolean $format Set true to return also the format as the extension.
+	 * 
+	 * @return string The path
+	 */
+	public function getFullPath ($format = false) {
+		if ($format === true && $this->format) {
+			return BASE_URL.$this->path.'.'.$this->format;
+		}
+
+		return BASE_URL.$this->path;
 	}
 
 

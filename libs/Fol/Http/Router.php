@@ -284,7 +284,7 @@ class Router {
 			$Response = new Response($Response);
 		}
 
-		$Response->appendContent(ob_get_clean());
+		$Response->prependContent(ob_get_clean());
 
 		return $Response;
 	}
