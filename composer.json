@@ -18,7 +18,9 @@
 		"issues": "https://github.com/oscarotero/Fol/issues"
 	},
 	"require": {
-		"php": ">=5.4.0"
+		"php": ">=5.4.0",
+		"stylecow/stylecow": "*",
+		"imagecow/imagecow": "*"
 	},
 	"config": {
 		"vendor-dir": "libs"

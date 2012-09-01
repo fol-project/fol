@@ -180,5 +180,15 @@ class Response {
 	public function sendContent () {
 		echo $this->content;
 	}
+
+
+	/**
+	 * Redirect to another page
+	 */
+	public function redirect ($url, $status = 301) {
+		$this->Headers->delete();
+		$this->Headers->set('location', $url);
+		$this->setStatus(301);
+	}
 }
 ?>

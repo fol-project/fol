@@ -1,4 +1,7 @@
 <?php
-include('../bootstrap.php');
+use Fol\App;
+use Fol\Http\Request;
 
-Fol\App::create('File')->bootstrap();
+include('../../bootstrap.php');
+
+(new Apps\File\App)->handle(Request::createFromGlobals())->send();

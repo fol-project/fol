@@ -24,6 +24,10 @@ class Loader {
 	 */
 	static public function setLibrariesPath ($libraries_path) {
 		if (is_dir($libraries_path)) {
+			if ($libraries_path[strlen($libraries_path) - 1] !== '/') {
+				$libraries_path .= '/';
+			}
+
 			self::$libraries_path = $libraries_path;
 		} else {
 			throw new \ErrorException("The folder '$libraries_path' does not exists");

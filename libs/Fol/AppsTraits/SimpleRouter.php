@@ -10,6 +10,7 @@ use Fol\Http\Headers;
 use Fol\Http\Request;
 use Fol\Http\Response;
 use Fol\Http\Router;
+use Fol\Http\HttpException;
 
 trait SimpleRouter {
 
@@ -42,7 +43,7 @@ trait SimpleRouter {
 			$controller = Router::getErrorController($this, $Request, $Exception);
 
 			if ($controller === false) {
-				$Response = new Response($Exception->getMessage().'<pre>'.$Exception->getTraceAsString().'</pre>');
+				$Response = new Response($Exception->getMessage(), $Exception->getCode() ?: null);
 			} else {
 				$Response = Router::executeController($controller[0], $controller[1], array($this, $Request));
 			}

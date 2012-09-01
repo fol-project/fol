@@ -4,4 +4,4 @@ use Fol\Http\Request;
 
 include('bootstrap.php');
 
-App::create('Web')->handle(Request::createFromGlobals())->send();
+(new Apps\Web\App)->handle(Request::createFromGlobals())->send();

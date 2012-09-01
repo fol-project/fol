@@ -1,0 +1,129 @@
+html {
+	background: color(black, 90);
+	color: white;
+}
+
+body {
+	padding: 40px;
+	font-family: 'Source Sans Pro', sans-serif;
+}
+
+a {
+	outline: none;
+	color: gold;
+	text-decoration: none;
+}
+a:hover {
+	color: white;
+	text-decoration: underline;
+}
+
+.boton {
+	background: gold;
+	background: linear-gradient(top, gold, color(gold, light:-20));
+	color: black;
+	padding: 3px 12px 4px 12px;
+	display: inline-block;
+	border-radius: 20px;
+	box-shadow: 1px 1px 4px black;
+	text-shadow: 0 1px 0 color(gold, 80);
+	border: none;
+	border-top: solid 1px color(gold, 30);
+	font-weight: normal;
+	font-size: 1rem;
+	vertical-align: bottom;
+}
+.boton:hover {
+	text-decoration: none;
+	background: color(gold, light:-20);
+	text-shadow: 0 -1px 0 black;
+	border-top: solid 1px gold;
+	box-shadow: 1px 1px 1px black;
+	color: white;
+}
+.hidden {
+	display: none;
+}
+.zona-dragdrop {
+	background: color(black, 85);
+	border: 8px dashed color(black, 70);
+	padding: 40px;
+	border-radius: 20px;
+	font-weight: bold;
+	font-size: 3rem;
+	color: color(black, 70);
+	text-align: center;
+	text-shadow: 1px 1px 1px black;
+	line-height: 1;
+	margin-bottom: 40px;
+
+	p {
+		font-weight: normal;
+		font-size: 1rem;
+		color: color(black, 50);
+		margin-top: 10px;
+	}
+	progress {
+		font-size: 1rem;
+		width: 100%;
+	}
+}
+
+input[type="text"] {
+	border: none;
+	border-radius: 20px;
+	padding: 3px 12px 4px 12px;
+}
+form {
+	display: inline-block;
+	vertical-align: bottom;
+}
+
+section {
+	> header {
+		padding: 10px 0 30px 0;
+
+		h1 {
+			color: white;
+			margin: 0 20px 0 0;
+			display: inline-block;
+		}
+	}
+}
+
+
+.galeria {
+	ul.fotos {
+		list-style: none;
+		margin: 0 auto;
+		column-width: 250px;
+		column-gap: 10px;
+
+		a img {
+			width: 100%;
+			display: block;
+			margin-bottom: 10px;
+			border-radius: 5px;
+			transition: transform 0.2s;
+			-moz-transition: -moz-transform 0.2s;
+			box-sizing: border-box;
+			border: solid 5px black;
+		}
+
+		a:hover img {
+			transform: scale(1.1);
+			box-shadow: 0 0 10px black;
+			border-color: white;
+			z-index: 2;
+		}
+	}
+}
+
+.index {
+	ul.galerias {
+		list-style: none;
+		margin: 0 auto;
+		font-size: 1.4em;
+		column-width: 200px;
+	}
+}

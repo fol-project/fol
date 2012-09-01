@@ -90,7 +90,7 @@ class Router {
 
 
 	/**
-	 * Private function to check if a method (controller) is callable
+	 * Public function to check if a method (controller) is callable
 	 * 
 	 * @param Fol\Http\Request $Request The request used (used to check the request properties: method, if it's ajax, etc)
 	 * @param ReflectionClass $Class The class reflection instance (used to check if it's instantiable)
@@ -99,7 +99,7 @@ class Router {
 	 * 
 	 * @return array The controller data or FALSE if it's not callable
 	 */
-	static private function checkControllerMethod (Request $Request, \ReflectionClass $Class, $method, array $parameters = array()) {
+	static public function checkControllerMethod (Request $Request, \ReflectionClass $Class, $method, array $parameters = array()) {
 		if (!$Class->isInstantiable() || !$Class->hasMethod($method)) {
 			return false;
 		}
@@ -281,10 +281,10 @@ class Router {
 		}
 
 		if (!($Response instanceof Response)) {
-			$Response = new Response($response);
+			$Response = new Response($Response);
 		}
 
-		$Response->appendContent(ob_get_clean());
+		$Response->prependContent(ob_get_clean());
 
 		return $Response;
 	}

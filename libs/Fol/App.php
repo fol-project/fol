@@ -12,26 +12,6 @@ abstract class App {
 
 
 	/**
-	 * Creates a new App instance
-	 * 
-	 * @param string $name The name of the app (for example 'web')
-	 *
-	 * @throws a InvalidArgumentException if the app doesn't exist
-	 * 
-	 * @return object The app instance or null if app doesn't exists
-	 */
-	static function create ($name) {
-		$class = 'Apps\\'.str_replace(' ', '', ucwords(strtolower(str_replace('-', ' ', $name)))).'\\App';
-
-		if (class_exists($class)) {
-			return new $class();
-		}
-
-		throw new \InvalidArgumentException('"'.$class.'" is an invalid app class');
-	}
-
-
-	/**
 	 * Magic function to get some special properties.
 	 * Instead calculate this on the __constructor, is better use __get to do not obligate to call this constructor in the extensions of this class
 	 * 

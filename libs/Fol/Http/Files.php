@@ -54,9 +54,13 @@ class Files extends Input {
 	 * @return array The files values fixed
 	 */
 	private function moveToRight ($files) {
+		if (!is_array($files['name'])) {
+			return $files;
+		}
+
 		$results = array();
 
-		foreach($files['name'] as $index => $name) {
+		foreach ($files['name'] as $index => $name) {
 			$reordered = array(
 				'name' => $files['name'][$index],
 				'tmp_name' => $files['tmp_name'][$index],
