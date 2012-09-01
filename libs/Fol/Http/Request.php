@@ -211,23 +211,6 @@ class Request {
 
 
 	/**
-	 * Gets the current path in full version (with BASE_URL included and optional format)
-	 * 
-	 * @param boolean $format Set true to return also the format as the extension.
-	 * 
-	 * @return string The path
-	 */
-	public function getFullPath ($format = false) {
-		if ($format === true && $this->format) {
-			return BASE_URL.$this->path.'.'.$this->format;
-		}
-
-		return BASE_URL.$this->path;
-	}
-
-
-
-	/**
 	 * Gets the current path
 	 * 
 	 * @return string The path
