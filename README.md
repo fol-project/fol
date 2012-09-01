@@ -1,11 +1,10 @@
-Galeria
-=======
+Aqui tes o FOL
+==============
+(o resto da gaita xa é cousa túa)
 
-Pequena web para crear galerias fotograficas. Non usa base de datos senon que funciona directamente con carpetas e arquivos.
-Pensada para instalar en entornos privados (protexidos por contrasinal) onde todos os usuarios poden crear novas galerias e subir fotos directamente.
-Por exemplo: un grupo de amigos que quere subir e intercambiar as suas fotos de xeito facil mantendo a privacidade.
+FOL é framework escrito en PHP por Oscar Otero (http://oscarotero.com) como exercicio de deseño e como ferramenta para desenvolver experimentos e proxectos persoais. A intención é ter algo manexable, moi flexible e que permita xuntar librerías externas. Vamos, un microframework.
+Como é algo persoal que non pretende ter moita repercusión (hai miles de frameworks en PHP), escribo a documentación en galego por comodidade e por se alguen máis lle interesa o proxecto. Aínda así, a documentación básica que hai en forma de comentarios no código está en inglés (cutre, of course).
 
-<<<<<<< HEAD
 * Rápido e lixeiro: Só carga as cousas que precisa en cada momento.
 * Escrito en PHP 5.4. (Sempre é moito mellor e máis divertido traballar con versións novas que antigas)
 * Lóxica sinxela e fácil de entender.
@@ -89,6 +88,9 @@ class App extends \Fol\App {
 
 //Agora instanciamos a aplicación manualmente:
 $Aplicacion = new Apps\Blog\App();
+
+//ou usando unha función estática
+$Aplicacion = Fol\App::create('Blog');
 
 //E executamos a aplicación
 $Aplicacion->handle('/blog/view/34');
@@ -208,9 +210,3 @@ Este exemplo define un controlador chamado Saudo con dous métodos: ola e adeus.
 Os comentarios que aparecen xusto antes do método "ola" definen que só se executará se estamos chamando a páxina co método GET ou POST, o scheme "http" e por ajax. Se non se cumple algunha desas condicións (chamamos a ese controlador sen ser por ajax, ou usamos https) xeneraríase un erro 404 de páxina non atopada.
 Podes meter comentarios que afecten a todos os métodos metendo comentarios encima da clase. No exemplo definimos que esa clase só funcionan co método GET, polo que nin "ola" nin "adeus" se executarán chamándoos por POST (aínda que "ola" sí permite POST, a clase non o permite polo que non se executa)
 A maneira de facer anotacións nos controladores sempre é igual: comezando polo tag @router seguido do nome da propiedade (method, scheme, ajax, port, ip) e o valor ou valores separados por un espazo
-=======
-* Feito co framework Fol (https://github.com/oscarotero/Fol/)
-* As fotos súbense directamente mediante drag and drop
-* Crea miniaturas automaticamente. Redimensiona as fotos subidas a un tamaño máximo de 1200px para aforrar espazo.
-* Chrome/Firefox
->>>>>>> c1c383e3775b2142acca665d0fe4b4e142405e6a
