@@ -1,0 +1,7 @@
+assets/*
+!assets/cache
+!assets/.htaccess
+
+assets/cache/*
+!assets/cache/.htaccess
+!assets/cache/index.php

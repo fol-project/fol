@@ -10,6 +10,7 @@ use Fol\Http\Headers;
 use Fol\Http\Request;
 use Fol\Http\Response;
 use Fol\Http\Router;
+use Fol\Http\HttpException;
 
 trait SimpleRouter {
 

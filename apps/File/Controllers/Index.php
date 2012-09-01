@@ -2,11 +2,13 @@
 namespace Apps\File\Controllers;
 
 use Fol\Http\Response;
-use Fol\Templates;
 
 class Index {
+	private $cache = true;
 
-	public function __construct () {
+	public function __construct ($App, $Request) {
+		$this->App = $App;
+		$this->Request = $Request;
 	}
 
 	private function cachePath ($file) {
