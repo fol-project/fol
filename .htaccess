@@ -1,12 +1,22 @@
-Options -Indexes
+# No indexes
+<IfModule mod_autoindex.c>
+	Options -Indexes
+</IfModule>
 
 <Files ~ "^\.">
 	Order allow,deny
 	Deny from all
 </Files>
 
+# Rewrites the requested to index.php
 <IfModule mod_rewrite.c>
 	RewriteEngine On
 
 	RewriteRule ^.*$ index.php [L,QSA]
 </IfModule>
+
+# Use UTF-8 encoding for anything served text/plain or text/html
+AddDefaultCharset utf-8
+
+# Force UTF-8 for a number of file formats
+AddCharset utf-8 .atom .css .js .json .rss .vtt .xml
