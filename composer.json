@@ -18,7 +18,7 @@
 		"issues": "https://github.com/oscarotero/Fol/issues"
 	},
 	"require": {
-		"php": ">=5.4.0",
+		"php": ">=5.4.0"
 	},
 	"config": {
 		"vendor-dir": "libs"
