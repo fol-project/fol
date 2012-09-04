@@ -96,7 +96,7 @@ class Data {
 
 
 	/**
-	 * Loads the data of files (in php or ini format)
+	 * Loads the data from php file (that returns the value)
 	 * 
 	 * @param string $name The name of the data (must be the name of the files where the data are stored)
 	 * 

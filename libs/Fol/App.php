@@ -37,11 +37,11 @@ abstract class App {
 		}
 
 		if ($name === 'assetsPath') {
-			return $this->assetsPath = BASE_PATH.'assets/';
+			return $this->assetsPath = BASE_PATH.'assets/'.strtolower($this->name).'/';
 		}
 
 		if ($name === 'assetsUrl') {
-			return $this->assetsUrl = BASE_URL.'assets/';
+			return $this->assetsUrl = BASE_URL.'assets/'.strtolower($this->name).'/';
 		}
 	}
 

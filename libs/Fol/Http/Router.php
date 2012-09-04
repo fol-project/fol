@@ -28,7 +28,7 @@ class Router {
 	 * 
 	 * @return array The controller data (an array with the controller and the arguments) or false
 	 */
-	static public function getErrorController (\Fol\App $App, Request $Request, \Exception $Exception) {
+	static public function getExceptionController (\Fol\App $App, Request $Request, \Exception $Exception) {
 		$class = $App->namespace.'\\Controllers\\Errors';
 
 		if (class_exists($class) === false) {

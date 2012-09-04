@@ -1,9 +1,9 @@
 <?php
-namespace Apps\File\Controllers;
+namespace Apps\Web\Controllers;
 
 use Fol\Http\Response;
 
-class Index {
+class Files {
 	private $cache = true;
 
 	public function __construct ($App, $Request) {

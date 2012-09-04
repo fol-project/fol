@@ -1,5 +1,4 @@
 <?php
-use Fol\App;
 use Fol\Http\Request;
 
 include('bootstrap.php');

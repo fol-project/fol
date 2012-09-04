@@ -40,7 +40,7 @@ trait SimpleRouter {
 				$Response = Router::executeController($controller[0], $controller[1], array($this, $Request));
 			}
 		} catch (\Exception $Exception) {
-			$controller = Router::getErrorController($this, $Request, $Exception);
+			$controller = Router::getExceptionController($this, $Request, $Exception);
 
 			if ($controller === false) {
 				$Response = new Response($Exception->getMessage(), $Exception->getCode() ?: null);
