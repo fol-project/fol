@@ -22,5 +22,6 @@
 	},
 	"config": {
 		"vendor-dir": "libs"
-	}
+	},
+	"minimum-stability": "dev"
 }
