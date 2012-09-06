@@ -25,7 +25,7 @@ trait PreprocessedFileRouter {
 	 */
 	public function handleFile (Request $Request) {
 		$file = preg_replace('#^'.preg_quote($this->assetsUrl.'cache/', '#').'#', '', $Request->getFullPath(true));
-		$class = $this->namespace.'\\Controllers\\Index';
+		$class = $this->namespace.'\\Controllers\\Files';
 
 		if (class_exists($class)) {
 			$controller = Router::checkControllerMethod($Request, new \ReflectionClass($class), $Request->getFormat(), array($file));
