@@ -80,11 +80,11 @@ trait PreprocessedFileRouter {
 
 			foreach ($iterator as $path) {
 				if ($path->isDir()) {
-					if (rmdir($path->__toString()) === false) {
+					if (rmdir($path->getPathname()) === false) {
 						return false;
 					}
 				} else {
-					if (unlink($path->__toString()) === false) {
+					if (unlink($path->getPathname()) === false) {
 						return false;
 					}
 				}
