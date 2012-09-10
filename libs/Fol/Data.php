@@ -102,7 +102,7 @@ class Data {
 	 * 
 	 * @return mixed The data or null if doesn't exists
 	 */
-	public function load ($name) {
+	public function load ($name, $merge = true) {
 		if (!$this->folder) {
 			throw new ErrorException('The base folder is not defined');
 
@@ -117,7 +117,11 @@ class Data {
 			$data = null;
 		}
 
-		$this->set($name, $data);
+		if ($merge === true) {
+			$this->merge($name, $data);
+		} else {
+			$this->set($name, $data);
+		}
 
 		return $data;
 	}
@@ -181,6 +185,22 @@ class Data {
 			$this->items = array_replace($this->items, $name);
 		} else {
 			$this->items[$name] = $value;
+		}
+	}
+
+
+
+	/**
+	 * Merges the old values with new values
+	 * 
+	 * @param string $name The data name or an array with all data name and value
+	 * @param mixed $value The value of the data
+	 */
+	public function merge ($name, $value = null) {
+		if (is_array($name)) {
+			$this->items = array_replace_recursive($this->items, $name);
+		} else if ($value) {
+			$this->items[$name] = array_replace_recursive($this->items[$name], $value);
 		}
 	}
 
