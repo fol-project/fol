@@ -99,6 +99,7 @@ class Data {
 	 * Loads the data from php file (that returns the value)
 	 * 
 	 * @param string $name The name of the data (must be the name of the files where the data are stored)
+	 * @param boolean $merge True to merge the loaded data, false to replace
 	 * 
 	 * @return mixed The data or null if doesn't exists
 	 */
@@ -189,7 +190,7 @@ class Data {
 	}
 
 
-
+	
 	/**
 	 * Merges the old values with new values
 	 * 
