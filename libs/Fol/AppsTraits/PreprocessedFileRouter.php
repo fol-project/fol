@@ -45,5 +45,59 @@ trait PreprocessedFileRouter {
 
 		return $Response;
 	}
+
+	
+	/**
+	 * Returns the path where a cached file is stored. Creates also the directories if it's needle
+	 * 
+	 * @param string $file The file path (from the assets folder)
+	 * 
+	 * @return string The file path
+	 */
+	public function getCacheFilePath ($file) {
+		$path = dirname($file);
+
+		if (!is_dir($this->assetsPath.'cache/'.$path)) {
+			mkdir($this->assetsPath.'cache/'.$path, 0777, true);
+		}
+
+		return $this->assetsPath.'cache/'.$file;
+	}
+
+
+	/**
+	 * Removes cached files and folders
+	 * 
+	 * @param string $path The file/folder path
+	 * 
+	 * @return boolean True if everything has removed, false if there was errors
+	 */
+	public function removeCache ($path) {
+		$path = $this->getCacheFilePath($path);
+
+		if (is_dir($path)) {
+			$iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($path), \RecursiveIteratorIterator::CHILD_FIRST);
+
+			foreach ($iterator as $path) {
+				if ($path->isDir()) {
+					if (rmdir($path->__toString()) === false) {
+						return false;
+					}
+				} else {
+					if (unlink($path->__toString()) === false) {
+						return false;
+					}
+				}
+			}
+
+			return true;
+		}
+
+		if (is_file($path)) {
+			return unlink($path);
+		}
+
+		return false;
+	}
 }
 ?>

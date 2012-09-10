@@ -11,14 +11,24 @@ class Files {
 		$this->Request = $Request;
 	}
 
-	private function cachePath ($file) {
-		$path = dirname($file);
+	/** Example of preprocessed CSS file
 
-		if (!is_dir($this->App->assetsPath.'cache/'.$path)) {
-			mkdir($this->App->assetsPath.'cache/'.$path, 0777, true);
+	public function css ($file) {
+		$filepath = $this->App->assetsPath.$file;
+	
+		//Preprocess the file and get the content
+		$result = myCssPreprocessor($filepath);
+
+		//Save the result in the cache
+		if ($this->cache === true) {
+			file_put_contents($this->App->getCacheFilePath($file), $result);
 		}
 
-		return $this->App->assetsPath.'cache/'.$file;
+		//Returns the result
+		$Response = new Response($result);
+		$Response->setContentType('css');
+
+		return $Response;
 	}
 }
 ?>
