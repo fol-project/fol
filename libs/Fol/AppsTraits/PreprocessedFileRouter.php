@@ -75,25 +75,23 @@ trait PreprocessedFileRouter {
 	public function removeCache ($path) {
 		$path = $this->getCacheFilePath($path);
 
-		if (is_dir($path)) {
-			$iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($path), \RecursiveIteratorIterator::CHILD_FIRST);
+		if (is_dir($path) === true) {
+			$files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($path), \RecursiveIteratorIterator::CHILD_FIRST);
 
-			foreach ($iterator as $path) {
-				if ($path->isDir()) {
-					if (rmdir($path->getPathname()) === false) {
-						return false;
-					}
-				} else {
-					if (unlink($path->getPathname()) === false) {
-						return false;
+			foreach ($files as $file) {
+				if (in_array($file->getBasename(), array('.', '..')) !== true) {
+					if ($file->isDir() === true) {
+						rmdir($file->getPathName());
+					} else if (($file->isFile() === true) || ($file->isLink() === true)) {
+						unlink($file->getPathname());
 					}
 				}
 			}
 
-			return true;
+			return rmdir($path);
 		}
 
-		if (is_file($path)) {
+		if ((is_file($path) === true) || (is_link($path) === true)) {
 			return unlink($path);
 		}
 
