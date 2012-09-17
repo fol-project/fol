@@ -23,7 +23,11 @@ trait PreprocessedFileRouter {
 	 * 
 	 * @return Fol\Http\Response The response object with the controller result
 	 */
-	public function handleFile (Request $Request) {
+	public function handleFile (Request $Request = null) {
+		if (func_num_args() === 0) {
+			$Request = Request::createFromGlobals();
+		}
+
 		$file = preg_replace('#^'.preg_quote($this->assetsUrl.'cache/', '#').'#', '', $Request->getFullPath(true));
 		$class = $this->namespace.'\\Controllers\\Files';
 

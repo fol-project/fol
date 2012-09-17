@@ -26,8 +26,10 @@ trait SimpleRouter {
 	 * 
 	 * @return Fol\Http\Response The response object with the controller result
 	 */
-	public function handle ($Request, $method = 'GET', array $parameters = array()) {
-		if (!is_object($Request) || get_class($Request) !== 'Fol\\Http\\Request') {
+	public function handle ($Request = null, $method = 'GET', array $parameters = array()) {
+		if (func_num_args() === 0) {
+			$Request = Request::createFromGlobals();
+		} else if (!is_object($Request) || get_class($Request) !== 'Fol\\Http\\Request') {
 			$Request = Request::create($Request, $method, $parameters);
 		}
 
