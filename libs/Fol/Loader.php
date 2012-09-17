@@ -85,13 +85,13 @@ class Loader {
 		$namespace = '';
 
 		if (($last_pos = strripos($class_name, '\\')) !== false) {
-			$namespace = substr($class_name, 0, $last_pos);
+			$namespace = substr($class_name, 0, $last_pos + 1);
 			$class_name = substr($class_name, $last_pos + 1);
 		}
 
 		foreach (self::$namespaces as $ns => $path) {
 			if (strpos($namespace, $ns) === 0) {
-				return self::filePath(preg_replace('#^'.$ns.'#', '', $namespace), $class_name, $path);
+				return self::filePath(preg_replace('#^'.preg_quote($ns, '#').'#', '', $namespace), $class_name, $path);
 			}
 		}
 
@@ -114,10 +114,10 @@ class Loader {
 		$file = isset($libraries_path) ? $libraries_path : self::$libraries_path;
 
 		if (!empty($namespace)) {
-			$file .= '/'.str_replace('\\', '/', $namespace);
+			$file .= str_replace('\\', '/', $namespace);
 		}
 
-		return $file.'/'.str_replace('_', '/', $class_name).'.php';
+		return $file.str_replace('_', '/', $class_name).'.php';
 	}
 
 
@@ -137,7 +137,7 @@ class Loader {
 			return;
 		}
 
-		self::$classes[$class] = $path;
+		self::$classes[$class] = $path.(($path[strlen($path) - 1] !== '/') ? '/' : '');
 	}
 
 
@@ -157,7 +157,7 @@ class Loader {
 			return;
 		}
 
-		self::$namespaces[$namespace] = $path;
+		self::$namespaces[$namespace.(($namespace[strlen($namespace) - 1] !== '\\') ? '\\' : '')] = $path.(($path[strlen($path) - 1] !== '/') ? '/' : '');
 	}
 
 
@@ -177,7 +177,7 @@ class Loader {
 
 		if (is_file($file)) {
 			foreach (include($file) as $namespace => $path) {
-				self::registerNamespace($namespace, $path.$namespace.'/');
+				self::registerNamespace($namespace, $path.str_replace('\\', '/', $namespace).'/');
 			}
 		}
 	}
