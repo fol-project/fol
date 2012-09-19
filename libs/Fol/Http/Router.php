@@ -14,49 +14,6 @@ use Fol\Http\HttpException;
 class Router {
 
 	/**
-	 * Returns a controller according to a Exception
-	 * The class search for the [app_namespace]\Controllers\Errors class and a method with the name of the Exception name
-	 * 
-	 * For example, an HttpException with code 404 (page not found):
-	 * Search for the method [app_namespace]\Controllers\Errors::HttpException404
-	 * If does not exists, search for the method [app_namespace]\Controllers\Errors::HttpException
-	 * If does not exists, search for the method [app_namespace]\Controllers\Errors::Exception
-	 * 
-	 * @param Fol\App $App The instance of the application
-	 * @param Fol\Http\Request $Request The request used
-	 * @param Exception $Exception The exception used
-	 * 
-	 * @return array The controller data (an array with the controller and the arguments) or false
-	 */
-	static public function getExceptionController (\Fol\App $App, Request $Request, \Exception $Exception) {
-		$class = $App->namespace.'\\Controllers\\Errors';
-
-		if (class_exists($class) === false) {
-			return false;
-		}
-
-		$class = new \ReflectionClass($class);
-
-		$name = explode('\\', get_class($Exception));
-		$name = end($name);
-
-		if ($Exception->getCode() && ($controller = self::checkControllerMethod($Request, $class, $name.$Exception->getCode())) !== false) {
-			return $controller;
-		}
-
-		if (($controller = self::checkControllerMethod($Request, $class, $name)) !== false) {
-			return $controller;
-		}
-
-		if (($name !== 'Exception') && ($controller = self::checkControllerMethod($Request, $class, $name)) !== false) {
-			return $controller;
-		}
-
-		return false;
-	}
-
-
-	/**
 	 * Returns a controller according to the request data
 	 * 
 	 * For example, for the request with url: post/list
@@ -72,20 +29,24 @@ class Router {
 		$segments = $Request->getPathSegments($App->url);
 
 		$class = $App->namespace.'\\Controllers\\Index';
-		$method = $segments ? lcfirst(str_replace(' ', '', ucwords(strtolower(str_replace('-', ' ', array_shift($segments)))))) : 'index';
+		$method = $segments ? lcfirst(str_replace(' ', '', ucwords(strtolower(str_replace('-', ' ', $segments[0]))))) : 'index';
+		$controller = self::checkController($Request, $class, $method, array_slice($segments, 1));
 
-		if (class_exists($class) && ($controller = self::checkControllerMethod($Request, new \ReflectionClass($class), $method, $segments)) !== false) {
+		if (isset($controller[1])) {
 			return $controller;
 		}
 
-		$class = $App->namespace.'\\Controllers\\'.str_replace(' ', '', ucwords(strtolower(str_replace('-', ' ', array_shift($segments)))));
-		$method = $segments ? lcfirst(str_replace(' ', '', ucwords(strtolower(str_replace('-', ' ', array_shift($segments)))))) : 'index';
+		if ($segments) {
+			$class = $App->namespace.'\\Controllers\\'.str_replace(' ', '', ucwords(strtolower(str_replace('-', ' ', array_shift($segments)))));
+			$method = $segments ? lcfirst(str_replace(' ', '', ucwords(strtolower(str_replace('-', ' ', array_shift($segments)))))) : 'index';
+			$controller = self::checkController($Request, $class, $method, $segments);
 
-		if (class_exists($class) && ($controller = self::checkControllerMethod($Request, new \ReflectionClass($class), $method, $segments))) {
-			return $controller;
+			if (isset($controller[1])) {
+				return $controller;
+			}
 		}
 
-		return false;
+		return array(null, null, null);
 	}
 
 
@@ -97,32 +58,26 @@ class Router {
 	 * @param string $method The method name of the controller
 	 * @param array $parameters The parameters used to call the method
 	 * 
-	 * @return array The controller data or FALSE if it's not callable
+	 * @return array The controller data (class, method and parameters)
 	 */
-	static public function checkControllerMethod (Request $Request, \ReflectionClass $Class, $method, array $parameters = array()) {
-		if (!$Class->isInstantiable() || !$Class->hasMethod($method)) {
+	static public function checkController (Request $Request, $class, $method, array $parameters = array()) {
+		if (!class_exists($class)) {
 			return false;
 		}
 
-		if (self::checkRulesComments($Request, $Class->getDocComment()) === false) {
+		$Class = new \ReflectionClass($class);
+
+		if (!$Class->isInstantiable() || !$Class->hasMethod($method) || (self::checkRulesComments($Request, $Class->getDocComment()) === false)) {
 			return false;
 		}
 
 		$Method = $Class->getMethod($method);
 
-		if (!$Method->isPublic()) {
+		if (!$Method->isPublic() || (self::checkRulesComments($Request, $Method->getDocComment()) === false) || (($parameters = self::getParameters($Method, $Request, $parameters)) === false)) {
 			return false;
 		}
 
-		if (self::checkRulesComments($Request, $Method->getDocComment()) === false) {
-			return false;
-		}
-
-		if (($parameters = self::getParameters($Method, $Request, $parameters)) === false) {
-			return false;
-		}
-
-		return array($Method, $parameters);
+		return array($Class, $Method, $parameters);
 	}
 
 
@@ -259,26 +214,19 @@ class Router {
 	/**
 	 * Executes a controller
 	 * 
-	 * @param ReflectionFunctionAbstract $Controller The ReflectionFunction or ReflectionMethod instance with the constructor data
-	 * @param array $parameters The parameters used to call the constructor
-	 * @param array $constructor_parameters If the controller is a method, the parameters used in the constructor of the class
+	 * @param array $controller The controller data
+	 * @param array $constructor_parameters. The parameters used in the constructor of the class
 	 * 
 	 * @return Fol\Http\Response The response of the controller
 	 */
-	static public function executeController (\ReflectionFunctionAbstract $Controller, array $parameters = null, array $constructor_parameters = null) {
+	static public function executeController (array $controller = null, array $constructor_parameters = null) {
 		ob_start();
 
-		if (isset($Controller->class)) {
-			if (isset($constructor_parameters)) {
-				$class = $Controller->getDeclaringClass()->newInstanceArgs($constructor_parameters);
-			} else {
-				$class = $Controller->getDeclaringClass()->newInstance();
-			}
+		list($Class, $Method, $arguments) = $controller;
 
-			$Response = $Controller->invokeArgs($class, $parameters);
-		} else {
-			$Response = $Constructor->invokeArgs($parameters);
-		}
+		$class = isset($constructor_parameters) ? $Class->newInstanceArgs($constructor_parameters) : $Class->newInstance();
+
+		$Response = $Method->invokeArgs($class, $arguments);
 
 		if (!($Response instanceof Response)) {
 			$Response = new Response($Response);

@@ -23,28 +23,24 @@ trait PreprocessedFileRouter {
 	 * 
 	 * @return Fol\Http\Response The response object with the controller result
 	 */
-	public function handleFile (Request $Request = null) {
+	public function handleFile ($Request = null) {
 		if (func_num_args() === 0) {
 			$Request = Request::createFromGlobals();
+		} else if (!is_object($Request) || get_class($Request) !== 'Fol\\Http\\Request') {
+			$Request = Request::create($Request);
 		}
 
 		$file = preg_replace('#^'.preg_quote($this->assetsUrl.'cache/', '#').'#', '', $Request->getFullPath(true));
-		$class = $this->namespace.'\\Controllers\\Files';
+		$controller = Router::checkController($Request, $this->namespace.'\\Controllers\\Files', $Request->getFormat(), array($file));
 
-		if (class_exists($class)) {
-			$controller = Router::checkControllerMethod($Request, new \ReflectionClass($class), $Request->getFormat(), array($file));
-
-			try {
-				if ($controller === false) {
-					$Response = new Response('File cannot be preprocessed', 404);
-				} else {
-					$Response = Router::executeController($controller[0], $controller[1], array($this, $Request));
-				}
-			} catch (\Exception $Exception) {
-				$Response = new Response($Exception->getMessage(), $Exception->getCode());
+		try {
+			if ($controller === false) {
+				throw new HttpException('File cannot be preprocessed', 500);
+			} else {
+				$Response = Router::executeController($controller[0], $controller[1], array($this, $Request));
 			}
-		} else {
-			$Response = new Response('Controllers not defined', 404);
+		} catch (HttpException $Exception) {
+			$Response = new Response($Exception->getMessage(), $Exception->getCode());
 		}
 
 		return $Response;
@@ -83,7 +79,7 @@ trait PreprocessedFileRouter {
 			$files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($path), \RecursiveIteratorIterator::CHILD_FIRST);
 
 			foreach ($files as $file) {
-				if (in_array($file->getBasename(), array('.', '..')) !== true) {
+				if ($file->isDot() === false) {
 					if ($file->isDir() === true) {
 						rmdir($file->getPathName());
 					} else if (($file->isFile() === true) || ($file->isLink() === true)) {

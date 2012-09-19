@@ -11,7 +11,11 @@ class Files {
 		$this->Request = $Request;
 	}
 
-	/** Example of preprocessed CSS file
+	public function error ($Exception) {
+		return new Response($Exception->getMessage(), $Exception->getCode() ?: 500);
+	}
+
+	/* Example of preprocessed CSS file
 
 	public function css ($file) {
 		$filepath = $this->App->assetsPath.$file;
@@ -30,5 +34,6 @@ class Files {
 
 		return $Response;
 	}
+	*/
 }
 ?>

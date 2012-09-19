@@ -33,21 +33,63 @@ trait SimpleRouter {
 			$Request = Request::create($Request, $method, $parameters);
 		}
 
-		try {
-			$controller = Router::getController($this, $Request);
+		$segments = $Request->getPathSegments($this->url);
 
+		$parameters = $segments;
+		$class = $this->namespace.'\\Controllers\\Index';
+		$method = $parameters ? lcfirst(str_replace(' ', '', ucwords(strtolower(str_replace('-', ' ', array_shift($parameters)))))) : 'index';
+
+		$controller = Router::checkController($Request, $class, $method, $parameters);
+
+		if (($controller === false) && $segments) {
+			$parameters = $segments;
+			$class = $this->namespace.'\\Controllers\\'.str_replace(' ', '', ucwords(strtolower(str_replace('-', ' ', array_shift($parameters)))));
+			$method = $parameters ? lcfirst(str_replace(' ', '', ucwords(strtolower(str_replace('-', ' ', array_shift($parameters)))))) : 'index';
+
+			$controller = Router::checkController($Request, $class, $method, $parameters);
+		}
+
+		try {
 			if ($controller === false) {
 				throw new HttpException(Headers::$status[404], 404);
 			} else {
-				$Response = Router::executeController($controller[0], $controller[1], array($this, $Request));
+				$Response = Router::executeController($controller, array($this, $Request));
 			}
-		} catch (\Exception $Exception) {
-			$controller = Router::getExceptionController($this, $Request, $Exception);
+		} catch (HttpException $Exception) {
+			$controller = false;
+
+			if ($segments) {
+				$parameters = array($Exception);
+				$class = $this->namespace.'\\Controllers\\'.str_replace(' ', '', ucwords(strtolower(str_replace('-', ' ', $segments[0]))));
+				$method = 'error'.$Exception->getCode();
+
+				$controller = Router::checkController($Request, $class, $method, $parameters);
+
+				if ($controller === false) {
+					$method = 'error';
+
+					$controller = Router::checkController($Request, $class, $method, $parameters);
+				}
+			}
+
+			if ($controller === false) {
+				$parameters = array($Exception);
+				$class = $this->namespace.'\\Controllers\\Index';
+				$method = 'error'.$Exception->getCode();
+
+				$controller = Router::checkController($Request, $class, $method, $parameters);
+
+				if ($controller === false) {
+					$method = 'error';
+
+					$controller = Router::checkController($Request, $class, $method, $parameters);
+				}
+			}
 
 			if ($controller === false) {
 				$Response = new Response($Exception->getMessage(), $Exception->getCode() ?: null);
 			} else {
-				$Response = Router::executeController($controller[0], $controller[1], array($this, $Request));
+				$Response = Router::executeController($controller, array($this, $Request));
 			}
 		}
 

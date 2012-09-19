@@ -8,6 +8,7 @@ namespace Fol;
 
 class Errors {
 	static private $level;
+	static private $handler;
 
 
 	/**
@@ -58,10 +59,34 @@ class Errors {
 		}
 
 		if ((error_reporting() & $level) && (self::$level & $level)) {
-			throw new \ErrorException($message, $level, $level, $file, $line);
+			$Exception = new \ErrorException($message, $level, $level, $file, $line);
+
+			if (isset(self::$handler)) {
+				call_user_func(self::$handler, $Exception);
+			} else {
+				throw $Exception;
+			}
 		}
 
 		return false;
+	}
+
+
+	/**
+	 * Execute a callback on error or not catched exception
+	 * 
+	 * @param callable The callback executed
+	 */
+	static public function setHandler (callable $callback) {
+		self::$handler = $callback;
+		set_exception_handler($callback);
+	}
+
+	/**
+	 * Restore the execption handler to previous status
+	 */
+	static public function restoreHandler () {
+		restore_exception_handler();
 	}
 }
 ?>
