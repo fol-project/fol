@@ -9,22 +9,7 @@ namespace Fol;
 class Services {
 	private $items;
 
-	private static $shared;
-
-	/**
-	 * Magic method to register automatically unshared services
-	 */
-	public function __set ($name, $value) {
-		$this->register($name, $value);
-	}
-
-
-	/**
-	 * Magic method to get automatically the registered services
-	 */
-	public function __get ($name) {
-		$this->$name = $this->get($name);
-	}
+	private static $shared = array();
 
 
 	/**
