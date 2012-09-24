@@ -76,15 +76,13 @@ trait PreprocessedFileRouter {
 		$path = $this->getCacheFilePath($path);
 
 		if (is_dir($path) === true) {
-			$files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($path), \RecursiveIteratorIterator::CHILD_FIRST);
+			$files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($path, \FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::CHILD_FIRST);
 
 			foreach ($files as $file) {
-				if ($file->isDot() === false) {
-					if ($file->isDir() === true) {
-						rmdir($file->getPathName());
-					} else if (($file->isFile() === true) || ($file->isLink() === true)) {
-						unlink($file->getPathname());
-					}
+				if ($file->isDir() === true) {
+					rmdir($file->getPathName());
+				} else if (($file->isFile() === true) || ($file->isLink() === true)) {
+					unlink($file->getPathname());
 				}
 			}
 
