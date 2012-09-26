@@ -18,6 +18,22 @@ class Response {
 	protected $content_type;
 
 
+	/**
+	 * Creates a response that redirects to another url
+	 * 
+	 * @param string $url The new url to redirect
+	 * 
+	 * @return Fol\Http\Response The response object
+	 */
+	static public function createRedirect ($url) {
+		$Response = new static;
+
+		$Response->Headers->set('location', $url);
+		$Response->setStatus(301);
+
+		return $Response;
+	}
+
 
 	/**
 	 * Constructor
@@ -179,16 +195,6 @@ class Response {
 	 */
 	public function sendContent () {
 		echo $this->content;
-	}
-
-
-	/**
-	 * Redirect to another page
-	 */
-	public function redirect ($url, $status = 301) {
-		$this->Headers->delete();
-		$this->Headers->set('location', $url);
-		$this->setStatus(301);
 	}
 }
 ?>
