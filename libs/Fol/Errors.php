@@ -34,6 +34,16 @@ class Errors {
 
 
 	/**
+	 * Show or hide the errors in the screen
+	 * 
+	 * @param boolean $show True to show the errors, false to not
+	 */
+	static public function displayErrors ($display) {
+		ini_set('display_errors', ($display === true) ? 'On' : 'Off');
+	}
+
+
+	/**
 	 * Sets the error level. The errors lower than the level will be silentiated
 	 * 
 	 * @param int $level The error level you want to notify
