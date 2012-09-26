@@ -9,6 +9,7 @@ namespace Fol;
 use Fol\Container;
 
 class Templates {
+	protected $renders;
 	protected $templates;
 	protected $templatesPath;
 
@@ -127,6 +128,10 @@ class Templates {
 	 * @return string The template rendered
 	 */
 	public function render ($template, array $data = null) {
+		if (!isset($data) && isset($this->renders[$template])) {
+			return $this->renders[$template];
+		}
+
 		if (isset($data) && (!$data || isset($data[0]))) {
 			$result = '';
 			$total = count($data);
@@ -146,6 +151,28 @@ class Templates {
 		}
 
 		return $this->renderFile($template, $data);
+	}
+
+
+	/**
+	 * Register a rendered template to use inside another template
+	 * 
+	 * @param string $name The rendered template name (for example: menu)
+	 * @param string $template The template name or file path
+	 * @param array $data An optional array of data used in the template. If the array is numerical, renders the template once for each item
+	 */
+	public function registerRender ($name, $template, array $data = null) {
+		$this->renders[$name] = $this->render($template, $data);
+	}
+
+
+	/**
+	 * Unregister a rendered template
+	 * 
+	 * @param string $name The template name
+	 */
+	public function unregisterRender ($name) {
+		unset($this->renders[$name]);
 	}
 }
 ?>
