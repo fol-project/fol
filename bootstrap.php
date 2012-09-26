@@ -14,3 +14,4 @@ Loader::registerNamespace('Apps', BASE_PATH.'apps');
 Loader::registerComposer();
 
 Errors::register();
+Errors::displayErrors(true);
