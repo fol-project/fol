@@ -30,11 +30,11 @@ Penso que funciona ben, pero habería que probalo no mundo real, con proxectos r
 Documentación rápida (para saber por onde van os tiros):
 ========================================================
 
-No directorio raíz de FOL existen tres carpetas: apps, libs e assets.
+No directorio raíz de FOL existen tres carpetas: web, libs e assets.
 
 * Na carpeta libs gardaranse as bibliotecas externas, dependencias, etc, que uses nos teus proxectos (Composer xa as vai gardar aí automaticamente), entre elas as propias de Fol (no directorio Fol).
-* Na carpeta apps está a aplicación ou aplicacións que forman o sitio web. Ou sexa, o propio código do sitio (plantillas, datos, etc). Por defecto hai unha aplicación chamada "Web".
-* Na carpeta assets gárdanse todos os arquivos accesibles directamente dende o navegador (css, js, imaxes, etc). Na subcarpeta libs gardaríanse todas as bibliotecas externas (por exemplo, jquery, bootstrap, backbone, etc) e que poderían ser compartidas por varias aplicacións. Logo cada aplicación ten a súa propia subcarpeta para arquivos específicos. Por defecto temos a carpeta "web" para gardar os arquivos da aplicación "Web". Ademáis, dentro existe unha subcarpeta chamada "cache" onde se gardarían os arquivos cacheados (arquivos que precisan ser preprocesados antes como por exemplo arquivos less, sass, coffescript, imaxes redimensionadas dinamicamente, etc). A idea é que cando chames por un arquivo cacheado, por exemplo "/assets/web/cache/estilos.css" se ese arquivo non existe redirixe ao arquivo "/assets/web/cache/index.php" que se ocupa de xenerar o arquivo e gardalo con ese nome, polo que a proxima vez que se chame xa existe e non o ten que volver a xenerar. A redireccion faise usando un arquivo .htaccess.
+* Na carpeta web está a aplicación por defecto que forma o sitio web. Ou sexa, o propio código do sitio (plantillas, datos, etc). Podes crear máis aplicacións con outros nomes, gardadas noutras carpetas.
+* Na carpeta assets gárdanse todos os arquivos accesibles directamente dende o navegador (css, js, imaxes, etc). Mentres que a carpeta web ten tamén un directorio "assets", neste caso serían bibliotecas xenéricas que se poderían usar por moitas aplicacións (por exemplo, jquery, bootstrap, backbone, etc). 
 
 O arquivo bootstrap.php na raíz é o que inicia o framework e define 3 constantes:
 
@@ -105,6 +105,7 @@ $Aplicacion->handle('/blog/view/34');
 ```
 
 Existen ademáis diversos "traits" para extender as funcionalidades das apps (máis adiante explicoo co Router)
+
 
 
 HTTP
@@ -223,7 +224,7 @@ Os comentarios que aparecen xusto antes do método "ola" definen que só se exec
 Podes meter comentarios que afecten a todos os métodos metendo comentarios encima da clase. No exemplo definimos que esa clase só funcionan co método GET, polo que nin "ola" nin "adeus" se executarán chamándoos por POST (aínda que "ola" sí permite POST, a clase non o permite polo que non se executa)
 A maneira de facer anotacións nos controladores sempre é igual: comezando polo tag @router seguido do nome da propiedade (method, scheme, ajax, port, ip) e o valor ou valores separados por un espazo
 
-Outro trait de enrutamento é Fol\AppsTraits\PreprocessedFileRouter, que serve para preprocesar arquivos (assets). Este trait engade un novo método á applicación chamado "handleFile" e o que fai é coller o controlador [app_namespace]\Controllers\Files e executar o método que se chame igual que a extensión do arquivo preprocesado. Por exemplo:
+Dentro da carpeta da aplicación, existe a carpeta assets que contén unha subcarpeta chamada "cache" onde se gardarían os arquivos cacheados (arquivos que precisan ser preprocesados antes como por exemplo arquivos less, sass, coffescript, imaxes redimensionadas dinamicamente, etc). A idea é que cando chames por un arquivo cacheado, por exemplo "/web/assets/cache/estilos.css" se ese arquivo non existe redirixa ao arquivo "/web//assets/cache/index.php" que se ocupa de xenerar o arquivo e gardalo con ese nome, polo que a proxima vez que se chame xa existe e non o ten que volver a xenerar. A redireccion faise usando un arquivo .htaccess. Para poder usar isto, temos outro trait de enrutamento chamado Fol\AppsTraits\PreprocessedFileRouter, que serve para preprocesar arquivos (assets). Este trait engade un novo método á applicación chamado "handleFile" e o que fai é coller o controlador [app_namespace]\Controllers\Files e executar o método que se chame igual que a extensión do arquivo preprocesado. Por exemplo:
 
 Engadimos ese trait a maiores na nosa aplicación:
 
@@ -257,7 +258,7 @@ class Files {
 }
 ```
 
-Logo en assets/web/cache/index.php (ou sexa o arquivo ao que se redirixe cando queremos cargar un arquivo que non existe en cache), executamos a petición do seguinte modo:
+Logo en /web/assets/cache/index.php (ou sexa o arquivo ao que se redirixe cando queremos cargar un arquivo que non existe en cache), executamos a petición do seguinte modo:
 
 ```php
 use Fol\Http\Request;
@@ -269,4 +270,4 @@ $Response = $Web->handleFile(Request::createFromGlobals());
 $Response->send();
 ```
 
-Cando a petición é "assets/web/cache/estilos.less.css", executa o controlador Apps\Web\Controllers\Files::css('estilos.less.css'); e esa función xa se encargaría de cargar o arquivo orixinal (que sería "assets/web/estilos.less.css"), procesalo e gardalo en "assets/web/cache/estilos.less.css", polo que a seguinte vez xa devolvería directamente ese arquivo cacheado sen volver a procesalo (a non ser que esteamos en fase de desenvolvemento polo que podemos facer que se procese en cada petición).
+Cando a petición é "/web/assets/cache/estilos.less.css", executa o controlador Apps\Web\Controllers\Files::css('estilos.less.css'); e esa función xa se encargaría de cargar o arquivo orixinal (que sería "/web/assets/estilos.less.css"), procesalo e gardalo en "/web/assets/cache/estilos.less.css", polo que a seguinte vez xa devolvería directamente ese arquivo cacheado sen volver a procesalo (a non ser que esteamos en fase de desenvolvemento polo que podemos facer que se procese en cada petición).

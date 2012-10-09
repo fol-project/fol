@@ -20,28 +20,39 @@ abstract class App {
 	 * @return string The property value or null
 	 */
 	public function __get ($name) {
+		//The app name. (Web)
 		if ($name === 'name') {
 			return $this->name = substr(strrchr($this->namespace, '\\'), 1);
 		}
 
+		//The app namespace. (Apps\Web)
 		if ($name === 'namespace') {
 			return $this->namespace = (new \ReflectionClass($this))->getNameSpaceName();
 		}
 
+		//The app path. (/sites/my-site/web/)
 		if ($name === 'path') {
 			return $this->path = str_replace('\\', '/', dirname((new \ReflectionClass($this))->getFileName())).'/';
 		}
 
+		//The app base url (/)
 		if ($name === 'url') {
 			return $this->url = BASE_URL;
 		}
 
+		//The assets app path. (/sites/my-site/web/assets/)
 		if ($name === 'assetsPath') {
-			return $this->assetsPath = BASE_PATH.'assets/'.strtolower($this->name).'/';
+			return $this->assetsPath = $this->path.'assets/';
 		}
 
-		if ($name === 'assetsUrl') {
-			return $this->assetsUrl = BASE_URL.'assets/'.strtolower($this->name).'/';
+		//The assets app url (/web/assets/)
+		if ($name === 'assets') {
+			return $this->assetsUrl = BASE_URL.preg_replace('|^'.BASE_PATH.'|', '', $this->path).'assets/';
+		}
+
+		//The assets library (/assets/)
+		if ($name === 'assetsLibs') {
+			return BASE_URL.'assets/';
 		}
 	}
 

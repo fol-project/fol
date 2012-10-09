@@ -137,7 +137,7 @@ class Loader {
 			return;
 		}
 
-		self::$classes[$class] = $path.(($path[strlen($path) - 1] !== '/') ? '/' : '');
+		self::$classes[$class] = $path;
 	}
 
 

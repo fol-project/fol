@@ -198,7 +198,9 @@ class Data {
 	 * @param mixed $value The value of the data
 	 */
 	public function merge ($name, $value = null) {
-		if (is_array($name)) {
+		if (!isset($this->items[$name])) {
+			$this->items[$name] = $value;
+		} else if (is_array($name)) {
 			$this->items = array_replace_recursive($this->items, $name);
 		} else if ($value) {
 			$this->items[$name] = array_replace_recursive($this->items[$name], $value);

@@ -25,13 +25,10 @@ class Response {
 	 * 
 	 * @return Fol\Http\Response The response object
 	 */
-	static public function createRedirect ($url) {
-		$Response = new static;
-
-		$Response->Headers->set('location', $url);
-		$Response->setStatus(301);
-
-		return $Response;
+	static public function createRedirect ($url, $status = 302) {
+		return new static('', $status, array(
+			'location' => $url
+		));
 	}
 
 

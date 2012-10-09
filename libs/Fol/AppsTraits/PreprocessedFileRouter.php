@@ -30,7 +30,7 @@ trait PreprocessedFileRouter {
 			$Request = Request::create($Request);
 		}
 
-		$file = preg_replace('#^'.preg_quote($this->assetsUrl.'cache/', '#').'#', '', $Request->getFullPath(true));
+		$file = preg_replace('#^'.preg_quote($this->assets.'cache/', '#').'#', '', $Request->getFullPath(true));
 		$controller = Router::checkController($Request, $this->namespace.'\\Controllers\\Files', $Request->getFormat(), array($file));
 
 		try {
