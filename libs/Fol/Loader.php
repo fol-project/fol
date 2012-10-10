@@ -177,11 +177,7 @@ class Loader {
 
 		if (is_file($file)) {
 			foreach (include($file) as $namespace => $path) {
-				if (substr($path, -2) === '/.') {
-					self::registerNamespace($namespace, substr($path, 0, -1));
-				} else {
-					self::registerNamespace($namespace, $path.str_replace('\\', '/', $namespace).'/');
-				}
+				self::registerNamespace($namespace, $path.str_replace('\\', '/', $namespace).'/');
 			}
 		}
 	}
