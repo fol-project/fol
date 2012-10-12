@@ -16,7 +16,7 @@ class Container {
 	 * @param array $items The items to store
 	 */
 	public function __construct (array $items = null) {
-		if (isset($items)) {
+		if ($items !== null) {
 			$this->set($items);
 		}
 	}
@@ -64,7 +64,7 @@ class Container {
 	 * @return mixed The parameter value or the default
 	 */
 	public function get ($name = null, $default = null) {
-		if (func_num_args() === 0) {
+		if ($name === null) {
 			return $this->items;
 		}
 
@@ -102,7 +102,7 @@ class Container {
 	 * @param string $name The parameter name
 	 */
 	public function delete ($name = null) {
-		if (func_num_args() === 0) {
+		if ($name === null) {
 			$this->items = array();
 		} else {
 			unset($this->items[$name]);

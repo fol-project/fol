@@ -126,7 +126,7 @@ class Files extends Input {
 	public function getErrorMessage ($name) {
 		$code = $this->getErrorCode($name);
 
-		if (!isset($code) || !isset(self::$errors[$code])) {
+		if (($code === null) || !isset(self::$errors[$code])) {
 			return null;
 		}
 

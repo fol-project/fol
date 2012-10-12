@@ -106,8 +106,8 @@ class Templates {
 	 * @return string The file content
 	 */
 	protected function renderFile ($_file, array $_data = null) {
-		if (isset($_data)) {
-			extract((array)$_data, EXTR_SKIP);
+		if ($_data !== null) {
+			extract($_data, EXTR_SKIP);
 		}
 
 		ob_start();
@@ -128,11 +128,11 @@ class Templates {
 	 * @return string The template rendered
 	 */
 	public function render ($template, array $data = null) {
-		if (!isset($data) && isset($this->renders[$template])) {
+		if (($data === null) && isset($this->renders[$template])) {
 			return $this->renders[$template];
 		}
 
-		if (isset($data) && (!$data || isset($data[0]))) {
+		if (($data !== null) && (!$data || isset($data[0]))) {
 			$result = '';
 			$total = count($data);
 

@@ -176,6 +176,10 @@ class Loader {
 			return;
 		}
 
+		if (!is_file(self::$libraries_path.'composer/ClassLoader.php')) {
+			return;
+		}
+
 		self::registerClass('Composer\Autoload\ClassLoader', self::$libraries_path.'composer/ClassLoader.php');
 
 		$Composer = new \Composer\Autoload\ClassLoader();

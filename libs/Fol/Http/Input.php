@@ -65,7 +65,7 @@ class Input extends Container {
 			return $value;
 		}
 
-		return isset($options) ? filter_var($value, $filter) : filter_var($value, $filter, $options);
+		return ($options === null) ? filter_var($value, $filter) : filter_var($value, $filter, $options);
 	}
 }
 ?>

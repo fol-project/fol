@@ -222,14 +222,14 @@ class Data {
 	 * @param string $key The optional key of the data
 	 */
 	public function delete ($name, $key = null) {
-		if (isset($key)) {
+		if ($key === null) {
+			unset($this->items[$name]);
+		} else {
 			unset($this->items[$name][$key]);
 
 			if (!$this->items[$name]) {
 				unset($this->items[$name]);
 			}
-		} else {
-			unset($this->items[$name]);
 		}
 	}
 
@@ -267,7 +267,7 @@ class Data {
 	 */
 	public function saveFile ($name, $environment = null) {
 		$data = $this->get($name);
-		$environment = isset($environment) ? $environment : $this->environment;
+		$environment = ($environment === null) ? $this->environment : $environment;
 		$path = $this->folder.($environment ? '/'.$environment : ($this->environment ? '/'.$this->environment : ''));
 
 		if (!is_dir($path)) {
@@ -293,7 +293,7 @@ class Data {
 	 */
 	public function deleteFile ($name = null, $environment = null) {
 		$data = $this->get($name);
-		$environment = isset($environment) ? $environment : $this->environment;
+		$environment = ($environment === null) ? $this->environment : $environment;
 		$path = $this->folder.($environment ? '/'.$environment : ($this->environment ? '/'.$this->environment : ''));
 
 		if (is_file($path.'/'.$name.'.php') && unlink($path.'/'.$name.'.php') === false) {
