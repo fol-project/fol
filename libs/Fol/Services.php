@@ -71,7 +71,7 @@ class Services {
 		}
 
 		if ($this->registered($name) === false) {
-			throw new Exception("There is not any service registered with the name '$name'");
+			throw new \Exception("There is not any service registered with the name '$name'");
 		}
 
 		$instance = call_user_func_array($this->items[$name], func_get_args());

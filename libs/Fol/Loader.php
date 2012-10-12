@@ -10,6 +10,7 @@ class Loader {
 	static private $libraries_path;
 	static private $classes = array();
 	static private $namespaces = array();
+	static private $Composer;
 
 
 	/**
@@ -80,6 +81,10 @@ class Loader {
 
 		if (isset(self::$classes[$class_name])) {
 			return self::$classes[$class_name];
+		}
+
+		if (isset(self::$Composer) && ($file = self::$Composer->findFile($class_name)) !== null) {
+			return $file;
 		}
 
 		$namespace = '';
@@ -163,23 +168,30 @@ class Loader {
 
 
 	/**
-	 * Register the classes installed by composer.
-	 * Search in the libraries path for the composer directory and loads the classmap and namespaces registered.
+	 * Register the composer autoloader
+	 * Search in the libraries path for the composer directory, loads autoloader and adds the namespaces and classmap.
 	 */
 	static function registerComposer () {
-		$file = self::$libraries_path.'composer/autoload_classmap.php';
-
-		if (is_file($file)) {
-			self::registerClass(include($file));
+		if (isset(self::$Composer)) {
+			return;
 		}
 
-		$file = self::$libraries_path.'composer/autoload_namespaces.php';
+		self::registerClass('Composer\Autoload\ClassLoader', self::$libraries_path.'composer/ClassLoader.php');
 
-		if (is_file($file)) {
-			foreach (include($file) as $namespace => $path) {
-				self::registerNamespace($namespace, $path.str_replace('\\', '/', $namespace).'/');
-			}
+		$Composer = new \Composer\Autoload\ClassLoader();
+
+		$namespaces = include(self::$libraries_path.'composer/autoload_namespaces.php');
+		$classMap = include(self::$libraries_path.'composer/autoload_classmap.php');
+
+		foreach ($namespaces as $namespace => $path) {
+			$Composer->add($namespace, $path);
 		}
+
+		if ($classMap) {
+			$Composer->addClassMap($classMap);
+		}
+
+		self::$Composer = $Composer;
 	}
 }
 ?>
