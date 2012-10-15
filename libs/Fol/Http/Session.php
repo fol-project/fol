@@ -168,6 +168,14 @@ class Session extends Container {
 
 
 	/**
+	 * Import or refresh the global variables in $_SESSION in the class container
+	 */
+	public function importGlobals () {
+		self::$Data->set($_SESSION);
+	}
+
+
+	/**
 	 * Get a value from the current session
 	 * 
 	 * @param string $name The value name. If it is not defined, returns all stored variables
