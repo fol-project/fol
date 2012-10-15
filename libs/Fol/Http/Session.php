@@ -8,8 +8,7 @@ namespace Fol\Http;
 
 use Fol\Http\Container;
 
-class Session extends Container {
-	static private $Data;
+class Session {
 
 	/**
 	 * Constructor. Start/resume the latest session.
@@ -33,10 +32,6 @@ class Session extends Container {
 
 				$this->start();
 				break;
-		}
-
-		if (!isset(self::$Data)) {
-			self::$Data = new Container($_SESSION);
 		}
 	}
 
@@ -70,12 +65,8 @@ class Session extends Container {
 	 */
 	public function close () {
 		if ($this->isStarted()) {
-			$_SESSION = self::$Data->get();
-
 			session_write_close();
 		}
-
-		self::$Data = null;
 	}
 
 
@@ -95,8 +86,6 @@ class Session extends Container {
 		}
 
 		session_start();
-
-		self::$Data = new Container($_SESSION);
 	}
 
 
@@ -112,8 +101,6 @@ class Session extends Container {
 		}
 
 		session_destroy();
-
-		self::$Data = null;
 	}
 
 
@@ -168,14 +155,6 @@ class Session extends Container {
 
 
 	/**
-	 * Import or refresh the global variables in $_SESSION in the class container
-	 */
-	public function importGlobals () {
-		self::$Data->set($_SESSION);
-	}
-
-
-	/**
 	 * Get a value from the current session
 	 * 
 	 * @param string $name The value name. If it is not defined, returns all stored variables
@@ -185,7 +164,15 @@ class Session extends Container {
 	 * @return array All stored variables in case no name is defined.
 	 */
 	public function get ($name = null, $default = null) {
-		return self::$Data->get($name, $default);
+		if ($name === null) {
+			return $_SESSION;
+		}
+
+		if (isset($_SESSION[$name])) {
+			return $_SESSION[$name];
+		}
+
+		return $default;
 	}
 
 
@@ -196,7 +183,11 @@ class Session extends Container {
 	 * @param string $value The value of the variable
 	 */
 	public function set ($name, $value = null) {
-		self::$Data->set($name, $value);
+		if (is_array($name)) {
+			$_SESSION = array_replace($_SESSION, $name);
+		} else {
+			$_SESSION[$name] = $value;
+		}
 	}
 
 
@@ -206,7 +197,11 @@ class Session extends Container {
 	 * @param string $name The variable name. If it is not defined, delete all variables
 	 */	
 	public function delete ($name = null) {
-		self::$Data->delete($name);
+		if ($name === null) {
+			$_SESSION = array();
+		} else {
+			unset($_SESSION[$name]);
+		}
 	}
 
 
@@ -218,7 +213,7 @@ class Session extends Container {
 	 * @return boolean True if it's defined, false if not
 	 */
 	public function exists ($name) {
-		return self::$Data->exists($name);
+		return array_key_exists($name, $_SESSION);
 	}
 }
 ?>
