@@ -45,7 +45,7 @@ class Session extends Container {
 	/**
 	 * Magic function to close the session on destroy the object
 	 */
-	public function __destroy () {
+	public function __destruct () {
 		$this->close();
 	}
 
