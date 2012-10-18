@@ -83,7 +83,7 @@ class Loader {
 			return self::$classes[$class_name];
 		}
 
-		if (isset(self::$Composer) && ($file = self::$Composer->findFile($class_name)) !== null) {
+		if (isset(self::$Composer) && ($file = self::$Composer->findFile($class_name)) !== false) {
 			return $file;
 		}
 
