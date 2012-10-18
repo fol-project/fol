@@ -274,6 +274,10 @@ class Headers {
 
 		$name = $this->normalize($name);
 
+		if (!isset($this->items[$name])) {
+			return null;
+		}
+
 		if (is_array($this->items[$name]) && $first) {
 			return $this->items[$name][0];
 		}
