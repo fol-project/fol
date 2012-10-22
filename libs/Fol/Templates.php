@@ -47,14 +47,17 @@ class Templates {
 	 * 
 	 * @param string $name The template name (for example: menu)
 	 * @param string $file The file path of the template (for example: menu.php)
+	 * @param array $data An optional array of data used in the template. If the array is numerical, renders the template once for each item
 	 */
-	public function register ($name, $file = null) {
+	public function register ($name, $file = null, array $data = null) {
 		if (is_array($name)) {
 			foreach ($name as $name => $file) {
 				$this->templates[$name] = $file;
 			}
-		} else {
+		} else if ($data === null) {
 			$this->templates[$name] = $file;
+		} else {
+			$this->renders[$name] = $this->render($file, $data);
 		}
 	}
 
@@ -67,6 +70,7 @@ class Templates {
 	 */
 	public function unregister ($name) {
 		unset($this->templates[$name]);
+		unset($this->renders[$name]);
 	}
 
 
@@ -106,8 +110,8 @@ class Templates {
 	 * @return string The file content
 	 */
 	protected function renderFile ($_file, array $_data = null) {
-		if ($_data !== null) {
-			extract($_data, EXTR_SKIP);
+		if (isset($_data)) {
+			extract((array)$_data, EXTR_SKIP);
 		}
 
 		ob_start();
@@ -128,11 +132,11 @@ class Templates {
 	 * @return string The template rendered
 	 */
 	public function render ($template, array $data = null) {
-		if (($data === null) && isset($this->renders[$template])) {
+		if (!isset($data) && isset($this->renders[$template])) {
 			return $this->renders[$template];
 		}
 
-		if (($data !== null) && (!$data || isset($data[0]))) {
+		if (isset($data) && (!$data || isset($data[0]))) {
 			$result = '';
 			$total = count($data);
 
@@ -151,28 +155,6 @@ class Templates {
 		}
 
 		return $this->renderFile($template, $data);
-	}
-
-
-	/**
-	 * Register a rendered template to use inside another template
-	 * 
-	 * @param string $name The rendered template name (for example: menu)
-	 * @param string $template The template name or file path
-	 * @param array $data An optional array of data used in the template. If the array is numerical, renders the template once for each item
-	 */
-	public function registerRender ($name, $template, array $data = null) {
-		$this->renders[$name] = $this->render($template, $data);
-	}
-
-
-	/**
-	 * Unregister a rendered template
-	 * 
-	 * @param string $name The template name
-	 */
-	public function unregisterRender ($name) {
-		unset($this->renders[$name]);
 	}
 }
 ?>
