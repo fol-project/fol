@@ -33,9 +33,13 @@ class Data {
 	 * Constructor. You can define the folder where search the data
 	 *
 	 * $data = new Fol\Data('apps/my_app/data')
+	 * 
+	 * @param string $folder The folder where the data files are placed.
 	 */
 	public function __construct ($folder = null) {
-		$this->setFolder($folder);
+		if ($folder !== null) {
+			$this->setFolder($folder);
+		}
 	}
 
 

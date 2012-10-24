@@ -1,18 +1,18 @@
 <?php
 /**
- * Fol\AppsTraits\SimpleRouter
+ * Fol\Utils\Router
  * 
  * Provides a simple router handler
  */
-namespace Fol\AppsTraits;
+namespace Fol\Utils;
 
 use Fol\Http\Headers;
 use Fol\Http\Request;
 use Fol\Http\Response;
-use Fol\Http\Router;
+use Fol\Http\Router as HttpRouter;
 use Fol\Http\HttpException;
 
-trait SimpleRouter {
+trait Router {
 
 	/**
 	 * Handle a http request
@@ -39,21 +39,21 @@ trait SimpleRouter {
 		$class = $this->namespace.'\\Controllers\\Index';
 		$method = $parameters ? lcfirst(str_replace(' ', '', ucwords(strtolower(str_replace('-', ' ', array_shift($parameters)))))) : 'index';
 
-		$controller = Router::checkController($Request, $class, $method, $parameters);
+		$controller = HttpRouter::checkController($Request, $class, $method, $parameters);
 
 		if (($controller === false) && $segments) {
 			$parameters = $segments;
 			$class = $this->namespace.'\\Controllers\\'.str_replace(' ', '', ucwords(strtolower(str_replace('-', ' ', array_shift($parameters)))));
 			$method = $parameters ? lcfirst(str_replace(' ', '', ucwords(strtolower(str_replace('-', ' ', array_shift($parameters)))))) : 'index';
 
-			$controller = Router::checkController($Request, $class, $method, $parameters);
+			$controller = HttpRouter::checkController($Request, $class, $method, $parameters);
 		}
 
 		try {
 			if ($controller === false) {
 				throw new HttpException(Headers::$status[404], 404);
 			} else {
-				$Response = Router::executeController($controller, array($this, $Request));
+				$Response = HttpRouter::executeController($controller, array($this, $Request));
 			}
 		} catch (HttpException $Exception) {
 			$controller = false;
@@ -63,12 +63,12 @@ trait SimpleRouter {
 				$class = $this->namespace.'\\Controllers\\'.str_replace(' ', '', ucwords(strtolower(str_replace('-', ' ', $segments[0]))));
 				$method = 'error'.$Exception->getCode();
 
-				$controller = Router::checkController($Request, $class, $method, $parameters);
+				$controller = HttpRouter::checkController($Request, $class, $method, $parameters);
 
 				if ($controller === false) {
 					$method = 'error';
 
-					$controller = Router::checkController($Request, $class, $method, $parameters);
+					$controller = HttpRouter::checkController($Request, $class, $method, $parameters);
 				}
 			}
 
@@ -77,19 +77,19 @@ trait SimpleRouter {
 				$class = $this->namespace.'\\Controllers\\Index';
 				$method = 'error'.$Exception->getCode();
 
-				$controller = Router::checkController($Request, $class, $method, $parameters);
+				$controller = HttpRouter::checkController($Request, $class, $method, $parameters);
 
 				if ($controller === false) {
 					$method = 'error';
 
-					$controller = Router::checkController($Request, $class, $method, $parameters);
+					$controller = HttpRouter::checkController($Request, $class, $method, $parameters);
 				}
 			}
 
 			if ($controller === false) {
 				$Response = new Response($Exception->getMessage(), $Exception->getCode() ?: null);
 			} else {
-				$Response = Router::executeController($controller, array($this, $Request));
+				$Response = HttpRouter::executeController($controller, array($this, $Request));
 			}
 		}
 

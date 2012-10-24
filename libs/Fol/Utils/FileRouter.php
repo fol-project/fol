@@ -1,18 +1,18 @@
 <?php
 /**
- * Fol\AppsTraits\PreprocessedFileRouter
+ * Fol\Utils\FileRouter
  * 
- * Provides a simple router handler for preprocessed files
+ * Provides a simple router handler for preprocessed files in Apps
  */
-namespace Fol\AppsTraits;
+namespace Fol\Utils;
 
 use Fol\Http\Headers;
 use Fol\Http\Request;
 use Fol\Http\Response;
-use Fol\Http\Router;
+use Fol\Http\Router as HttpRouter;
 use Fol\Http\HttpException;
 
-trait PreprocessedFileRouter {
+trait FileRouter {
 
 	/**
 	 * Handle a http request

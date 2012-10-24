@@ -1,12 +1,12 @@
 <?php
 /**
- * Fol\AppsTraits\SymfonyRouter
+ * Fol\Utils\SymfonyRouter
  * 
  * Provides a Symfony based router handler.
  * Based on this article from Fabien Potencier:
  * http://fabien.potencier.org/article/50/create-your-own-framework-on-top-of-the-symfony2-components-part-1
  */
-namespace Fol\AppsTraits;
+namespace Fol\Utils;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

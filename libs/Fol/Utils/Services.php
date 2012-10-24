@@ -1,10 +1,32 @@
 <?php
 /**
- * Fol\Services
+ * Fol\Utils\Service
  * 
- * Provides a simple dependecy injection manager
+ * Provides a simple dependecy injection manager for any class
+ * Example:
+ * 
+ * class App {
+ * 	use Fol\Utils\Service
+ * }
+ * 
+ * $App = new App;
+ * 
+ * $App->register('database', function () {
+ * 	$dsn = 'mysql:dbname=testdb;host=127.0.0.1';
+ *  $user = 'dbuser';
+ *  $password = 'dbpass';
+ * 
+ *  try {
+ *     $dbh = new PDO($dsn, $user, $password);
+ *  } catch (PDOException $e) { 
+ *     echo 'Connection failed: ' . $e->getMessage();
+ *  }
+ * 	return $dbh;
+ * });
+ * 
+ * $result = $App->database->query('SELECT * FROM items');
  */
-namespace Fol\AppsTraits;
+namespace Fol\Utils;
 
 trait Services {
 	private $services;
@@ -14,18 +36,18 @@ trait Services {
 	 * Register a new service
 	 * 
 	 * @param string $name The service name
-	 * @param Closure $resolve A function that returns a service instance
+	 * @param Closure $resolver A function that returns a service instance
 	 */
-	public function register ($name, \Closure $resolve = null) {
+	public function register ($name, \Closure $resolver = null) {
 		if (is_array($name)) {
-			foreach ($name as $name => $resolve) {
-				$this->register($name, $resolve);
+			foreach ($name as $name => $resolver) {
+				$this->register($name, $resolver);
 			}
 
 			return;
 		}
 
-		$this->services[$name] = $resolve;
+		$this->services[$name] = $resolver;
 	}
 
 
