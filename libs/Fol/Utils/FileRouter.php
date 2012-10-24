@@ -31,13 +31,13 @@ trait FileRouter {
 		}
 
 		$file = preg_replace('#^'.preg_quote($this->assets.'cache/', '#').'#', '', $Request->getFullPath(true));
-		$controller = Router::checkController($Request, $this->namespace.'\\Controllers\\Files', $Request->getFormat(), array($file));
+		$controller = HttpRouter::checkController($Request, $this->namespace.'\\Controllers\\Files', $Request->getFormat(), array($file));
 
 		try {
 			if ($controller === false) {
 				throw new HttpException('File cannot be preprocessed', 500);
 			} else {
-				$Response = Router::executeController($controller, array($this, $Request));
+				$Response = HttpRouter::executeController($controller, array($this, $Request));
 			}
 		} catch (HttpException $Exception) {
 			$Response = new Response($Exception->getMessage(), $Exception->getCode());
