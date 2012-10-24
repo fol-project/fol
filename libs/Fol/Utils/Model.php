@@ -195,7 +195,7 @@ trait Model {
 		//Insert
 		if (empty($this->id)) {
 			$table = static::$table;
-			$fields = array_keys($data);
+			$fields = implode(', ', array_keys($data));
 			$marks = implode(', ', array_fill(0, count($fields), '?'));
 
 			$Query = static::$Db->prepare("INSERT INTO `$table` ($fields) VALUES ($marks)");
