@@ -27,6 +27,10 @@ namespace Fol\Utils;
 trait Model {
 	private $_cache;
 
+	protected static $Db;
+	protected static $table;
+	protected static $fields;
+
 	/**
 	 * static function to configure the model.
 	 * Define the database, the table name and the available fields
