@@ -192,6 +192,8 @@ trait Model {
 			}
 		}
 
+		unset($data['id']);
+
 		//Insert
 		if (empty($this->id)) {
 			$table = static::$table;
@@ -212,9 +214,7 @@ trait Model {
 			$id = intval($this->id);
 
 			foreach ($data as $field => $value) {
-				if ($field !== 'id') {
-					$set[] = "`$field` = ?";
-				}
+				$set[] = "`$field` = ?";
 			}
 
 			$set = implode(', ', $set);
