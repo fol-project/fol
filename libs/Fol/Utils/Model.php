@@ -194,7 +194,7 @@ trait Model {
 
 		unset($data['id']);
 
-		if (!($data = $this->prepareToSave($data)) === false) {
+		if (($data = $this->prepareToSave($data)) === false) {
 			return false;
 		}
 
