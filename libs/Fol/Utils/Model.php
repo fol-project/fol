@@ -194,6 +194,10 @@ trait Model {
 
 		unset($data['id']);
 
+		if (!($data = $this->prepareToSave($data)) === false) {
+			return false;
+		}
+
 		//Insert
 		if (empty($this->id)) {
 			$table = static::$table;
@@ -224,6 +228,19 @@ trait Model {
 		}
 
 		return $result;
+	}
+
+
+	/**
+	 * Prepare the data before to save. Useful to validate or transform data before save in database
+	 * This function is provided to be overwrited by the class that uses this trait
+	 * 
+	 * @param array $data The data to save.
+	 * 
+	 * @return array The transformed data. If returns false, the data will be not saved.
+	 */
+	public function prepareToSave (array $data) {
+		return $data;
 	}
 }
 ?>
