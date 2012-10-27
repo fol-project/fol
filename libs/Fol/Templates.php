@@ -12,6 +12,7 @@ class Templates {
 	protected $renders;
 	protected $templates;
 	protected $templatesPath;
+	protected $helpers = array();
 
 
 
@@ -39,6 +40,37 @@ class Templates {
 		$this->templatesPath = $path;
 	}
 
+
+	/**
+	 * Register a new helper
+	 * 
+	 * @param string $name The helper name
+	 * @param Closure $helper The function that execute this helper
+	 */
+	public function setHelper ($name, \Closure $helper) {
+		$this->helpers[$name] = $helper;
+	}
+
+
+
+	/**
+	 * Register various helpers
+	 * 
+	 * @param array $helpers The helpers to register
+	 */
+	public function setHelpers (array $helpers) {
+		$this->helpers = array_replace($this->helpers, $helpers);
+	}
+
+
+	/**
+	 * Magic function to execute the registered helpers
+	 */
+	public function __call ($name, $arguments) {
+		if (isset($this->helpers[$name])) {
+			return call_user_func_array($this->helpers[$name], $arguments);
+		}
+	}
 
 
 	/**

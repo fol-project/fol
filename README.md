@@ -7,10 +7,9 @@ Como é algo persoal que non pretende ter moita repercusión (hai miles de frame
 
 Características:
 
-* Super rápido e lixeiro: Só carga as cousas que precisa en cada momento (lazy loader).
+* Rápido e lixeiro.
 * Escrito en PHP 5.4. (Sempre é moito mellor e máis divertido traballar con versións novas que antigas)
-* Lóxica sinxela e fácil de entender.
-* Lévase ben con librarías externas: Calquera libraría que use o estándar PSR-0 non debería dar problemas (e se non o usa, podes definir as rutas manualmente). Ademáis é 100% compatible con Composer.
+* Lévase ben con bibliotecas externas: Calquera bibliotecas que use o estándar PSR-0 non debería dar problemas (e se non o usa, podes definir as rutas manualmente). Ademáis é 100% compatible con Composer.
 
 Por claridade, todas as instancias de clases comezan por maiúscula e o resto de variables en minúscula. Ou sexa:
 
@@ -21,20 +20,14 @@ $request = 'hello';
 $Request->Get->get(); //"Get" é un obxecto e "get" unha funcion (podería ser tamén unha propiedade)
 ```
 
-Cal é a situación actual?
--------------------------
-
-Penso que funciona ben, pero habería que probalo no mundo real, con proxectos reais. Aínda así está en beta ata que non faga algun proxecto con el.
-
 
 Documentación rápida (para saber por onde van os tiros):
 ========================================================
 
-No directorio raíz de FOL existen tres carpetas: web, libs e assets.
+No directorio raíz de FOL existen dúas carpetas: libs e apps
 
 * Na carpeta libs gardaranse as bibliotecas externas, dependencias, etc, que uses nos teus proxectos (Composer xa as vai gardar aí automaticamente), entre elas as propias de Fol (no directorio Fol).
-* Na carpeta web está a aplicación por defecto que forma o sitio web. Ou sexa, o propio código do sitio (plantillas, datos, etc). Podes crear máis aplicacións con outros nomes, gardadas noutras carpetas.
-* Na carpeta assets gárdanse todos os arquivos accesibles directamente dende o navegador (css, js, imaxes, etc). Mentres que a carpeta web ten tamén un directorio "assets", neste caso serían bibliotecas xenéricas que se poderían usar por moitas aplicacións (por exemplo, jquery, bootstrap, backbone, etc). 
+* Na carpeta apps están as aplicacións por defecto que forman o sitio web. Ou sexa, o propio código do sitio (plantillas, datos, etc). Por defecto existe unha aplicación chamada "Web", aínda que podes crear máis aplicacións.
 
 O arquivo bootstrap.php na raíz é o que inicia o framework e define 3 constantes:
 
@@ -42,13 +35,13 @@ O arquivo bootstrap.php na raíz é o que inicia o framework e define 3 constant
 * BASE_PATH: A ruta base onde está aloxado o teu sitio web (ruta interna do servidor). Por exemplo "/var/www/o-meu-sitio/"
 * BASE_URL: A ruta base onde está aloxado o sitio web (ruta http do navegador). Por exemplo se accedemos por http://localhost/o-meu-sitio, o seu valor sería "/o-meu-sitio/"
 
-Ademáis carga as clases Fol\Loader e Fol\Errors, para xestionar a carga de librarías e erros que haxa:
+Ademáis carga as clases Fol\Loader e Fol\Errors, para xestionar a carga de bibliotecas e erros que haxa:
 
 Loader
 ------
 
 Serve para cargar automaticamente o resto de clases empregando o estándar PSR-0. Tamén é compatible co sistema de autoloader de Composer.
-Ademais podemos rexistrar directorios específicos para calquera namespace ou clase concreta. Por exemplo todas as clases que se atopan no namespace App podemos configurar para que as busque na carpeta apps, fora de libraries.
+Ademais podemos rexistrar directorios específicos para calquera namespace ou clase concreta. Por exemplo todas as clases que se atopan no namespace App podemos configurar para que as busque na carpeta apps.
 
 #### Exemplo
 
@@ -78,9 +71,6 @@ As aplicacións manexan o código específico do noso sitio web. Podes meter tod
 * $App->assetsPath: Devolve a ruta onde está aloxada a carpeta de assets no servidor (/www/assets/blog/).
 * $App->assetsUrl: Devolve a url onde está aloxada a carpeta de assets (/assets/blog/)
 
-Todos os frameworks e microframeworks teñen un sistema de enrutamento, que permite especificar as rutas do noso sitio web e que functións (ou controladores) se asignan a cada ruta.
-Fol tamén proporciona esa funcionalidade, pero dun xeito moito máis sinxelo e flexible. Ademáis non forma parte da clase App, senón que é algo externo, polo que permite usar ese sistema ou crear o teu router personalizado (ou pasar de todo e non usar controladores).
-
 Para crear unha nova aplicación, debemos crear un directorio dentro da carpeta apps co nome da nosa aplicación e crear dentro un arquivo chamado App.php co seguinte código:
 
 ```php
@@ -89,29 +79,26 @@ namespace Apps\Blog;
 class App extends \Fol\App {
 
 	public function __construct () {
-		//Codigo para executar no constructor da nosa aplicación (cargar a configuración, instanciar clases básicas, etc)
+		//Contructor da applicación (cargar a configuración, instanciar clases básicas, etc)
 	}
 
 	public function handle ($request) {
-		//Codigo que busca e executa un controlador dependendo do "request"
+		//Función para manexar peticións (por exemplo nun sistema MVC)
 	}
 }
 
 //Agora instanciamos a aplicación:
-$Aplicacion = new Apps\Blog\App();
+$Aplicacion = new \Apps\Blog\App();
 
 //E executamos a aplicación
 $Aplicacion->handle('/blog/view/34');
 ```
 
-Existen ademáis diversos "traits" para extender as funcionalidades das apps (máis adiante explicoo co Router)
-
-
 
 HTTP
-----
+====
 
-Aínda que podes usar calquera outro servizo, Fol contén dunha serie de clases para traballar con Http, é dicir: recoller os "request" ou peticións http e todas as súas variables (cabeceiras, get, post, cookies, files, etc) e xerar "responses" ou respostas. Para iso temos a clase Fol\Http\Request e Fol\Http\Response.
+Fol contén dunha serie de clases para traballar con Http, é dicir: recoller os "request" ou peticións http e todas as súas variables (cabeceiras, get, post, cookies, files, etc) e xerar "responses" ou respostas. Para iso temos a clase Fol\Http\Request e Fol\Http\Response.
 
 Request
 -------
@@ -158,116 +145,4 @@ $Response->setContent('texto de resposta');
 $Response->send();
 ```
 
-Se coñeces o framework Symfony2 verás que o sistema é moi parecido (aínda que máis simplificado)
-
-
-Router
-------
-
-A clase Router sirve para buscar a función (ou controladores) que se ten que executar por cada petición http. É unha clase moi sinxeliña que busca máis a rapidez e comodidade á hora de crear novos controladores (non precisas definir de anteman as rutas) que algo moi completo (e complexo).
-
-A maioría dos frameworks MVC requiren que teñas que especificar que controladores usar en cada url, usando expresións regulares, etc. Neste caso non sería asi. O sistema é moito máis sinxelo, que busca directamente o controlador apropiado dependendo da url actual, sen necesidade de definir nada.
-
-Existe unha clase controlador por defecto que é [app_namespace]\Controllers\Index e logo podes crear ti novas clases con máis controladores. Asi, por exemplo, se a url actual é "blog/post/23", primeiro buscará se pode executar a función [app_namespace]\Controllers\Index::blog('post', 23) e se non se pode, mirará de executar [app_namespace]\Controllers\Blog::post(23). Deste xeito podes crear todas as tuas rutas dentro do controlador Index ou agrupar determinadas rutas noutros controladores.
-
-A clase Router xa se encarga de examinar o controlador e ver se se pode usar ou non. Se a clase non se pode instanciar (p.e. é abstracta), ou a función é privada ou non existen todos os parámetros que se precisan, dará un erro 404 de que a páxina non existe.
-
-Fol trae unha serie de "traits" (unha das novidades de PHP 5.4) para as aplicacións e estan aloxados no namespace Fol\AppsTraits. Un deles é Fol\AppsTraits\SimpleRouter que engade o método "handle" para manexar as peticións e cargar os controladores deste xeito. Polo tanto para poder empregalo deberías definir a túa aplicación deste xeito:
-
-```php
-namespace Apps\Web;
-
-class App extends \Fol\App {
-	use \Fol\AppsTraits\SimpleRouter;
-}
-```
-
-E logo cargala así:
-
-```php
-use Fol\Http\Request;
-
-$Web = new Apps\Web\App();
-
-$Response = $Web->handle(Request::createFromGlobals());
-
-$Response->send();
-```
-
-SimpleRouter tamén analiza a documentación de cada controlador para poder afinar máis cando executar ese controlador ou non. Un exemplo:
-
-```php
-namespace Apps\Web\Controllers;
-
-/**
- * @router method get
- */
-class Saudo {
-
-	/**
-	 * @router method get post
-	 * @router scheme http
-	 * @router ajax true
-	 */
-	public function ola () {
-		echo 'Ola mundo';
-	}
-
-	public function adeus () {
-		echo 'Adeus mundo';
-	}
-}
-```
-
-Este exemplo define un controlador chamado Saudo con dous métodos: ola e adeus. A url "saudo/ola" executará o primeiro método e "saudo/adeus" o segundo.
-Os comentarios que aparecen xusto antes do método "ola" definen que só se executará se estamos chamando a páxina co método GET ou POST, o scheme "http" e por ajax. Se non se cumple algunha desas condicións (chamamos a ese controlador sen ser por ajax, ou usamos https) xeneraríase un erro 404 de páxina non atopada.
-Podes meter comentarios que afecten a todos os métodos metendo comentarios encima da clase. No exemplo definimos que esa clase só funcionan co método GET, polo que nin "ola" nin "adeus" se executarán chamándoos por POST (aínda que "ola" sí permite POST, a clase non o permite polo que non se executa)
-A maneira de facer anotacións nos controladores sempre é igual: comezando polo tag @router seguido do nome da propiedade (method, scheme, ajax, port, ip) e o valor ou valores separados por un espazo
-
-Dentro da carpeta da aplicación, existe a carpeta assets que contén unha subcarpeta chamada "cache" onde se gardarían os arquivos cacheados (arquivos que precisan ser preprocesados antes como por exemplo arquivos less, sass, coffescript, imaxes redimensionadas dinamicamente, etc). A idea é que cando chames por un arquivo cacheado, por exemplo "/web/assets/cache/estilos.css" se ese arquivo non existe redirixa ao arquivo "/web//assets/cache/index.php" que se ocupa de xenerar o arquivo e gardalo con ese nome, polo que a proxima vez que se chame xa existe e non o ten que volver a xenerar. A redireccion faise usando un arquivo .htaccess. Para poder usar isto, temos outro trait de enrutamento chamado Fol\AppsTraits\PreprocessedFileRouter, que serve para preprocesar arquivos (assets). Este trait engade un novo método á applicación chamado "handleFile" e o que fai é coller o controlador [app_namespace]\Controllers\Files e executar o método que se chame igual que a extensión do arquivo preprocesado. Por exemplo:
-
-Engadimos ese trait a maiores na nosa aplicación:
-
-```php
-namespace Apps\Web;
-
-class App extends \Fol\App {
-	use \Fol\AppsTraits\SimpleRouter;
-	use \Fol\AppsTraits\PreprocessedFileRouter;
-}
-```
-
-Definimos un controlador Files para manexar as peticións de arquivos:
-
-```php
-namespace Apps\Web\Controllers;
-
-class Files {
-
-	public function css ($file) {
-		//codigo para preprocesar o arquivo css $file e devolver o resultado
-	}
-
-	public function js () {
-		//codigo para preprocesar o arquivo js $file e devolver o resultado
-	}
-
-	public function jpg () {
-		//codigo para preprocesar o arquivo jpg $file e devolver o resultado
-	}
-}
-```
-
-Logo en /web/assets/cache/index.php (ou sexa o arquivo ao que se redirixe cando queremos cargar un arquivo que non existe en cache), executamos a petición do seguinte modo:
-
-```php
-use Fol\Http\Request;
-
-$Web = new Apps\Web\App();
-
-$Response = $Web->handleFile(Request::createFromGlobals());
-
-$Response->send();
-```
-
-Cando a petición é "/web/assets/cache/estilos.less.css", executa o controlador Apps\Web\Controllers\Files::css('estilos.less.css'); e esa función xa se encargaría de cargar o arquivo orixinal (que sería "/web/assets/estilos.less.css"), procesalo e gardalo en "/web/assets/cache/estilos.less.css", polo que a seguinte vez xa devolvería directamente ese arquivo cacheado sen volver a procesalo (a non ser que esteamos en fase de desenvolvemento polo que podemos facer que se procese en cada petición).
+Se coñeces o framework Symfony2 verás que é moi moi parecido (aínda que moitísimo máis simplificado)
