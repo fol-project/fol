@@ -24,12 +24,13 @@
  */
 namespace Fol\Utils;
 
-trait Model {
+trait MysqlModel {
 	private $_cache;
 
 	protected static $Db;
 	protected static $table;
 	protected static $fields;
+
 
 	/**
 	 * static function to configure the model.
@@ -37,12 +38,17 @@ trait Model {
 	 * 
 	 * @param PDO $Db The database object
 	 * @param string $table The table name used in this model
-	 * @param array $fields The name of all fields of the table
+	 * @param array $fields The name of all fields of the table. If it's not defined, execute a DESCRIBE query
 	 */
-	public static function setDb (\PDO $Db, $table, array $fields) {
+	public static function setDb (\PDO $Db, $table, array $fields = null) {
 		static::$Db = $Db;
 		static::$table = $table;
-		static::$fields = $fields;
+
+		if ($fields === null) {
+			static::$fields = static::$Db->query("DESCRIBE `$table`", \PDO::FETCH_COLUMN, 0)->fetchAll();
+		} else {
+			static::$fields = $fields;
+		}
 	}
 
 	
@@ -187,15 +193,19 @@ trait Model {
 		$data = array();
 
 		foreach (static::$fields as $field) {
-			if (isset($this->$field)) {
-				$data[$field] = $this->$field;
-			}
+			$data[$field] = isset($this->$field) ? $this->$field : null;
 		}
 
 		unset($data['id']);
 
 		if (($data = $this->prepareToSave($data)) === false) {
 			return false;
+		}
+
+		foreach ($data as $field => $value) {
+			if ($value === null) {
+				unset($data[$field]);
+			}
 		}
 
 		//Insert
