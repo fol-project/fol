@@ -21,8 +21,8 @@ $Request->Get->get(); //"Get" é un obxecto e "get" unha funcion (podería ser t
 ```
 
 
-Documentación rápida (para saber por onde van os tiros):
-========================================================
+Documentación rápida
+====================
 
 No directorio raíz de FOL existen dúas carpetas: libs e apps
 
