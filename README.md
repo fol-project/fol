@@ -3,7 +3,7 @@ Aqui tes o FOL
 (o resto da gaita xa é cousa túa)
 
 FOL é framework escrito en PHP por Oscar Otero (http://oscarotero.com) como exercicio de deseño e como ferramenta para desenvolver experimentos e proxectos persoais. A intención é ter algo manexable, moi flexible e que permita xuntar librerías externas. Vamos, un microframework.
-Como é algo persoal que non pretende ter moita repercusión (hai miles de frameworks en PHP), escribo a documentación en galego por comodidade e por se alguen máis daquí lle interesa o proxecto. Aínda así, a documentación básica que hai en forma de comentarios no código está en inglés (cutre, of course).
+Como é algo persoal que non pretende ter moita repercusión (hai miles de frameworks en PHP), escribo a documentación en galego por comodidade e por se alguen máis daquí lle interesa o proxecto. Aínda así, a documentación básica que hai en forma de comentarios no código está en inglés (ou algo parecido).
 
 Características:
 
@@ -11,7 +11,7 @@ Características:
 * Escrito en PHP 5.4. (Sempre é moito mellor e máis divertido traballar con versións novas que antigas)
 * Lévase ben con bibliotecas externas: Calquera bibliotecas que use o estándar PSR-0 non debería dar problemas (e se non o usa, podes definir as rutas manualmente). Ademáis é 100% compatible con Composer.
 
-Por claridade, todas as instancias de clases comezan por maiúscula e o resto de variables en minúscula. Ou sexa:
+Por claridade, todas as instancias de clases comezan por maiúscula e o resto de variables en minúscula (camelCase). Ou sexa:
 
 ```php
 $Request = new Request();
@@ -26,7 +26,7 @@ Documentación rápida
 
 No directorio raíz de FOL existen dúas carpetas: libs e apps
 
-* Na carpeta libs gardaranse as bibliotecas externas, dependencias, etc, que uses nos teus proxectos (Composer xa as vai gardar aí automaticamente), entre elas as propias de Fol (no directorio Fol).
+* Na carpeta libs gardaranse as bibliotecas externas, dependencias, etc, que uses nos teus proxectos (Podelas instalar con Composer ou manualmente). Tamén se atopan as propias bibliotecas de Fol.
 * Na carpeta apps están as aplicacións por defecto que forman o sitio web. Ou sexa, o propio código do sitio (plantillas, datos, etc). Por defecto existe unha aplicación chamada "Web", aínda que podes crear máis aplicacións.
 
 O arquivo bootstrap.php na raíz é o que inicia o framework e define 3 constantes:
@@ -94,6 +94,11 @@ $Aplicacion = new \Apps\Blog\App();
 $Aplicacion->handle('/blog/view/34');
 ```
 
+Ten en conta que as aplicacións se cargan co estándar PSR-0, igual que calquera outra biblioteca. A única diferencia é que se aloxan na carpeta apps, en vez de libs. Polo tanto, a aplicación \Apps\Blog\App, estaría no arquivo apps/Blog/App.php. Se queres aloxar as aplicacións noutro directorio distinto, só tes que configurar a clase Loader para que busque o namespace "Apps" noutro directorio distinto. Esa configuración atópase en bootstrap.php, na raíz:
+
+```php
+Loader::registerNamespace('Apps', BASE_PATH.'myNewAppsDirectory');
+```
 
 HTTP
 ====

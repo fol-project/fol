@@ -140,7 +140,7 @@ class Config {
 		}
 
 		if (!isset($this->items[$name])) {
-			$this->items[$name] = $this->load($name);
+			$this->items[$name] = $this->read($name);
 		}
 
 		return $this->items[$name];

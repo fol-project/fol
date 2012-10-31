@@ -46,13 +46,8 @@ abstract class App {
 		}
 
 		//The assets app url (/web/assets/)
-		if ($name === 'assets') {
+		if ($name === 'assetsUrl') {
 			return $this->assetsUrl = BASE_URL.preg_replace('|^'.BASE_PATH.'|', '', $this->path).'assets/';
-		}
-
-		//The assets library (/assets/)
-		if ($name === 'assetsLibs') {
-			return BASE_URL.'assets/';
 		}
 	}
 
