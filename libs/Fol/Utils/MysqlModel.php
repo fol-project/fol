@@ -25,7 +25,8 @@
 namespace Fol\Utils;
 
 trait MysqlModel {
-	private $_cache;
+	private $_cache = array();
+	private $_error;
 
 	protected static $Db;
 	protected static $table;
@@ -43,15 +44,84 @@ trait MysqlModel {
 	public static function setDb (\PDO $Db, $table, array $fields = null) {
 		static::$Db = $Db;
 		static::$table = $table;
+		static::$fields = $fields;
+	}
 
-		if ($fields === null) {
-			static::$fields = static::$Db->query("DESCRIBE `$table`", \PDO::FETCH_COLUMN, 0)->fetchAll();
-		} else {
-			static::$fields = $fields;
+
+	/**
+	 * static function to return all available fields of this model
+	 * 
+	 * @return array The database fields names of this model
+	 */
+	public static function getFields () {
+		if (static::$fields === null) {
+			$table = static::$table;
+			return static::$fields = static::$Db->query("DESCRIBE `$table`", \PDO::FETCH_COLUMN, 0)->fetchAll();
+		}
+
+		return static::$fields;
+	}
+
+
+	/**
+	 * returns the model queries ready to use in a mysql query
+	 * This function is useful to "import" a model inside another, you just have to include the fields names of the model.
+	 * 
+	 * Example:
+	 * $fieldsQuery = User::getQueryFields();
+	 * $posts = Post::select("posts.*, $fieldsQuery FROM posts, users WHERE posts.author = users.id");
+	 * $posts[0]->User //The user model inside the post
+	 * 
+	 * @param string $name The name of the parameter used to the sub-model. If it's not defined, uses the model class name (without the namespace)
+	 * 
+	 * @return string The portion of mysql code with the fields names
+	 */
+	public static function getQueryFields ($name = null) {
+		$table = static::$table;
+		$fields = array();
+		$class = get_called_class();
+
+		if ($name === null) {
+			$name = (($pos = strrpos($class, '\\')) === false) ? $class : substr($class, $pos + 1);
+		}
+
+		foreach (static::getFields() as $field) {
+			$fields[] = "`$table`.`$field` as `$class::$name::$field`";
+		}
+
+		return implode(', ', $fields);
+	}
+
+
+	/**
+	 * Constructor class that executes automatically the resolveFields method
+	 */
+	public function __construct () {
+		$this->resolveFields();
+	}
+
+
+	/**
+	 * Resolve the fields included using the getQueryFields method
+	 */
+	public function resolveFields () {
+		$extracted = array();
+
+		foreach ($this as $key => $value) {
+			if (strpos($key, '::') !== false) {
+				list($class, $name, $field) = explode('::', $key, 3);
+
+				if (!isset($this->$name)) {
+					$this->$name = new $class();
+				}
+
+				$this->$name->$field = $value;
+				unset($this->$key);
+			}
 		}
 	}
 
-	
+
 	/**
 	 * Execute a selection and returns an array with the models result
 	 * 
@@ -65,10 +135,13 @@ trait MysqlModel {
 	 * 
 	 * @return array The result of the query or false if there was an error
 	 */
-	public static function select ($query = null, array $marks = null) {
-		$table = static::$table;
+	public static function select ($query = '', array $marks = null) {
+		if (stripos($query, ' FROM ') === false) {
+			$table = static::$table;
+			$query = "* FROM `$table` $query";
+		}
 
-		$Query = static::$Db->prepare("SELECT * FROM `$table` $query");
+		$Query = static::$Db->prepare("SELECT $query");
 		$Query->execute($marks);
 
 		return $Query->fetchAll(\PDO::FETCH_CLASS, get_called_class());
@@ -87,7 +160,11 @@ trait MysqlModel {
 	 * @return object The result of the query or false if there was an error
 	 */
 	public static function selectOne ($query = null, array $marks = null) {
-		return current(static::select("$query LIMIT 1", $marks));
+		if (stripos($query, 'LIMIT ') === false) {
+			$query .= ' LIMIT 1';
+		}
+
+		return current(static::select($query, $marks));
 	}
 
 
@@ -131,9 +208,15 @@ trait MysqlModel {
 	 * $Item->getColor('blue'); //Don't execute the selection again, returns the cached result
 	 */
 	public function __call ($name, $arguments) {
-		$key = $name.implode($arguments);
+		$key = array();
 
-		if (isset($this->_cache[$key])) {
+		foreach ($arguments as $argument) {
+			$key[] = is_object($argument) ? spl_object_hash($argument) : $argument;
+		}
+
+		$key = $name.implode($key);
+
+		if (array_key_exists($key, $this->_cache)) {
 			return $this->_cache[$key];
 		}
 
@@ -142,6 +225,8 @@ trait MysqlModel {
 		if (method_exists($this, $method)) {
 			return $this->_cache[$key] = call_user_func_array(array($this, $method), $arguments);
 		}
+
+		throw new \Exception("The function $name is not defined");
 	}
 
 	
@@ -170,12 +255,24 @@ trait MysqlModel {
 	 * @param array $data The new data
 	 */
 	public function edit (array $data) {
+		$fields = static::getFields();
+
 		foreach ($data as $field => $value) {
-			if (!in_array($field, static::$fields)) {
+			if (!in_array($field, $fields)) {
 				throw new \Exception("The field '$field' does not exists");
 			}
 
 			$this->$field = $value;
+		}
+	}
+
+
+	/**
+	 * Deletes the properties of the model (but not in the database)
+	 */
+	public function clean () {
+		foreach (static::getFields() as $field) {
+			unset($this->$field);
 		}
 	}
 
@@ -192,7 +289,7 @@ trait MysqlModel {
 
 		$data = array();
 
-		foreach (static::$fields as $field) {
+		foreach (static::getFields() as $field) {
 			$data[$field] = isset($this->$field) ? $this->$field : null;
 		}
 
@@ -219,6 +316,8 @@ trait MysqlModel {
 
 			if ($result === true) {
 				$this->id = static::$Db->lastInsertId();
+			} else {
+				$this->_error = static::$Db->errorInfo();
 			}
 
 		//Update
@@ -234,10 +333,34 @@ trait MysqlModel {
 			$set = implode(', ', $set);
 
 			$Query = static::$Db->prepare("UPDATE `$table` SET $set WHERE id = $id LIMIT 1");
-			$result = $Query->execute(array_values($data));
+
+			if (($result = $Query->execute(array_values($data))) === false) {
+				$this->_error = static::$Db->errorInfo();
+			}
 		}
 
 		return $result;
+	}
+
+
+	/**
+	 * Deletes the current row in the database (but keep the data in the object)
+	 * 
+	 * @return boolean True if the register is deleted, false if any error happened
+	 */
+	public function delete () {
+		if (!empty($this->id)) {
+			$table = static::$table;
+			$id = intval($this->id);
+
+			if (static::$Db->exec("DELETE FROM `$table` WHERE id = $id LIMIT 1") !== false) {
+				$this->id = null;
+
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 
@@ -251,6 +374,16 @@ trait MysqlModel {
 	 */
 	public function prepareToSave (array $data) {
 		return $data;
+	}
+
+
+	/**
+	 * Return the last mysql error
+	 * 
+	 * @return array The error info or null
+	 */
+	public function getError () {
+		return $this->_error;
 	}
 }
 ?>
