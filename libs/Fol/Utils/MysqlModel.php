@@ -105,19 +105,24 @@ trait MysqlModel {
 	 * Resolve the fields included using the getQueryFields method
 	 */
 	public function resolveFields () {
-		$extracted = array();
+		$fields = array();
 
 		foreach ($this as $key => $value) {
 			if (strpos($key, '::') !== false) {
 				list($class, $name, $field) = explode('::', $key, 3);
 
 				if (!isset($this->$name)) {
-					$this->$name = new $class();
+					$fields[] = $name;
+					$this->$name = (new \ReflectionClass($class))->newInstanceWithoutConstructor();
 				}
 
 				$this->$name->$field = $value;
 				unset($this->$key);
 			}
+		}
+
+		foreach ($fields as $name) {
+			$this->$name->__construct();
 		}
 	}
 
