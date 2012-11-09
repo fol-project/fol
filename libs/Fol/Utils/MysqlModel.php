@@ -26,11 +26,11 @@ namespace Fol\Utils;
 
 trait MysqlModel {
 	private $_cache = array();
-	private $_error;
 
 	protected static $Db;
 	protected static $table;
 	protected static $fields;
+
 
 
 	/**
@@ -86,7 +86,7 @@ trait MysqlModel {
 		}
 
 		foreach (static::getFields() as $field) {
-			$fields[] = "`$table`.`$field` as `$class::$name::$field`";
+			$fields[] = "`$table`.`$field` as `$class::$field::$name`";
 		}
 
 		return implode(', ', $fields);
@@ -109,7 +109,7 @@ trait MysqlModel {
 
 		foreach ($this as $key => $value) {
 			if (strpos($key, '::') !== false) {
-				list($class, $name, $field) = explode('::', $key, 3);
+				list($class, $field, $name) = explode('::', $key, 3);
 
 				if (!isset($this->$name)) {
 					$fields[] = $name;
@@ -310,41 +310,38 @@ trait MysqlModel {
 			}
 		}
 
+		$table = static::$table;
+
 		//Insert
 		if (empty($this->id)) {
-			$table = static::$table;
 			$fields = implode(', ', array_keys($data));
 			$marks = implode(', ', array_fill(0, count($data), '?'));
 
 			$Query = static::$Db->prepare("INSERT INTO `$table` ($fields) VALUES ($marks)");
-			$result = $Query->execute(array_values($data));
 
-			if ($result === true) {
-				$this->id = static::$Db->lastInsertId();
-			} else {
-				$this->_error = static::$Db->errorInfo();
+			if ($Query->execute(array_values($data)) === false) {
+				var_dump($Query->errorInfo());
+				return false;
 			}
+			
+			$this->id = static::$Db->lastInsertId();
 
-		//Update
-		} else {
-			$table = static::$table;
-			$set = array();
-			$id = intval($this->id);
-
-			foreach ($data as $field => $value) {
-				$set[] = "`$field` = ?";
-			}
-
-			$set = implode(', ', $set);
-
-			$Query = static::$Db->prepare("UPDATE `$table` SET $set WHERE id = $id LIMIT 1");
-
-			if (($result = $Query->execute(array_values($data))) === false) {
-				$this->_error = static::$Db->errorInfo();
-			}
+			return true;
 		}
 
-		return $result;
+		//Update
+		$set = array();
+		$id = intval($this->id);
+
+		foreach ($data as $field => $value) {
+			$set[] = "`$field` = ?";
+		}
+
+		$set = implode(', ', $set);
+
+		$Query = static::$Db->prepare("UPDATE `$table` SET $set WHERE id = $id LIMIT 1");
+
+		return $Query->execute(array_values($data));
 	}
 
 
@@ -379,16 +376,6 @@ trait MysqlModel {
 	 */
 	public function prepareToSave (array $data) {
 		return $data;
-	}
-
-
-	/**
-	 * Return the last mysql error
-	 * 
-	 * @return array The error info or null
-	 */
-	public function getError () {
-		return $this->_error;
 	}
 }
 ?>
