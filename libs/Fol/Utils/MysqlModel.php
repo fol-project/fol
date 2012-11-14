@@ -63,6 +63,38 @@ trait MysqlModel {
 	}
 
 
+	static private function generateSelectQuery (array $query) {
+		$string = 'SELECT '.(isset($query['SELECT']) ? implode(', ', (array)$query['SELECT']) : '*');
+		$string .= ' FROM '.implode(', ', (array)$query['FROM']);
+
+		if (isset($query['LEFT JOIN'])) {
+			$string .= ' LEFT JOIN '.$query['LEFT JOIN'];
+		}
+
+		if (isset($query['INNER JOIN'])) {
+			$string .= ' INNER JOIN '.$query['INNER JOIN'];
+		}
+
+		if (isset($query['WHERE'])) {
+			$string .= ' WHERE '.implode(' AND ', (array)$query['WHERE']);
+		}
+
+		if (isset($query['GROUP BY'])) {
+			$string .= ' GROUP BY '.implode(', ', (array)$query['GROUP BY']);
+		}
+
+		if (isset($query['ORDER BY'])) {
+			$string .= ' ORDER BY '.implode(', ', (array)$query['ORDER BY']);
+		}
+
+		if (isset($query['LIMIT'])) {
+			$string .= ' LIMIT '.implode(', ', (array)$query['LIMIT']);
+		}
+
+		return $string;
+	}
+
+
 	/**
 	 * returns the model queries ready to use in a mysql query
 	 * This function is useful to "import" a model inside another, you just have to include the fields names of the model.
@@ -95,8 +127,15 @@ trait MysqlModel {
 
 	/**
 	 * Constructor class that executes automatically the resolveFields method
+	 * and ensure all parameteres are initialized
 	 */
 	public function __construct () {
+		foreach (static::getFields() as $field) {
+			if (!isset($this->$field)) {
+				$this->$field = null;
+			}
+		}
+
 		$this->resolveFields();
 	}
 
@@ -141,12 +180,22 @@ trait MysqlModel {
 	 * @return array The result of the query or false if there was an error
 	 */
 	public static function select ($query = '', array $marks = null) {
-		if (stripos($query, ' FROM ') === false) {
-			$table = static::$table;
-			$query = "* FROM `$table` $query";
+		if (is_array($query)) {
+			if (!isset($query['SELECT'])) {
+				$query['SELECT'] = array('*');
+			}
+			if (!isset($query['FROM'])) {
+				$query['FROM'] = array($table);
+			}
+
+			$query = self::generateSelectQuery($query);
+		} else if (stripos($query, ' FROM ') === false) {
+			$query = 'SELECT * FROM `'.static::$table.'` '.$query;
+		} else {
+			$query = "SELECT $query";
 		}
 
-		$Query = static::$Db->prepare("SELECT $query");
+		$Query = static::$Db->prepare($query);
 		$Query->execute($marks);
 
 		return $Query->fetchAll(\PDO::FETCH_CLASS, get_called_class());
@@ -165,7 +214,11 @@ trait MysqlModel {
 	 * @return object The result of the query or false if there was an error
 	 */
 	public static function selectOne ($query = null, array $marks = null) {
-		if (stripos($query, 'LIMIT ') === false) {
+		if (is_array($query)) {
+			if (!isset($query['LIMIT'])) {
+				$query['LIMIT'] = 1;
+			}
+		} else if (stripos($query, ' LIMIT ') === false) {
 			$query .= ' LIMIT 1';
 		}
 
@@ -277,7 +330,7 @@ trait MysqlModel {
 	 */
 	public function clean () {
 		foreach (static::getFields() as $field) {
-			unset($this->$field);
+			$this->$field = null;
 		}
 	}
 
