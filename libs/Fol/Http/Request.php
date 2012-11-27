@@ -408,6 +408,17 @@ class Request {
 	}
 
 
+
+	/**
+	 * Gets the request host
+	 * 
+	 * @return string The request host
+	 */
+	public function getHost () {
+		return $this->Server->get('HTTP_HOST');
+	}
+
+
 	
 	/**
 	 * Gets the port on which the request is made
