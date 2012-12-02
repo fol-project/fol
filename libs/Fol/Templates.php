@@ -11,7 +11,7 @@ use Fol\Container;
 class Templates {
 	protected $renders;
 	protected $templates;
-	protected $templatesPath;
+	protected $templatesPath = array();
 	protected $helpers = array();
 
 
@@ -19,26 +19,36 @@ class Templates {
 	/**
 	 * Constructor method. You must define the base folder where the templates file are stored
 	 * 
-	 * @param string $path The base folder path
+	 * @param string/array $paths The base folder paths
 	 */
-	public function __construct ($path) {
-		$this->setFolder($path);
+	public function __construct ($paths) {
+		$this->addFolders($paths);
 	}
 
 
 
 	/**
-	 * Defines the base folder where the templates files are stored
+	 * Adds new base folders where search for the templates files
 	 * 
-	 * @param string $path The base folder path
+	 * @param string/array $paths The base folder paths
+	 * @param boolean $prepend If it's true, insert the new folder at begining of the array.
 	 */
-	public function setFolder ($path) {
-		if (substr($path, -1) !== '/') {
-			$path .= '/';
+	public function addFolders ($paths, $prepend = true) {
+		$paths = (array)$paths;
+
+		foreach ($paths as &$path) {
+			if (substr($path, -1) !== '/') {
+				$path .= '/';
+			}
 		}
 
-		$this->templatesPath = $path;
+		if ($prepend === true) {
+			$this->templatesPath = array_merge($paths, $this->templatesPath);
+		} else {
+			$this->templatesPath = array_merge($this->templatesPath, $paths);
+		}
 	}
+
 
 
 	/**
@@ -63,6 +73,7 @@ class Templates {
 	}
 
 
+
 	/**
 	 * Magic function to execute the registered helpers
 	 */
@@ -71,6 +82,7 @@ class Templates {
 			return call_user_func_array($this->helpers[$name], $arguments);
 		}
 	}
+
 
 
 	/**
@@ -122,10 +134,10 @@ class Templates {
 			$template = $this->templates[$template];
 		}
 
-		$template = $this->templatesPath.$template;
-
-		if (is_file($template)) {
-			return $template;
+		foreach ($this->templatesPath as $path) {
+			if (is_file($path.$template)) {
+				return $path.$template;
+			}
 		}
 
 		return false;
