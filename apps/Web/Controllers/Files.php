@@ -6,11 +6,6 @@ use Fol\Http\Response;
 class Files {
 	private $cache = true;
 
-	public function __construct ($App, $Request) {
-		$this->App = $App;
-		$this->Request = $Request;
-	}
-
 	public function error ($Exception) {
 		return new Response($Exception->getMessage(), $Exception->getCode() ?: 500);
 	}

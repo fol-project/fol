@@ -53,7 +53,7 @@ trait Router {
 			if ($controller === false) {
 				throw new HttpException(Headers::$status[404], 404);
 			} else {
-				$Response = HttpRouter::executeController($controller, array($this, $Request));
+				$Response = HttpRouter::executeController($controller, array('App' => $this, 'Request' => $Request));
 			}
 		} catch (HttpException $Exception) {
 			$controller = false;
@@ -89,7 +89,7 @@ trait Router {
 			if ($controller === false) {
 				$Response = new Response($Exception->getMessage(), $Exception->getCode() ?: null);
 			} else {
-				$Response = HttpRouter::executeController($controller, array($this, $Request));
+				$Response = HttpRouter::executeController($controller, array('App' => $this, 'Request' => $Request));
 			}
 		}
 

@@ -219,14 +219,28 @@ class Router {
 	 * 
 	 * @return Fol\Http\Response The response of the controller
 	 */
-	static public function executeController (array $controller = null, array $constructor_parameters = null) {
+	static public function executeController (array $controller = null, array $properties = null, array $constructor_args = null) {
 		ob_start();
 
 		list($Class, $Method, $arguments) = $controller;
 
-		$class = isset($constructor_parameters) ? $Class->newInstanceArgs($constructor_parameters) : $Class->newInstance();
+		$Controller = $Class->newInstanceWithoutConstructor();
 
-		$Response = $Method->invokeArgs($class, $arguments);
+		if ($properties !== null) {
+			foreach ($properties as $name => $value) {
+				$Controller->$name = $value;
+			}
+		}
+
+		if (($Constructor = $Class->getConstructor()) !== null) {
+			if ($constructor_args === null) {
+				$Constructor->invoke($Controller);
+			} else {
+				$Constructor->invokeArgs($Controller, $constructor_args);
+			}
+		}
+
+		$Response = $Method->invokeArgs($Controller, $arguments);
 
 		if (!($Response instanceof Response)) {
 			$Response = new Response($Response);

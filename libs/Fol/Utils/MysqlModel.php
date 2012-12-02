@@ -242,7 +242,7 @@ trait MysqlModel {
 
 
 	/**
-	 * Magic method to make selections and save the result in the cache.
+	 * Magic method to execute functions and save the result in the cache.
 	 * You must define a method started by "_".
 	 * 
 	 * Example:
@@ -285,6 +285,29 @@ trait MysqlModel {
 		}
 
 		throw new \Exception("The function $name is not defined");
+	}
+
+
+	/**
+	 * Magic method to execute 'get' functions and save the result in a property.
+	 * 
+	 * Example:
+	 * MyMethod {
+	 * 	use Fol\Utils\Model;
+	 * 
+	 * 	getColors () {
+	 * 		return static::DB->query('SELECT * FROM colors');
+	 * 	}
+	 * 
+	 * $Item = new MyMethod;
+	 * $Item->colors; //Execute the method "getColors" and save the result in the property colors
+	 */
+	public function __get ($name) {
+		$method = "get$name";
+
+		if (method_exists($this, $method) || method_exists($this, '_'.$method)) {
+			return $this->$name = $this->$method();
+		}
 	}
 
 	

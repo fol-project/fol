@@ -37,7 +37,7 @@ trait FileRouter {
 			if ($controller === false) {
 				throw new HttpException('File cannot be preprocessed', 500);
 			} else {
-				$Response = HttpRouter::executeController($controller, array($this, $Request));
+				$Response = HttpRouter::executeController($controller, array('App' => $this, 'Request' => $Request));
 			}
 		} catch (HttpException $Exception) {
 			$Response = new Response($Exception->getMessage(), $Exception->getCode());
