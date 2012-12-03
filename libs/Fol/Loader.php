@@ -83,10 +83,6 @@ class Loader {
 			return self::$classes[$class_name];
 		}
 
-		if (isset(self::$Composer) && ($file = self::$Composer->findFile($class_name))) {
-			return $file;
-		}
-
 		$namespace = '';
 
 		if (($last_pos = strripos($class_name, '\\')) !== false) {
@@ -169,33 +165,17 @@ class Loader {
 
 	/**
 	 * Register the composer autoloader
-	 * Search in the libraries path for the composer directory, loads autoloader and adds the namespaces and classmap.
 	 */
 	static function registerComposer () {
 		if (isset(self::$Composer)) {
 			return;
 		}
 
-		if (!is_file(self::$libraries_path.'composer/ClassLoader.php')) {
-			return;
+		$file = self::$libraries_path.'autoload.php';
+
+		if (is_readable($file)) {
+			self::$Composer = include_once(self::$libraries_path.'autoload.php');
 		}
-
-		self::registerClass('Composer\Autoload\ClassLoader', self::$libraries_path.'composer/ClassLoader.php');
-
-		$Composer = new \Composer\Autoload\ClassLoader();
-
-		$namespaces = include(self::$libraries_path.'composer/autoload_namespaces.php');
-		$classMap = include(self::$libraries_path.'composer/autoload_classmap.php');
-
-		foreach ($namespaces as $namespace => $path) {
-			$Composer->add($namespace, $path);
-		}
-
-		if ($classMap) {
-			$Composer->addClassMap($classMap);
-		}
-
-		self::$Composer = $Composer;
 	}
 }
 ?>
