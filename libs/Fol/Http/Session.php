@@ -215,5 +215,59 @@ class Session {
 	public function exists ($name) {
 		return array_key_exists($name, $_SESSION);
 	}
+
+
+	/**
+	 * Get a flash value (read only once)
+	 * 
+	 * @param string $name The value name. If it is not defined, returns all stored variables
+	 * @param string $default A default value in case the variable is not defined
+	 * 
+	 * @return string The value of the variable or the default value.
+	 * @return array All stored variables in case no name is defined.
+	 */
+	public function getFlash ($name = null, $default = null) {
+		if ($name === null) {
+			return isset($_SESSION['_flash']) ? $_SESSION['_flash'] : array();
+		}
+
+		if (isset($_SESSION['_flash'][$name])) {
+			$default = $_SESSION['_flash'][$name];
+			unset($_SESSION['_flash'][$name]);
+		}
+
+		return $default;
+	}
+
+
+	/**
+	 * Set a new flash value
+	 * 
+	 * @param string/array $name The variable name or an array of variables
+	 * @param string $value The value of the variable
+	 */
+	public function setFlash ($name, $value = null) {
+		if (!isset($_SESSION['_flash'])) {
+			$_SESSION['_flash'] = array();
+		}
+
+		if (is_array($name)) {
+			$_SESSION['_flash'] = array_replace($_SESSION['_flash'], $name);
+		} else {
+			$_SESSION['_flash'][$name] = $value;
+		}
+	}
+
+
+	/**
+	 * Check if a flash variable is defined or not (but does not remove it)
+	 * 
+	 * @param string $name The variable name.
+	 * 
+	 * @return boolean True if it's defined, false if not
+	 */
+	public function existsFlash ($name) {
+		return (isset($_SESSION['_flash']) && array_key_exists($name, $_SESSION['_flash']));
+	}
 }
 ?>

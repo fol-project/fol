@@ -374,11 +374,11 @@ trait MysqlModel {
 			$data[$field] = isset($this->$field) ? $this->$field : null;
 		}
 
-		unset($data['id']);
-
 		if (($data = $this->prepareToSave($data)) === false) {
 			return false;
 		}
+
+		unset($data['id']);
 
 		foreach ($data as $field => $value) {
 			if ($value === null) {
