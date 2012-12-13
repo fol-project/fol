@@ -34,7 +34,13 @@ trait Events {
 	 * @param callable $callback The event callback
 	 */
 	public function on ($name, callable $callback) {
-		$this->events[$name] = $callback;
+		if (is_array($name)) {
+			foreach ($name as $name) {
+				$this->events[$name] = $callback;
+			}
+		} else {
+			$this->events[$name] = $callback;
+		}
 	}
 
 

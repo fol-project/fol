@@ -11,7 +11,7 @@
  * 
  * $User = new User();
  * 
- * $User->setPermission('write', function ($User, $Post) {
+ * $User->setPermission('write', function ($Post) use ($User) {
  * 	if ($Post->author === $User->id) {
  * 		return true;
  * 	}
@@ -74,10 +74,7 @@ trait Acl {
 		}
 
 		if (is_callable($this->permissions[$permission])) {
-			$arguments = array_slice(func_get_args(), 1);
-			array_unshift($arguments, $this);
-
-			return call_user_func_array($this->permissions[$permission], $arguments);
+			return call_user_func_array($this->permissions[$permission], func_get_args());
 		}
 
 		return (bool)$this->permissions[$permission];
