@@ -16,7 +16,7 @@
 namespace Fol\Utils;
 
 trait UploadsModel {
-	protected static $uploads;
+	protected static $uploadsPath;
 
 
 	/**
@@ -25,7 +25,7 @@ trait UploadsModel {
 	 * @param string $folder The folder path
 	 */
 	public static function setUploadsFolder ($folder) {
-		static::$uploads = $folder;
+		static::$uploadsPath = $folder;
 	}
 
 
@@ -71,7 +71,7 @@ trait UploadsModel {
 				$filename .= ".$extension";
 			}
 
-			$destination = static::$uploads.$path.$filename;
+			$destination = static::$uploadsPath.$path.$filename;
 
 			if (!rename($file['tmp_name'], $destination)) {
 				return false;
@@ -103,7 +103,7 @@ trait UploadsModel {
 				$filename .= ".$extension";
 			}
 
-			$destination = static::$uploads.$path.$filename;
+			$destination = static::$uploadsPath.$path.$filename;
 
 			try {
 				$content = file_get_contents($file);

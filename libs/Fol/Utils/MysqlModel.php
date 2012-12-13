@@ -41,9 +41,9 @@ trait MysqlModel {
 	 * @param string $table The table name used in this model
 	 * @param array $fields The name of all fields of the table. If it's not defined, execute a DESCRIBE query
 	 */
-	public static function setDb (\PDO $Db, $table, array $fields = null) {
+	public static function setDb (\PDO $Db, $table = null, array $fields = null) {
 		static::$Db = $Db;
-		static::$table = $table;
+		static::$table = ($table === null) ? strtolower(substr(strrchr(get_called_class(), '\\'), 1)) : $table;
 		static::$fields = $fields;
 	}
 
