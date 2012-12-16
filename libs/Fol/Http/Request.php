@@ -65,8 +65,7 @@ class Request {
 		$components = parse_url($url);
 
 		if (isset($components['host'])) {
-			$defaults['SERVER_NAME'] = $components['host'];
-			$defaults['HTTP_HOST'] = $components['host'];
+			$defaults['SERVER_NAME'] = $defaults['HTTP_HOST'] = $components['host'];
 		}
 
 		if (isset($components['scheme']) && ($components['scheme'] === 'https')) {
@@ -193,19 +192,40 @@ class Request {
 	}
 
 
+
 	/**
-	 * Gets the current path in full version (with BASE_URL included and optional format)
+	 * Returns the full url
 	 * 
-	 * @param boolean $format Set true to return also the format as the extension.
+	 * @param boolean $absolute True to return the absolute url (with scheme and host)
+	 * @param boolean $format True to add the format of the request at the end of the path
+	 * @param boolean $query True to add the query to the url (false by default)
 	 * 
-	 * @return string The path
+	 * @return string The current url
 	 */
-	public function getFullPath ($format = false) {
-		if ($format === true && $this->format) {
-			return BASE_URL.$this->path.'.'.$this->format;
+	public function getUrl ($absolute = true, $format = true, $query = false) {
+		$url = '';
+
+		if ($absolute === true) {
+			$url .= $this->getScheme().'://';
+
+			if ($this->getPort() !== 80) {
+				$url .= $this->getPort().':';
+			}
+
+			$url .= $this->getHost();
+		}
+		
+		$url .= BASE_URL.$this->getPath();
+
+		if (($format === true) && ($format = $this->getFormat())) {
+			$url .= '.'.$format;
 		}
 
-		return BASE_URL.$this->path;
+		if (($query === true) && ($query = $this->Get->get())) {
+			$url .= '?'.http_build_query($query);
+		}
+
+		return $url;
 	}
 
 
@@ -329,25 +349,6 @@ class Request {
 	 */
 	public function get ($name, $default = null) {
 		return $this->Post->get($name, $this->Files->get($name, $this->Get->get($name, $this->Parameters->get($name, $default))));
-	}
-
-
-
-	/**
-	 * Gets the GET variables as a string
-	 * 
-	 * Example:
-	 * $request->Get->get() Returns array('page' => 1, 'sort' => 'title')
-	 * $request->getQueryString() Returns page=1&sort=title
-	 * 
-	 * @return string The GET query string or an empty string
-	 */
-	public function getQueryString () {
-		if (($query = $this->Get->get())) {
-			return http_build_query($query);
-		}
-
-		return '';
 	}
 
 
