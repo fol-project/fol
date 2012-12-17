@@ -185,7 +185,7 @@ trait MysqlModel {
 				$query['SELECT'] = array('*');
 			}
 			if (!isset($query['FROM'])) {
-				$query['FROM'] = array($table);
+				$query['FROM'] = array(static::$table);
 			}
 
 			$query = self::generateSelectQuery($query);
