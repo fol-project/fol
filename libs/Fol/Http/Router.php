@@ -28,25 +28,62 @@ class Router {
 	static public function getController (\Fol\App $App, Request $Request) {
 		$segments = $Request->getPathSegments($App->url);
 
-		$class = $App->namespace.'\\Controllers\\Index';
-		$method = $segments ? lcfirst(str_replace(' ', '', ucwords(strtolower(str_replace('-', ' ', $segments[0]))))) : 'index';
-		$controller = self::checkController($Request, $class, $method, array_slice($segments, 1));
+		$arguments = $segments;
+		$controller = self::checkController($Request, $App->namespace.'\\Controllers\\Index', ($arguments ? array_shift($arguments) : 'index'));
 
-		if (isset($controller[1])) {
+		if ($controller !== false) {
+			$controller[2] = $arguments;
+
 			return $controller;
 		}
 
 		if ($segments) {
 			$class = $App->namespace.'\\Controllers\\'.str_replace(' ', '', ucwords(strtolower(str_replace('-', ' ', array_shift($segments)))));
-			$method = $segments ? lcfirst(str_replace(' ', '', ucwords(strtolower(str_replace('-', ' ', array_shift($segments)))))) : 'index';
-			$controller = self::checkController($Request, $class, $method, $segments);
+			$controller = self::checkController($Request, $class, ($segments ? array_shift($segments) : 'index'));
 
-			if (isset($controller[1])) {
+			if ($controller !== false) {
+				$controller[2] = $segments;
+
 				return $controller;
 			}
 		}
 
-		return array(null, null, null);
+		return false;
+	}
+
+
+	/**
+	 * Returns a the error controller according to the request data
+	 * 
+	 * @param Fol\App $App The instance of the application
+	 * @param Fol\Http\Request $Request The request used
+	 * 
+	 * @return array The controller data (an array with the controller and the arguments) or false
+	 */
+	static public function getErrorController (\Fol\App $App, Request $Request) {
+		$segments = $Request->getPathSegments($App->url);
+
+		if ($segments) {
+			$arguments = $segments;
+			$class = $App->namespace.'\\Controllers\\'.str_replace(' ', '', ucwords(strtolower(str_replace('-', ' ', array_shift($segments)))));
+			$controller = self::checkController($Request, $class, 'error');
+
+			if ($controller !== false) {
+				$controller[2] = $segments;
+
+				return $controller;
+			}
+		}
+
+		$controller = self::checkController($Request, $App->namespace.'\\Controllers\\Index', 'error');
+
+		if ($controller !== false) {
+			$controller[2] = $arguments;
+
+			return $controller;
+		}
+
+		return false;
 	}
 
 
@@ -56,16 +93,16 @@ class Router {
 	 * @param Fol\Http\Request $Request The request used (used to check the request properties: method, if it's ajax, etc)
 	 * @param ReflectionClass $Class The class reflection instance (used to check if it's instantiable)
 	 * @param string $method The method name of the controller
-	 * @param array $parameters The parameters used to call the method
 	 * 
 	 * @return array The controller data (class, method and parameters)
 	 */
-	static public function checkController (Request $Request, $class, $method, array $parameters = array()) {
+	static public function checkController (Request $Request, $class, $method) {
 		if (!class_exists($class)) {
 			return false;
 		}
 
 		$Class = new \ReflectionClass($class);
+		$method = lcfirst(str_replace(' ', '', ucwords(strtolower(str_replace('-', ' ', $method)))));
 
 		if (!$Class->isInstantiable() || !$Class->hasMethod($method) || (self::checkRulesComments($Request, $Class->getDocComment()) === false)) {
 			return false;
@@ -73,11 +110,11 @@ class Router {
 
 		$Method = $Class->getMethod($method);
 
-		if (!$Method->isPublic() || (self::checkRulesComments($Request, $Method->getDocComment()) === false) || (($parameters = self::getParameters($Method, $Request, $parameters)) === false)) {
+		if (!$Method->isPublic() || (self::checkRulesComments($Request, $Method->getDocComment()) === false)) {
 			return false;
 		}
 
-		return array($Class, $Method, $parameters);
+		return array($Class, $Method);
 	}
 
 
@@ -180,67 +217,20 @@ class Router {
 
 
 	/**
-	 * Private function to sort the parameters used in a function in the apropiate order
-	 * 
-	 * @param ReflectionFunctionAbstract $Function An instance of the ReflectionFunction or ReflectionMethod class
-	 * @param Fol\Http\Request $Request The request (used to take custom parameters by name)
-	 * @param array $parameters The parameters in a numerical array (taken from the request path)
-	 * 
-	 * @return array Numerical array with the arguments in the apropiate order of false if some required arguments are missing
-	 */
-	static private function getParameters (\ReflectionFunctionAbstract $Function, Request $Request, array $parameters) {
-		$new_parameters = array();
-
-		foreach ($Function->getParameters() as $Parameter) {
-			$name = $Parameter->getName();
-
-			if ($Request->Parameters->exists($name)) {
-				$new_parameters[] = $Request->Parameters->get($name);
-			} else if (isset($parameters[0])) {
-				$Request->Parameters->set($name, array_shift($parameters));
-				$new_parameters[] = $Request->Parameters->get($name);
-			} else if ($Parameter->isOptional()) {
-				$new_parameters[] = $Parameter->getDefaultValue();
-			} else {
-				return false;
-			}
-		}
-
-		return array_merge($new_parameters, array_values($parameters));
-	}
-
-
-
-	/**
 	 * Executes a controller
 	 * 
 	 * @param array $controller The controller data
-	 * @param array $constructor_parameters. The parameters used in the constructor of the class
+	 * @param array $constructor_args The arguments for the controller constructor
+	 * @param array $controller_args The arguments for the controller method
 	 * 
 	 * @return Fol\Http\Response The response of the controller
 	 */
-	static public function executeController (array $controller = null, array $properties = null, array $constructor_args = null) {
+	static public function executeController (array $controller, array $constructor_args, array $controller_args) {
 		ob_start();
 
-		list($Class, $Method, $arguments) = $controller;
+		list($Class, $Method) = $controller;
 
-		$Controller = $Class->newInstanceWithoutConstructor();
-
-		if ($properties !== null) {
-			foreach ($properties as $name => $value) {
-				$Controller->$name = $value;
-			}
-		}
-
-		if (($Constructor = $Class->getConstructor()) !== null) {
-			if ($constructor_args === null) {
-				$Constructor->invoke($Controller);
-			} else {
-				$Constructor->invokeArgs($Controller, $constructor_args);
-			}
-		}
-
-		$Response = $Method->invokeArgs($Controller, $arguments);
+		$Response = $Method->invokeArgs($Class->newInstanceArgs($constructor_args), $controller_args);
 
 		if (!($Response instanceof Response)) {
 			$Response = new Response($Response);

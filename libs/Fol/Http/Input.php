@@ -20,15 +20,7 @@ class Input extends Container {
 	 * @return mixed The value or default value
 	 */
 	public function get ($name = null, $default = null) {
-		if (func_num_args() === 0) {
-			return $this->items;
-		}
-
-		if (isset($this->items[$name])) {
-			return $this->items[$name];
-		}
-
-		if ((strpos($name, '[') !== false) && (strpos($name, ']') !== false)) {
+		if (is_string($name) && (strpos($name, '[') !== false) && (strpos($name, ']') !== false)) {
 			$subarrays = explode('[', str_replace(']', '', $name));
 			$value = $this->items;
 
@@ -41,7 +33,7 @@ class Input extends Container {
 			}
 		}
 
-		return $default;
+		return parent::get($name, $default);
 	}
 
 
