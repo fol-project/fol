@@ -100,6 +100,10 @@ trait UploadsModel {
 			if ($filename === null) {
 				$filename = pathinfo($file, PATHINFO_BASENAME);
 			} else if (!pathinfo($filename, PATHINFO_EXTENSION) && ($extension = pathinfo($file, PATHINFO_EXTENSION))) {
+				if (strpos($extension, '?') !== false) {
+					$extension = explode('?', $extension)[0];
+				}
+
 				$filename .= ".$extension";
 			}
 
