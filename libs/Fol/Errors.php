@@ -40,6 +40,7 @@ class Errors {
 	 */
 	static public function displayErrors ($display) {
 		ini_set('display_errors', ($display === true) ? 'On' : 'Off');
+		ini_set('display_startup_errors', ($display === true) ? 'On' : 'Off');
 	}
 
 
