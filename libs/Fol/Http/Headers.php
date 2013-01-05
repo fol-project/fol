@@ -215,12 +215,11 @@ class Headers {
 		}
 
 		foreach ($this->items as $name => $value) {
-			if (is_string($value)) {
-				header($name.': '.$value, false);
-				continue;
-			}
-
-			foreach ($value as $value) {
+			if (is_array($value)) {
+				foreach ($value as $value) {
+					header($name.': '.$value, false);
+				}
+			} else {
 				header($name.': '.$value, false);
 			}
 		}
