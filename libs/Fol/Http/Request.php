@@ -208,11 +208,11 @@ class Request {
 		if ($absolute === true) {
 			$url .= $this->getScheme().'://';
 
-			if ($this->getPort() !== 80) {
-				$url .= $this->getPort().':';
-			}
-
 			$url .= $this->getHost();
+
+			if ($this->getPort() !== 80) {
+				$url .= ':'.$this->getPort();
+			}
 		}
 		
 		$url .= BASE_URL.$this->getPath();
