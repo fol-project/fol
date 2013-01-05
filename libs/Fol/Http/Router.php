@@ -240,5 +240,37 @@ class Router {
 
 		return $Response;
 	}
+
+
+	/**
+	 * Handle a http request: search a controller and execute it
+	 * 
+	 * @param Fol\App $App The instance of the application
+	 * @param Fol\Http\Request $Request The request object
+	 * @param array $constructor_args The arguments for the controller constructor
+	 * @param array $controller_args The arguments for the controller method
+	 * 
+	 * @return Fol\Http\Response The response object with the controller result
+	 */
+	static public function handle (\Fol\App $App, Request $Request, array $constructor_args = array(), array $controller_args = array()) {
+		try {
+			if (($controller = self::getController($App, $Request)) === false) {
+				throw new HttpException(Headers::$status[404], 404);
+			} else {
+				$Request->Parameters->set($controller[2]);
+				$Response = self::executeController($controller, $constructor_args, $controller_args);
+			}
+		} catch (\Exception $Exception) {
+			if (($controller = self::getErrorController($App, $Request)) === false) {
+				$Response = new Response($Exception->getMessage(), $Exception->getCode() ?: null);
+			} else {
+				$Request->Parameters->set($controller[2]);
+				array_unshift($controller_args, $Exception);
+				$Response = self::executeController($controller, $constructor_args, $controller_args);
+			}
+		}
+
+		return $Response;
+	}
 }
 ?>
