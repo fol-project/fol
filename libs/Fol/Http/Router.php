@@ -78,7 +78,7 @@ class Router {
 		$controller = self::checkController($Request, $App->namespace.'\\Controllers\\Index', 'error');
 
 		if ($controller !== false) {
-			$controller[2] = $arguments;
+			$controller[2] = $segments;
 
 			return $controller;
 		}
