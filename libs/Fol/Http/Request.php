@@ -416,7 +416,7 @@ class Request {
 	 * @return string The request host
 	 */
 	public function getHost () {
-		return $this->Server->get('HTTP_HOST');
+		return $this->Server->get('SERVER_NAME');
 	}
 
 
