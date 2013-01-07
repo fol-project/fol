@@ -215,9 +215,11 @@ class Request {
 			}
 		}
 		
-		$url .= BASE_URL.$this->getPath();
+		$path = $this->getPath();
 
-		if (($format === true) && ($format = $this->getFormat())) {
+		$url .= BASE_URL.$path;
+
+		if (($format === true) && !empty($path) && ($format = $this->getFormat())) {
 			$url .= '.'.$format;
 		}
 
