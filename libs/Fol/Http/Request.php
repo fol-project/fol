@@ -437,7 +437,7 @@ class Request {
 	/**
 	 * Gets the request method
 	 * 
-	 * @return string The request method (in uppercase: GET, POST, etc)
+	 * @return string The request method (in lowercase: get, post, etc)
 	 */
 	public function getMethod () {
 		$method = strtolower($this->Server->get('REQUEST_METHOD', 'get'));
