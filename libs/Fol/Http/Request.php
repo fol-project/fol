@@ -426,10 +426,10 @@ class Request {
 	/**
 	 * Gets the port on which the request is made
 	 * 
-	 * @return string The port number
+	 * @return int The port number
 	 */
 	public function getPort () {
-		return $this->Server->get('X_FORWARDED_PORT') ?: $this->Server->get('SERVER_PORT');
+		return intval($this->Server->get('X_FORWARDED_PORT') ?: $this->Server->get('SERVER_PORT'));
 	}
 
 
