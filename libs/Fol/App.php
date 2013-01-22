@@ -49,6 +49,11 @@ abstract class App {
 		if ($name === 'assetsUrl') {
 			return $this->assetsUrl = BASE_URL.preg_replace('|^'.BASE_PATH.'|', '', $this->path).'assets/';
 		}
+
+		//The base url (http://domain.com)
+		if ($name === 'baseUrl') {
+			return $this->baseUrl = ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? 'https' : 'http').'://'.$_SERVER['HTTP_HOST'];
+		}
 	}
 
 
