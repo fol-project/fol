@@ -5,7 +5,10 @@ use Fol\Http\Response;
 use Fol\Http\HttpException;
 
 class Index {
-	public function index () {
+	public function __construct ($App) {
+	}
+
+	public function index ($Request) {
 		return new Response('Ola mundo');
 	}
 
