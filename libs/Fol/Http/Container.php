@@ -68,7 +68,7 @@ class Container {
 			return $this->items;
 		}
 
-		if (isset($this->items[$name])) {
+		if (isset($this->items[$name]) && $this->items[$name] !== '') {
 			return $this->items[$name];
 		}
 
