@@ -23,6 +23,7 @@ class Headers {
 		'png' => array('image/png',  'image/x-png'),
 		'pdf' => array('application/pdf', 'application/x-download'),
 		'rdf' => array('application/rdf+xml'),
+		'rss' => array('application/rss+xml'),
 		'txt' => array('text/plain'),
 		'xml' => array('text/xml', 'application/xml', 'application/x-xml'),
 		'zip' => array('application/zip', 'application/x-zip', 'application/x-zip-compressed')
