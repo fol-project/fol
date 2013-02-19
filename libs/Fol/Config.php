@@ -83,7 +83,7 @@ class Config {
 			return true;
 		}
 
-		throw new ErrorException('The folder "'.$folder.'" does not exists');
+		throw new \ErrorException('The folder "'.$folder.'" does not exists');
 	}
 
 
@@ -108,7 +108,7 @@ class Config {
 	 */
 	public function read ($name) {
 		if (!$this->folder) {
-			throw new ErrorException('The base folder is not defined');
+			throw new \ErrorException('The base folder is not defined');
 
 			return false;
 		}
