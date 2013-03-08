@@ -242,37 +242,6 @@ class Request {
 	}
 
 
-
-	/**
-	 * Gets the current path in separated segments
-	 * 
-	 * Example:
-	 * $request->getPath() Returns 'post/view/34'
-	 * $request->getPathSegments() Returns array('post', 'view', '34')
-	 * $request->getPathSegments('post/view') Returns array('34')
-	 * 
-	 * @param string $basepath The base path ignored for the current path
-	 * 
-	 * @return array The segments
-	 */
-	public function getPathSegments ($basepath = '') {
-		if ($basepath !== '') {
-			$path = preg_replace('|^'.preg_quote($basepath).'|', '', $this->getPath().'/');
-		}
-
-		$segments = array();
-
-		foreach (explode('/', $path) as $segment) {
-			if ($segment !== '') {
-				$segments[] = $segment;
-			}
-		}
-
-		return $segments;
-	}
-
-
-
 	/**
 	 * Sets a new current path
 	 * 
@@ -282,6 +251,8 @@ class Request {
 		if (preg_match('/\.([\w]+)$/', $path, $match)) {
 			$this->setFormat($match[1]);
 			$path = preg_replace('/'.$match[0].'$/', '', $path);
+		} elseif (!empty($path) && (substr($path, -1) === '/')) {
+			$path = substr($path, 0, -1);
 		}
 
 		$this->path = $path;
@@ -437,13 +408,13 @@ class Request {
 	/**
 	 * Gets the request method
 	 * 
-	 * @return string The request method (in lowercase: get, post, etc)
+	 * @return string The request method (in uppercase: GET, POST, etc)
 	 */
 	public function getMethod () {
-		$method = strtolower($this->Server->get('REQUEST_METHOD', 'get'));
+		$method = $this->Server->get('REQUEST_METHOD', 'GET');
 	
-		if ($method === 'post') {
-			$this->method = strtoupper($this->Server->get('X_HTTP_METHOD_OVERRIDE', 'post'));
+		if ($method === 'POST') {
+			$this->method = strtoupper($this->Server->get('X_HTTP_METHOD_OVERRIDE', 'POST'));
 		}
 
 		return $method;

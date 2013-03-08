@@ -12,12 +12,8 @@ class Index {
 		return new Response('Ola mundo');
 	}
 
-	public function error (HttpException $Exception) {
+	public function error ($Request, HttpException $Exception) {
 		return new Response($Exception->getMessage(), 500);
-	}
-
-	public function error404 (HttpException $Exception) {
-		return new Response('Esta páxina non existe', 404);
 	}
 }
 ?>
