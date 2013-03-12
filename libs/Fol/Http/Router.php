@@ -9,7 +9,6 @@ namespace Fol\Http;
 
 class Router {
 	private $routes = array();
-	private $namedRoutes = array();
 	private $baseUrl = '';
 
 
@@ -41,18 +40,19 @@ class Router {
 	* Route factory method
 	*
 	* Maps the given URL to the given target.
-	* @param string $routeUrl string
+	* @param string $name string The route name.
+	* @param string $url string
 	* @param mixed $target The target of this route. Can be anything. You'll have to provide your own method to turn *      this into a filename, controller / action pair, etc..
 	* @param array $config Array of optional arguments.
 	*/
-	public function map ($routeUrl, $target = '', array $config = array()) {
-		$Route = new Route($this->baseUrl.$routeUrl, $target, $config);
+	public function map ($name, $url, $target = '', array $config = array()) {
+		$Route = new Route($name, $this->baseUrl.$url, $target, $config);
 
-		if (($name = $Route->getName()) && !isset($this->namedRoutes[$name])) {
-			$this->namedRoutes[$name] = $Route;
+		if ($name === null) {
+			$this->routes[] = $Route;
+		} else {
+			$this->routes[$name] = $Route;
 		}
-
-		$this->routes[] = $Route;
 	}
 
 
@@ -82,11 +82,11 @@ class Router {
 	 * @return string The url to the route
 	 */
 	public function generate ($routeName, array $params = array()) {
-		if (!isset($this->namedRoutes[$routeName])) {
+		if (!isset($this->routes[$routeName])) {
 			throw new Exception("No route with the name $routeName has been found.");
 		}
 
-		return $this->namedRoutes[$routeName]->generate($params);
+		return BASE_URL.$this->routes[$routeName]->generate($params);
 	}
 
 
@@ -106,10 +106,10 @@ class Router {
 				$Response = $Route->execute($App, $Request);
 			}
 		} catch (\Exception $Exception) {
-			if (($Route = $this->namedRoutes['error']) === false) {
+			if (!isset($this->routes['error'])) {
 				$Response = new Response($Exception->getMessage(), $Exception->getCode() ?: null);
 			} else {
-				$Response = $Route->execute($App, $Request, [$Exception]);
+				$Response = $this->routes['error']->execute($App, $Request, [$Exception]);
 			}
 		}
 

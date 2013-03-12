@@ -8,7 +8,7 @@ class App extends \Fol\App {
 	public function __construct () {
 		$this->Router = new Router($this->url);
 
-		$this->Router->map('/', 'Index::index');
+		$this->Router->map('index', '/', 'Index::index');
 	}
 
 	public function handle () {

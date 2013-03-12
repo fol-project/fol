@@ -42,12 +42,12 @@ abstract class App {
 
 		//The assets app path. (/sites/my-site/web/assets)
 		if ($name === 'assetsPath') {
-			return $this->assetsPath = $this->path.'assets';
+			return $this->assetsPath = $this->path.'/assets';
 		}
 
 		//The assets app url (/web/assets)
 		if ($name === 'assetsUrl') {
-			return $this->assetsUrl = BASE_URL.preg_replace('|^'.BASE_PATH.'|', '', $this->path).'assets';
+			return $this->assetsUrl = BASE_URL.preg_replace('|^'.BASE_PATH.'|', '', $this->path).'/assets';
 		}
 
 		//The base url (http://domain.com)

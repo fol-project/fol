@@ -16,20 +16,21 @@ class Route {
 	private $parameters = array();
 	private $regex = null;
 
-	public function __construct ($url, $target, array $config = array()) {
+	public function __construct ($name, $url, $target, array $config = array()) {
+		$this->name = $name;
 		$this->url = $url;
 		$this->target = $target;
 
 		if (isset($config['methods'])) {
-			$this->methods = $config['methods'];
+			$this->methods = (array)$config['methods'];
 		}
 
 		if (isset($config['filters'])) {
 			$this->filters = $config['filters'];
 		}
 
-		if (isset($config['name'])) {
-			$this->name = $config['name'];
+		if (isset($config['parameters'])) {
+			$this->parameters = (array)$config['parameters'];
 		}
 	}
 
@@ -60,12 +61,12 @@ class Route {
 
 		$filters = $this->filters;
 
-		return $this->regex = preg_replace_callback('/:(\w+)/', function ($matches) use ($filters) {
+		return $this->regex = preg_replace_callback('/:([^\/]+)/', function ($matches) use ($filters) {
 			if (isset($matches[1]) && isset($filters[$matches[1]])) {
 				return $filters[$matches[1]];
 			}
 
-			return '([\w-]+)';
+			return '([^\/]+)';
 		}, $this->url);
 	}
 
@@ -98,7 +99,7 @@ class Route {
 			}
 		}
 
-		$this->parameters = $params;
+		$this->parameters = array_replace($this->parameters, $params);
 
 		return true;
 	}
@@ -156,8 +157,9 @@ class Route {
 
 			$class = $App->namespace.'\\Controllers\\'.$class;
 
-			$Class = new $class($App);
-			$Response = call_user_func([$Class, $method], $arguments);
+			$Class = new $class($App, $Request);
+
+			$Response = call_user_func_array([$Class, $method], $arguments);
 		}
 
 		if (!($Response instanceof Response)) {
