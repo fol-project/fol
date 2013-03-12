@@ -10,6 +10,7 @@ namespace Fol\Http;
 class Router {
 	private $routes = array();
 	private $baseUrl = '';
+	private $absoluteUrl;
 
 
 	/**
@@ -18,6 +19,7 @@ class Router {
 	 * @param string $baseUrl
 	 */
 	public function __construct ($baseUrl = '') {
+		$this->absoluteUrl = BASE_ABSOLUTE_URL.BASE_URL;
 		$this->setBaseUrl($baseUrl);
 	}
 
@@ -78,15 +80,20 @@ class Router {
 	 * 
 	 * @param string $routeName The name of the route to reverse route.
 	 * @param array $params Optional array of parameters to use in URL
+	 * @param boolean $absolute Set true to generate absolute urls
 	 * 
 	 * @return string The url to the route
 	 */
-	public function generate ($routeName, array $params = array()) {
+	public function generate ($routeName, array $params = array(), $absolute = false) {
 		if (!isset($this->routes[$routeName])) {
 			throw new Exception("No route with the name $routeName has been found.");
 		}
 
-		return BASE_URL.$this->routes[$routeName]->generate($params);
+		if ($absolute === true) {
+			return $this->absoluteUrl.$this->routes[$routeName]->generate($params, $absolute);
+		}
+
+		return $this->routes[$routeName]->generate($params, $absolute);
 	}
 
 

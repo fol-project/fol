@@ -125,7 +125,7 @@ class Route {
 			}
 		}
 
-		return $url;
+		return BASE_URL.$url;
 	}
 
 
