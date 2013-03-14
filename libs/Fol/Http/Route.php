@@ -61,13 +61,15 @@ class Route {
 
 		$filters = $this->filters;
 
-		return $this->regex = preg_replace_callback('/:([^\/]+)/', function ($matches) use ($filters) {
+		$regex = preg_replace_callback('/:([\w-]+)/', function ($matches) use ($filters) {
 			if (isset($matches[1]) && isset($filters[$matches[1]])) {
 				return $filters[$matches[1]];
 			}
 
 			return '([^\/]+)';
 		}, $this->url);
+
+		return $this->regex = "@^$regex\$@i";
 	}
 
 	
@@ -83,7 +85,7 @@ class Route {
 			return false;
 		}
 
-		if (!preg_match('@^'.$this->getRegex().'*$@i', $Request->getPath(), $matches)) {
+		if (!preg_match($this->getRegex(), $Request->getPath(), $matches)) {
 			return false;
 		}
 
