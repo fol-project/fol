@@ -219,7 +219,7 @@ class Request {
 
 		$url .= BASE_URL.$path;
 
-		if (($format === true) && !empty($path) && ($format = $this->getFormat())) {
+		if (($format === true) && ($path !== '/') && ($format = $this->getFormat())) {
 			$url .= '.'.$format;
 		}
 
