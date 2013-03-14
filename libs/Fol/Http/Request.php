@@ -251,7 +251,11 @@ class Request {
 		if (preg_match('/\.([\w]+)$/', $path, $match)) {
 			$this->setFormat($match[1]);
 			$path = preg_replace('/'.$match[0].'$/', '', $path);
-		} elseif (!empty($path) && (substr($path, -1) === '/')) {
+		}
+
+		if (empty($path)) {
+			$path = '/';
+		} elseif ($path !== '/' && (substr($path, -1) === '/')) {
 			$path = substr($path, 0, -1);
 		}
 
