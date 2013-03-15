@@ -26,7 +26,7 @@ class Session {
 
 				$params = session_get_cookie_params();
 				$params['httponly'] = true;
-				$params['path'] = BASE_URL;
+				$params['path'] = BASE_URL ?: '/';
 
 				session_set_cookie_params($params['lifetime'], $params['path'], $params['domain'], $params['secure'], $params['httponly']);
 

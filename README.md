@@ -32,8 +32,8 @@ No directorio raíz de FOL existen dúas carpetas: libs e apps
 O arquivo bootstrap.php na raíz é o que inicia o framework e define 3 constantes:
 
 * FOL_VERSION: A versión actual do framework
-* BASE_PATH: A ruta base onde está aloxado o teu sitio web (ruta interna do servidor). Por exemplo "/var/www/o-meu-sitio/"
-* BASE_URL: A ruta base onde está aloxado o sitio web (ruta http do navegador). Por exemplo se accedemos por http://localhost/o-meu-sitio, o seu valor sería "/o-meu-sitio/"
+* BASE_PATH: A ruta base onde está aloxado o teu sitio web (ruta interna do servidor). Por exemplo "/var/www/o-meu-sitio" (sen barra ao final)
+* BASE_URL: A ruta base onde está aloxado o sitio web (ruta http do navegador). Por exemplo se accedemos por http://localhost/o-meu-sitio, o seu valor sería "/o-meu-sitio" (sen barra ao final)
 
 Ademáis carga as clases Fol\Loader e Fol\Errors, para xestionar a carga de bibliotecas e erros que haxa:
 
@@ -82,7 +82,7 @@ class App extends \Fol\App {
 		//Contructor da applicación (cargar a configuración, instanciar clases básicas, etc)
 	}
 
-	public function handle ($request) {
+	public function handle ($Request) {
 		//Función para manexar peticións (por exemplo nun sistema MVC)
 	}
 }
@@ -91,7 +91,7 @@ class App extends \Fol\App {
 $Aplicacion = new \Apps\Blog\App();
 
 //E executamos a aplicación
-$Aplicacion->handle('/blog/view/34');
+$Aplicacion->handle(\Fol\Http\Request::createFromGlobals());
 ```
 
 Ten en conta que as aplicacións se cargan co estándar PSR-0, igual que calquera outra biblioteca. A única diferencia é que se aloxan na carpeta apps, en vez de libs. Polo tanto, a aplicación \Apps\Blog\App, estaría no arquivo apps/Blog/App.php. Se queres aloxar as aplicacións noutro directorio distinto, só tes que configurar a clase Loader para que busque o namespace "Apps" noutro directorio distinto. Esa configuración atópase en bootstrap.php, na raíz:
