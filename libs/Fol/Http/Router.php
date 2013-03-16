@@ -19,7 +19,7 @@ class Router {
 	 * @param string $baseUrl
 	 */
 	public function __construct ($baseUrl = '') {
-		$this->absoluteUrl = BASE_ABSOLUTE_URL.BASE_URL;
+		$this->absoluteUrl = BASE_ABSOLUTE_URL;
 		$this->setBaseUrl($baseUrl);
 	}
 
