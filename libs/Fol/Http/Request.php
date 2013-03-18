@@ -154,6 +154,20 @@ class Request {
 		$this->Cookies = clone $this->Cookies;
 		$this->Server = clone $this->Server;
 		$this->Headers = clone $this->Headers;
+
+		if (isset($this->Session)) {
+			$this->Session = clone $this->Session;
+		}
+	}
+
+
+	/**
+	 * Magic function to initialize some internal objects
+	 */
+	public function __get ($name) {
+		if ($name === 'Session') {
+			return $this->Session = new Session();
+		}
 	}
 
 
