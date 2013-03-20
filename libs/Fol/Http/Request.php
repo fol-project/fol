@@ -168,6 +168,10 @@ class Request {
 		if ($name === 'Session') {
 			return $this->Session = new Session();
 		}
+
+		if ($name === 'Response') {
+			return $this->getResponse();
+		}
 	}
 
 
@@ -436,5 +440,20 @@ class Request {
 		}
 
 		return $method;
+	}
+
+
+	/**
+	 * Returns the response instance for this request
+	 * 
+	 * @return Fol\Http\Response
+	 */
+	public function getResponse ($content = '', $status = 200, array $headers = array()) {
+		if (!isset($this->Response)) {
+			$this->Response = new Response($content, $status, $headers);
+			$this->Response->setContentType($this->getFormat());
+		}
+
+		return $this->Response;
 	}
 }

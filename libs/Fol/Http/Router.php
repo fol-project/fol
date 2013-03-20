@@ -110,16 +110,22 @@ class Router {
 			if (($Route = $this->match($Request)) === false) {
 				throw new HttpException(Headers::$status[404], 404);
 			} else {
-				$Response = $Route->execute($App, $Request);
+				$Route->execute($App, $Request);
+			}
+		} catch (HttpException $Exception) {
+			if (!isset($this->routes['error'])) {
+				$Request->Response->setContent($Exception->getMessage());
+				$Request->Response->setStatus($Exception->getCode());
+			} else {
+				$this->routes['error']->execute($App, $Request, [$Exception]);
 			}
 		} catch (\Exception $Exception) {
 			if (!isset($this->routes['error'])) {
-				$Response = new Response($Exception->getMessage(), $Exception->getCode() ?: null);
+				$Request->Response->setContent($Exception->getMessage());
+				$Request->Response->setStatus(500);
 			} else {
-				$Response = $this->routes['error']->execute($App, $Request, [$Exception]);
+				$this->routes['error']->execute($App, $Request, [$Exception]);
 			}
 		}
-
-		return $Response;
 	}
 }

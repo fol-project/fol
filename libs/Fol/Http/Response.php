@@ -19,20 +19,6 @@ class Response {
 
 
 	/**
-	 * Creates a response that redirects to another url
-	 * 
-	 * @param string $url The new url to redirect
-	 * 
-	 * @return Fol\Http\Response The response object
-	 */
-	static public function createRedirect ($url, $status = 302) {
-		return new static('', $status, array(
-			'location' => $url
-		));
-	}
-
-
-	/**
 	 * Constructor
 	 * 
 	 * @param string $content The body of the response
@@ -155,6 +141,18 @@ class Response {
 	 */
 	public function getContentType () {
 		return $this->content_type;
+	}
+
+
+	/**
+	 * Set the status code and header needle to redirect to another url
+	 * 
+	 * @param  string  $url    The url of the new location
+	 * @param  integer $status The http code to redirect (302 by default)
+	 */
+	public function redirect ($url, $status = 302) {
+		$this->setStatus($status);
+		$this->Headers->set('location', $url);
 	}
 
 

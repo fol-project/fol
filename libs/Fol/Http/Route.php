@@ -147,12 +147,11 @@ class Route {
 		$target = $this->target;
 
 		$Request->Parameters->set($this->parameters);
-		$Response = null;
 
 		if (is_callable($target)) {
 			array_unshift($arguments, $Request, $App);
 
-			$Response = call_user_func_array($target, $arguments);
+			$return = call_user_func_array($target, $arguments);
 		} elseif (is_string($target) && (strpos($target, '::') !== false)) {
 			list($class, $method) = explode('::', $target, 2);
 			array_unshift($arguments, $Request);
@@ -161,15 +160,10 @@ class Route {
 
 			$Class = new $class($App, $Request);
 
-			$Response = call_user_func_array([$Class, $method], $arguments);
+			$return = call_user_func_array([$Class, $method], $arguments);
 		}
 
-		if (!($Response instanceof Response)) {
-			$Response = new Response($Response);
-		}
-
-		$Response->prependContent(ob_get_clean());
-
-		return $Response;
+		$Request->Response->prependContent($return);
+		$Request->Response->prependContent(ob_get_clean());
 	}
 }
