@@ -17,7 +17,7 @@ Por claridade, todas as instancias de clases comezan por maiúscula e o resto de
 $Request = new Request();
 $request = 'hello';
 
-$Request->Get->get(); //"Get" é un obxecto e "get" unha funcion (podería ser tamén unha propiedade)
+$Request->Get->get(); //"Get" é un obxecto e "get" unha funcion
 ```
 
 
@@ -34,6 +34,7 @@ O arquivo bootstrap.php na raíz é o que inicia o framework e define 3 constant
 * FOL_VERSION: A versión actual do framework
 * BASE_PATH: A ruta base onde está aloxado o teu sitio web (ruta interna do servidor). Por exemplo "/var/www/o-meu-sitio" (sen barra ao final)
 * BASE_URL: A ruta base onde está aloxado o sitio web (ruta http do navegador). Por exemplo se accedemos por http://localhost/o-meu-sitio, o seu valor sería "/o-meu-sitio" (sen barra ao final)
+* BASE_ABSOLUTE_URL: A parte da url para definir urls absolutas (por exemplo: http://localhost)
 
 Ademáis carga as clases Fol\Loader e Fol\Errors, para xestionar a carga de bibliotecas e erros que haxa:
 
@@ -133,13 +134,14 @@ $Request->Parameters; //Para gardar parámetros manualmente
 Response
 --------
 
-Esta clase xenera as respostas que se enviarán ao navegador do usuario:
+Esta clase xenera as respostas que se enviarán ao navegador do usuario.
+Aínda que se pode crear unha instancia de maneira individual, a clase Request xa xenera automáticamente unha clase response. Por exemplo, se no Request facemos unha petición de json (Content-Type: text/json) a clase Response automaticamente aplica ese content type.
 
 ```php
-$Response = new Fol\Http\Response;
+//Collemos o response xenerado polo request:
+$Response = $Request->Response;
 
 //A clase Response contén dentro outros obxectos para xestionar partes específicas:
-
 $Response->Headers; //Para enviar cabeceiras
 $Response->Cookies; //Para enviar cookies
 
@@ -150,4 +152,32 @@ $Response->setContent('texto de resposta');
 $Response->send();
 ```
 
-Se coñeces o framework Symfony2 verás que é moi moi parecido (aínda que moitísimo máis simplificado)
+Rutas
+-----
+
+Para xenerar as distintas rutas do noso documento, podemos usar a clase Fol\Http\Router. Por exemplo, na nosa applicación, no constructor podemos definir as rutas:
+
+```php
+namespace Apps\Blog;
+
+use Fol\Http\Router;
+
+class App extends \Fol\App {
+
+	public function __construct () {
+		//Instanciamos o enrutador, pasandolle a url base da aplicación.
+		$this->Router = new Router($this->url);
+
+		//Definimos as distintas rutas (nome da ruta, url e controlador)
+		$this->Router->map('index', '/', 'Index::index');
+		$this->Router->map('contacto', '/about', 'Index::about');
+	}
+
+	public function handle ($Request) {
+		//Resolvemos a petición actual
+		$this->Router->handle($this, $Request);
+
+		//Devolvemos a resposta xerada por esa petición
+		return $Request->Response;
+	}
+}

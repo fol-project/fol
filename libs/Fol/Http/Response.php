@@ -172,7 +172,7 @@ class Response {
 	 */
 	public function sendHeaders () {
 		if (headers_sent()) {
-			return false;
+			throw new \Exception('Cannot send headers because they have been send before');
 		}
 
 		header(sprintf('HTTP/1.1 %s', $this->status[0], $this->status[1]));

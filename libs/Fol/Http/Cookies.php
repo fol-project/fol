@@ -62,7 +62,7 @@ class Cookies {
 
 		foreach ($this->items as $cookie) {
 			if (!setcookie($cookie['name'], $cookie['value'], $cookie['expire'], $cookie['path'], $cookie['domain'], $cookie['secure'], $cookie['httponly'])) {
-				return false;
+				throw new \Exception('Error saving the cookie '.$cookie['name']);
 			}
 		}
 
@@ -100,7 +100,7 @@ class Cookies {
 	 * @param boolean $secure If the cookie is secure, only will be send in secure connection (https)
 	 * @param boolean $httponly If is set true, the cookie only will be accessed via http, so javascript cannot access to it.
 	 */
-	public function set ($name, $value = null, $expire = 0, $path = '/', $domain = null, $secure = false, $httponly = true) {
+	public function set ($name, $value = null, $expire = 0, $path = null, $domain = null, $secure = false, $httponly = false) {
 		if (is_array($name)) {
 			foreach ($name as $name => $value) {
 				$this->set($name, $value);
@@ -115,14 +115,16 @@ class Cookies {
 			$expire = strtotime($expire);
 		}
 
-		$path = empty($path) ? '/' : $path;
+		if (empty($path)) {
+			$path = BASE_URL.'/';
+		}
 
 		$this->items["$name $path $domain"] = array(
 			'name' => $name,
 			'value' => $value,
 			'domain' => $domain,
 			'expire' => $expire,
-			'path' => empty($path) ? '/' : $path,
+			'path' => $path,
 			'secure' => (Boolean)$secure,
 			'httponly' => (Boolean)$httponly
 		);
@@ -137,13 +139,13 @@ class Cookies {
 	 * @param string $path The cookie path
 	 * @param string $domain The cookie domain
 	 */
-	public function delete ($name = null, $path = '/', $domain = null) {
+	public function delete ($name = null, $path = null, $domain = null) {
 		if (func_num_args() === 0) {
 			foreach ($this->items as $cookie) {
-				$this->set($cookie['name'], null, time() - 31536001, $cookie['path'], $cookie['domain']);
+				$this->set($cookie['name'], '', 1, $cookie['path'], $cookie['domain']);
 			}
 		} else {
-			$this->set($name, null, time() - 31536001, $path, $domain);
+			$this->set($name, '', 1, $path, $domain);
 		}
 	}
 
@@ -156,10 +158,14 @@ class Cookies {
 	 * @param string $path The cookie path
 	 * @param string $domain The cookie domain
 	 */
-	public function clear ($name = null, $path = '/', $domain = null) {
+	public function clear ($name = null, $path = null, $domain = null) {
 		if (func_num_args() === 0) {
 			$this->items = array();
 		} else {
+			if (empty($path)) {
+				$path = BASE_URL.'/';
+			}
+
 			unset($this->items["$name $path $domain"]);
 		}
 	}
