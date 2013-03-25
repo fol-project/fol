@@ -454,4 +454,35 @@ class Request {
 
 		return $this->Response;
 	}
+
+
+	/**
+	 * Check if the response has been modified or not
+	 * 
+	 * @return boolean False if the response is modified, true if not
+	 */
+	public function responseIsNotModified () {
+		$RequestHeaders = $this->Headers;
+		$ResponseHeaders = $this->Response->Headers;
+
+		$hasCondition = false;
+
+		if ($RequestHeaders->has('If-Modified-Since')) {
+			$hasCondition = true;
+
+			if ($RequestHeaders->getDateTime('If-Modified-Since')->getTimestamp() < $ResponseHeaders->getDateTime('Last-Modified')->getTimestamp()) {
+				return false;
+			}
+		}
+
+		if ($ResponseHeaders->has('Expires')) {
+			$hasCondition = true;
+
+			if ($ResponseHeaders->getDateTime('Expires')->getTimestamp() < time()) {
+				return false;
+			}
+		}
+
+		return $hasCondition;
+	}
 }

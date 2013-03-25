@@ -68,5 +68,35 @@ class ResponseHeaders extends Headers {
 	public static function getStatusText ($code) {
 		return isset(self::$status[$code]) ? self::$status[$code] : false;
 	}
+
+
+	/**
+	 * Defines a Last-Modified header
+	 * 
+	 * @param string/Datetime $datetime
+	 */
+	public function setLastModified ($datetime) {
+		$this->setDateTime('Last-Modified', $datetime);
+	}
+
+
+	/**
+	 * Defines a Expire header
+	 * 
+	 * @param string/Datetime $datetime
+	 */
+	public function setExpires ($datetime) {
+		$this->setDateTime('Expires', $datetime);
+	}
+
+
+	/**
+	 * Defines an Age header
+	 * 
+	 * @param string/Datetime $datetime
+	 */
+	public function setAge ($datetime) {
+		$this->setDateTime('Age', $datetime);
+	}
 }
 ?>

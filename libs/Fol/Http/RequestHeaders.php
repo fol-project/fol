@@ -35,5 +35,15 @@ class RequestHeaders extends Headers {
 
 		return $headers;
 	}
+
+
+	/**
+	 * Defines a If-Modified-Since header
+	 * 
+	 * @param string/Datetime $datetime
+	 */
+	public function setIfModifiedSince ($datetime) {
+		$this->setDateTime('If-Modified-Since', $datetime);
+	}
 }
 ?>
