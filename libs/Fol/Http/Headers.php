@@ -303,7 +303,7 @@ class Headers {
 	 * 
 	 * @return boolean True if the header exists, false if not
 	 */
-	public function exists ($name) {
+	public function has ($name) {
 		$name = $this->normalize($name);
 
 		return array_key_exists($name, $this->items);

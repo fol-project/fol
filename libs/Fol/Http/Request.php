@@ -367,8 +367,8 @@ class Request {
 	 * 
 	 * @return boolean TRUE if the variable exists in any of the parameters and FALSE if doesn't
 	 */
-	public function exists ($name) {
-		return ($this->Post->exists($name) || $this->Files->exists($name) || $this->Get->exists($name) || $this->Parameters->exists($name)) ? true : false;
+	public function has ($name) {
+		return ($this->Post->has($name) || $this->Files->has($name) || $this->Get->has($name) || $this->Parameters->has($name)) ? true : false;
 	}
 
 

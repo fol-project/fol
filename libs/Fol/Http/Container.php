@@ -118,7 +118,7 @@ class Container {
 	 * 
 	 * @return boolean True if the parameter exists (even if it's null) or false if not
 	 */
-	public function exists ($name) {
+	public function has ($name) {
 		return array_key_exists($name, $this->items);
 	}
 }

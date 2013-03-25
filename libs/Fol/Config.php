@@ -235,18 +235,18 @@ class Config {
 	/**
 	 * Checks if some data exists
 	 * 
-	 * $data->check('database');
+	 * $data->has('database');
 	 * 
 	 * or if you want to check just one sub-value
 	 * 
-	 * $data->check('database', 'user');
+	 * $data->has('database', 'user');
 	 * 
 	 * @param string $name The name of the data
 	 * @param string $key The optional key of the data
 	 * 
 	 * @return boolean True if the data exists, false if not.
 	 */
-	public function exists ($name, $key = null) {
+	public function has ($name, $key = null) {
 		if (!array_key_exists($name, $this->items)) {
 			return false;
 		}

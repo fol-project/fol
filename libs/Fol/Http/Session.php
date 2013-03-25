@@ -212,7 +212,7 @@ class Session {
 	 * 
 	 * @return boolean True if it's defined, false if not
 	 */
-	public function exists ($name) {
+	public function has ($name) {
 		return array_key_exists($name, $_SESSION);
 	}
 
@@ -266,7 +266,7 @@ class Session {
 	 * 
 	 * @return boolean True if it's defined, false if not
 	 */
-	public function existsFlash ($name) {
+	public function hasFlash ($name) {
 		return (isset($_SESSION['_flash']) && array_key_exists($name, $_SESSION['_flash']));
 	}
 }
