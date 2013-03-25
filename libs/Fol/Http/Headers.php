@@ -7,7 +7,7 @@
 namespace Fol\Http;
 
 class Headers {
-	private $items = array();
+	protected $items = array();
 
 	/**
 	 * list of standard mime-types used
@@ -29,52 +29,13 @@ class Headers {
 		'zip' => array('application/zip', 'application/x-zip', 'application/x-zip-compressed')
 	);
 
+
 	/**
-	 * List of standard http status codes
+	 * Magic function to recover the object exported by var_export
 	 */
-	static public $status = array(
-		100 => 'Continue',
-		101 => 'Switching Protocols',
-		200 => 'OK',
-		201 => 'Created',
-		202 => 'Accepted',
-		203 => 'Non-Authoritative Information',
-		204 => 'No Content',
-		205 => 'Reset Content',
-		206 => 'Partial Content',
-		300 => 'Multiple Choices',
-		301 => 'Moved Permanently',
-		302 => 'Found',
-		303 => 'See Other',
-		304 => 'Not Modified',
-		305 => 'Use Proxy',
-		307 => 'Temporary Redirect',
-		400 => 'Bad Request',
-		401 => 'Unauthorized',
-		402 => 'Payment Required',
-		403 => 'Forbidden',
-		404 => 'Not Found',
-		405 => 'Method Not Allowed',
-		406 => 'Not Acceptable',
-		407 => 'Proxy Authentication Required',
-		408 => 'Request Timeout',
-		409 => 'Conflict',
-		410 => 'Gone',
-		411 => 'Length Required',
-		412 => 'Precondition Failed',
-		413 => 'Request Entity Too Large',
-		414 => 'Request-URI Too Long',
-		415 => 'Unsupported Media Type',
-		416 => 'Requested Range Not Satisfiable',
-		417 => 'Expectation Failed',
-		418 => 'I\'m a teapot',
-		500 => 'Internal Server Error',
-		501 => 'Not Implemented',
-		502 => 'Bad Gateway',
-		503 => 'Service Unavailable',
-		504 => 'Gateway Timeout',
-		505 => 'HTTP Version Not Supported',
-	);
+	public static function __set_state ($array) {
+		return new static($array['items']);
+	}
 
 
 	/**
@@ -132,51 +93,6 @@ class Headers {
 		return isset(self::$formats[$format][0]) ? self::$formats[$format][0] : false;
 	}
 
-
-
-	/**
-	 * Gets the status text related with a status code. Search in self::$status array
-	 * 
-	 * $headers->getStatusText(404) Returns "Not Found"
-	 * 
-	 * @param integer $code The Http code
-	 * 
-	 * @return string The status text or false
-	 */
-	public static function getStatusText ($code) {
-		return isset(self::$status[$code]) ? self::$status[$code] : false;
-	}
-
-
-
-	/**
-	 * Detects http header from a $_SERVER array
-	 * 
-	 * @param array $server The $_SERVER array
-	 * 
-	 * @return array The headers found
-	 */
-	public static function getHeadersFromServer (array $server) {
-		$headers = array();
-
-		foreach ($server as $name => $value) {
-			if (strpos($name, 'HTTP_') === 0) {
-				$headers[str_replace('_', '-', substr($name, 5))] = $value;
-				continue;
-			}
-
-			if (in_array($name, array('CONTENT_LENGTH', 'CONTENT_MD5', 'CONTENT_TYPE'))) {
-				$headers[str_replace('_', '-', $name)] = $value;
-			}
-		}
-
-		if (isset($server['PHP_AUTH_USER'])) {
-			$pass = isset($server['PHP_AUTH_PW']) ? $server['PHP_AUTH_PW'] : '';
-			$headers['AUTHORIZATION'] = 'Basic '.base64_encode($server['PHP_AUTH_USER'].':'.$pass);
-		}
-
-		return $headers;
-	}
 
 
 	/**
@@ -476,129 +392,6 @@ class Headers {
 		}
 
 		return implode(',', $results);
-	}
-
-
-
-	/**
-	 * Define the cache headers to send
-	 * 
-	 * Example:
-	 * $headers->setCache(array(
-	 *     'Last-Modified' => 'now',
-	 *     'Expires' => 'tomorrow'
-	 *     'public' => true
-	 * ));
-	 * 
-	 * @param array $options The cache options
-	 */
-	public function setCache (array $options) {
-		if (isset($options['ETag'])) {
-			if ($options['ETag']) {
-				$this->set('ETag', $options['ETag']);
-			} else {
-				$this->delete('ETag');
-			}
-		}
-
-		if (isset($options['Last-Modified'])) {
-			if ($options['Last-Modified']) {
-				$this->setDateTime('Last-Modified', $options['Last-Modified']);
-			} else {
-				$this->delete('Last-Modified');
-			}
-		}
-
-		if (isset($options['Expires'])) {
-			if ($options['Expires']) {
-				$this->setDateTime('Expires', $options['Expires']);
-			} else {
-				$this->delete('Expires');
-			}
-		}
-
-		$cache_control = $this->getParsed('Cache-Control');
-
-		if ($cache_control) {
-			$cache_control = current($cache_control);
-		}
-
-		if (isset($options['max-age'])) {
-			if ($options['max-age']) {
-				$cache_control['max-age'] = $options['max-age'];
-			} else {
-				unset($cache_control['max-age']);
-			}
-		}
-
-		if (isset($options['s-maxage'])) {
-			if ($options['s-maxage']) {
-				$cache_control['s-maxage'] = $options['s-maxage'];
-			} else {
-				unset($cache_control['s-maxage']);
-			}
-		}
-
-		if (isset($options['must-revalidate'])) {
-			if ($options['must-revalidate']) {
-				$cache_control['must-revalidate'] = true;
-			} else {
-				unset($cache_control['must-revalidate']);
-			}
-		}
-
-		if (isset($options['proxy-revalidate'])) {
-			if ($options['proxy-revalidate']) {
-				$cache_control['proxy-revalidate'] = true;
-			} else {
-				unset($cache_control['proxy-revalidate']);
-			}
-		}
-
-		if (isset($options['no-store'])) {
-			if ($options['no-store']) {
-				$cache_control['no-store'] = true;
-			} else {
-				unset($cache_control['no-store']);
-			}
-		}
-
-		if (isset($options['private'])) {
-			$options['public'] = true;
-		}
-
-		if (isset($options['public'])) {
-			if ($options['public']) {
-				$cache_control['public'] = true;
-				unset($cache_control['private']);
-			} else {
-				$cache_control['private'] = true;
-				unset($cache_control['public']);
-			}
-		}
-
-		if ($cache_control) {
-			$this->setParsed('Cache-Control', array($cache_control));
-		} else {
-			$this->delete('Cache-Control');
-		}
-	}
-
-
-
-	/**
-	 * Returns the current cache configuration
-	 * 
-	 * @return array The key => value array with the cache configuration
-	 */
-	public function getCache () {
-		$cache = current($this->getParsed('Cache-Control'));
-
-		$cache['ETag'] = $this->get('ETag');
-		$cache['Last-Modified'] = $this->getDateTime('Last-Modified');
-		$cache['Expires'] = $this->getDateTime('Expires');
-
-		return $cache;
 	}
 }
 ?>

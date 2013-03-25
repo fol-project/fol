@@ -14,7 +14,9 @@ class App extends \Fol\App {
 	public function handle () {
 		$Request = Request::createFromGlobals();
 
-		return $this->Router->handle($this, $Request);
+		$this->Router->handle($this, $Request);
+
+		return $Request->Response;
 	}
 }
 ?>

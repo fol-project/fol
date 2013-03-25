@@ -129,7 +129,7 @@ class Request {
 		$this->Files = new Files($files);
 		$this->Cookies = new Input($cookies);
 		$this->Server = new Container($server);
-		$this->Headers = new Headers(Headers::getHeadersFromServer($server));
+		$this->Headers = new RequestHeaders(RequestHeaders::getHeadersFromServer($server));
 
 		foreach (array_keys($this->Headers->getParsed('Accept')) as $mimetype) {
 			if ($format = Headers::getFormat($mimetype)) {
@@ -203,9 +203,7 @@ class Request {
 		return md5(serialize(array(
 			$this->getPath(),
 			$this->Parameters->get(),
-			$this->Get->get(),
-			$this->Post->get(),
-			$this->Files->get()
+			$this->Get->get()
 		)));
 	}
 

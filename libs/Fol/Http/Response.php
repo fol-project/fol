@@ -18,6 +18,17 @@ class Response {
 	protected $content_type;
 
 
+	public static function __set_state ($array) {
+		$Response = new static($array['content'], $array['status'][0]);
+		$Response->setContentType($array['content_type']);
+
+		$Response->Headers = $array['Headers'];
+		$Response->Cookies = $array['Cookies'];
+
+		return $Response;
+	}
+
+
 	/**
 	 * Constructor
 	 * 
@@ -30,7 +41,7 @@ class Response {
 		$this->setStatus($status);
 		$this->setContentType('text/html');
 
-		$this->Headers = new Headers($headers);
+		$this->Headers = new ResponseHeaders($headers);
 		$this->Cookies = new Cookies();
 	}
 
@@ -106,7 +117,7 @@ class Response {
 	 * @param string $text The status text. If it's not defined, the text will be the defined in the Fol\Http\Headers:$status array
 	 */
 	public function setStatus ($code, $text = null) {
-		$this->status = array($code, ($text ?: Headers::getStatusText($code)));
+		$this->status = array($code, ($text ?: ResponseHeaders::getStatusText($code)));
 	}
 
 
