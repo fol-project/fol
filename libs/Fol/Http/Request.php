@@ -21,7 +21,7 @@ class Request {
 	public $Server;
 
 	private $path;
-	private $format;
+	private $format = 'html'; //Default format
 
 
 
