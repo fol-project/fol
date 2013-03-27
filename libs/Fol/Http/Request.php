@@ -200,11 +200,7 @@ class Request {
 	 * @return string The id
 	 */
 	public function getId () {
-		return md5(serialize(array(
-			$this->getPath(),
-			$this->Parameters->get(),
-			$this->Get->get()
-		)));
+		return md5($this->getUrl(true, true, true).' '.$this->getMethod().' '.$this->getLanguage());
 	}
 
 
