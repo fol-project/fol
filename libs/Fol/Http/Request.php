@@ -200,7 +200,7 @@ class Request {
 	 * @return string The id
 	 */
 	public function getId () {
-		return md5($this->getUrl(true, true, true).' '.$this->getMethod().' '.$this->getLanguage());
+		return md5($this->getUrl(true, true, true).' '.$this->getMethod());
 	}
 
 
