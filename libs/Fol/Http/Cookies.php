@@ -11,6 +11,17 @@ class Cookies {
 
 
 	/**
+	 * Magic function to recover the object exported by var_export
+	 */
+	public static function __set_state ($array) {
+		$Cookies = new static();
+		$Cookies->setState($array['items']);
+
+		return $Cookies;
+	}
+
+
+	/**
 	 * Magic function to converts all cookies to a string
 	 */
 	public function __toString () {
