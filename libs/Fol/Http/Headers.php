@@ -220,7 +220,7 @@ class Headers {
 	 * @return array The parsed value
 	 */
 	public function getParsed ($name) {
-		return $this->toArray($this->get($name));
+		return static::toArray($this->get($name));
 	}
 
 
@@ -231,7 +231,7 @@ class Headers {
 	 * @param array $value The parsed value
 	 */
 	public function setParsed ($name, array $value) {
-		$this->set($name, $this->toString($value));
+		$this->set($name, static::toString($value));
 	}
 
 
@@ -246,11 +246,15 @@ class Headers {
 	 * @return Datetime The value in a datetime object or false
 	 */
 	public function getDateTime ($name, $default = 'now') {
-		if ($date = $this->get($name) ?: $default) {
-			return \DateTime::createFromFormat(DATE_RFC2822, $date);
+		if ($this->has($name)) {
+			return \DateTime::createFromFormat(DATE_RFC2822, $this->get($name));
 		}
 
-		return false;
+		if ($default instanceof \Datetime) {
+			return $default;
+		}
+
+		return new \Datetime($default, new \DateTimeZone('UTC'));
 	}
 
 
@@ -263,8 +267,8 @@ class Headers {
 	 * 
 	 * @return Datetime The datetime object
 	 */
-	public function setDateTime ($name, $Datetime) {
-		if (is_string($Datetime)) {
+	public function setDateTime ($name, $Datetime = null) {
+		if (!($Datetime instanceof \Datetime)) {
 			$Datetime = new \DateTime($Datetime);
 		}
 
@@ -318,7 +322,7 @@ class Headers {
 	 * 
 	 * @return array The parsed value
 	 */
-	private function toArray ($value) {
+	private static function toArray ($value) {
 		if (!$value) {
 			return array();
 		}
@@ -326,27 +330,24 @@ class Headers {
 		$results = array();
 
 		foreach (explode(',', $value) as $values) {
-			$values = explode(';', $values);
+			$items = array();
 
-			if (strpos($values[0], '=') === false) {
-				$name = trim(array_shift($values));
-			} else {
-				$name = false;
+			foreach (explode(';', $values) as $value) {
+				if (strpos($value, '=') === false) {
+					$items[trim($value)] = true;
+				} else {
+					list($name, $value) = explode('=', $value, 2);
+					$items[trim($name)] = trim($value);
+				}
 			}
 
-			$parameters = array();
+			$name = key($items);
 
-			foreach ($values as $value) {
-				list($key, $value) = explode('=', $value, 2);
-				$value = trim($value);
-
-				$parameters[trim($key)] = $value ? $value : true;
-			}
-
-			if ($name === false) {
-				$results[] = $parameters;
+			if (($items[$name] === true) && (count($items) > 1)) {
+				array_shift($items);
+				$results[$name] = $items;
 			} else {
-				$results[$name] = $parameters;
+				$results[$name] = $items[$name];
 			}
 		}
 
@@ -362,36 +363,28 @@ class Headers {
 	 * 
 	 * @return string The value in string format
 	 */
-	private function toString (array $values) {
+	private static function toString (array $values) {
 		if (!$values) {
 			return '';
 		}
 
 		$results = array();
 
-		foreach ($values as $name => $sub_values) {
-			$sub_results = array();
-
-			if (!is_int($name)) {
-				$sub_results[] = $name;
+		foreach ($values as $name => $value) {
+			if (!is_array($value)) {
+				$results[] = ($value === true) ? $name : "$name=$value";
+				continue;
 			}
 
-			foreach ($sub_values as $sub_name => $sub_value) {
-				if ($sub_value === false) {
-					continue;
-				}
+			$sub_values = array($name);
 
-				if ($sub_value === true) {
-					$sub_results[] = $sub_name;
-				} else {
-					$sub_results[] = $sub_name.'='.$sub_value;
-				}
+			foreach ($value as $value_name => $value_value) {
+				$sub_values[] = ($value_value === true) ? $value_name : "$value_name=$value_value";
 			}
 
-			$results[] = implode(';', $sub_results);
+			$results[] = implode(';', $sub_values);
 		}
 
 		return implode(',', $results);
 	}
 }
-?>
