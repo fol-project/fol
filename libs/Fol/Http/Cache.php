@@ -8,7 +8,6 @@ namespace Fol\Http;
 
 class Cache {
 	protected $Container;
-	protected $privateId;
 
 
 	/**
@@ -21,14 +20,9 @@ class Cache {
 	}
 
 
-	public function setPrivateId ($id) {
-		$this->privateId = $id;
-	}
-
-
 	public function save (Request $Request) {
 		if (static::isCacheable($Request)) {
-			$id = $Request->getId().'.'.$this->privateId;
+			$id = $Request->getId();
 
 			$this->Container->set($id, $Request->Response);
 		}
@@ -44,13 +38,21 @@ class Cache {
 	 * @return boolean Fol\Http\Response The cached response or false
 	 */
 	public function getCachedResponse (Request $Request) {
-		$id = $Request->getId().'.'.$this->privateId;
+		$id = $Request->getId();
 
-		if (!$this->Container->has($id)) {
+		if (!($Response = $this->Container->get($id))) {
 			return false;
 		}
 
-		return $this->Container->get($id);
+		if ($Response->Headers->has('Expires') && ($Response->Headers->getDateTime('Expires')->getTimestamp() < time())) {
+			return false;
+		}
+
+		if ($Response->getAge() > $Response->getMaxAge()) {
+			return false;
+		}
+
+		return $Response;
 	}
 
 
@@ -78,4 +80,3 @@ class Cache {
 		return true;
 	}
 }
-?>

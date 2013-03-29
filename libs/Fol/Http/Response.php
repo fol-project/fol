@@ -43,6 +43,10 @@ class Response {
 
 		$this->Headers = new ResponseHeaders($headers);
 		$this->Cookies = new Cookies();
+
+		if (!$this->Headers->has('Date')) {
+			$this->Headers->setDateTime('Date', new \DateTime());
+		}
 	}
 
 
@@ -168,6 +172,19 @@ class Response {
 
 
 	/**
+	 * Defines a Not Modified status
+	 */
+	public function setNotModified () {
+		$this->setStatus(304);
+		$this->setContent('');
+
+		foreach (array('Allow', 'Content-Encoding', 'Content-Language', 'Content-Length', 'Content-MD5', 'Content-Type', 'Last-Modified') as $name) {
+			$this->Headers->remove($header);
+		}
+	}
+
+
+	/**
 	 * Sends the headers and the content
 	 */
 	public function send () {
@@ -202,5 +219,116 @@ class Response {
 	public function sendContent () {
 		echo $this->content;
 	}
+
+
+	/**
+	 * Defines a Last-Modified header
+	 * 
+	 * @param string/Datetime $datetime
+	 */
+	public function setLastModified ($datetime) {
+		$this->Headers->setDateTime('Last-Modified', $datetime);
+	}
+
+
+
+	/**
+	 * Defines a Expire header
+	 * 
+	 * @param string/Datetime $datetime
+	 */
+	public function setExpires ($datetime) {
+		$this->Headers->setDateTime('Expires', $datetime);
+	}
+
+
+
+	/**
+	 * Returns the age of the response
+	 * 
+	 * @return integer The age in seconds
+	 */
+	public function getAge () {
+		if ($this->Headers->has('Age')) {
+			return (int)$this->Headers->get('Age');
+		}
+
+		return max(time() - $this->Headers->getDateTime('Date')->getTimestamp(), 0);
+	}
+
+
+	/**
+	 * Defines a max-age and optionally s-maxage cache directive
+	 *
+	 * @param int $max_age The max age in seconds
+	 * @param int $shared_max_age The shared max age in seconds
+	 */
+	public function setMaxAge ($max_age, $shared_max_age = null) {
+		$cacheControl = $this->Headers->getParsed('Cache-Control');
+		$cacheControl['max-age'] = (int)$max_age;
+
+		if ($shared_max_age !== null) {
+			$cacheControl['s-maxage'] = (int)$shared_max_age;
+		}
+
+		$this->Headers->setParsed('Cache-Control', $cacheControl);
+	}
+
+
+	/**
+	 * Returns the max-age cache directive
+	 *
+	 * @return int $age The age in seconds
+	 */
+	public function getMaxAge () {
+		$cacheControl = $this->Headers->getParsed('Cache-Control');
+
+		if (isset($cacheControl['s-maxage'])) {
+			return (int)$cacheControl['s-maxage'];
+		}
+
+		return isset($cacheControl['max-age']) ? (int)$cacheControl['max-age'] : 0;
+	}
+
+
+	/**
+	 * Defines the response as public in Cache-Control directive
+	 */
+	public function setPublic () {
+		$cacheControl = $this->Headers->getParsed('Cache-Control');
+		$cacheControl['public'] = true;
+		unset($cacheControl['private']);
+		$this->Headers->setParsed('Cache-Control', $cacheControl);
+	}
+
+
+	/**
+	 * Defines the response as private in Cache-Control directive
+	 */
+	public function setPrivate () {
+		$cacheControl = $this->Headers->getParsed('Cache-Control');
+		$cacheControl['private'] = true;
+		unset($cacheControl['public']);
+		$this->Headers->setParsed('Cache-Control', $cacheControl);
+	}
+
+
+	/**
+	 * Check if the response must be revalidated by the origin
+	 */
+	public function mustRevalidate () {
+		$cacheControl = $this->Headers->getParsed('Cache-Control');
+
+		return (!empty($cacheControl['must-revalidate']) || $this->Headers->has('proxy-revalidate'));
+	}
+
+
+	/**
+	 * Add a must-revalidate cache control directive
+	 */
+	public function setMustRevalidate () {
+		$cacheControl = $this->Headers->getParsed('Cache-Control');
+		$cacheControl['must-revalidate'] = true;
+		$this->Headers->setParsed('Cache-Control', $cacheControl);
+	}
 }
-?>

@@ -21,7 +21,7 @@ class Request {
 	public $Server;
 
 	private $path;
-	private $format = 'html'; //Default format
+	private $format = 'html';
 
 
 
@@ -280,10 +280,10 @@ class Request {
 	 * Gets the requested format.
 	 * The format is get from the path (the extension of the requested file), or from the Accept http header
 	 * 
-	 * @return string The current format (html, xml, css, etc) or false
+	 * @return string The current format (html, xml, css, etc) or the default format
 	 */
 	public function getFormat () {
-		return $this->format ?: false;
+		return $this->format;
 	}
 
 
@@ -455,7 +455,7 @@ class Request {
 	/**
 	 * Check if the response has been modified or not
 	 * 
-	 * @return boolean False if the response is modified, true if not
+	 * @return boolean True if the response is not modified, false if is modified or there isn't cache headers
 	 */
 	public function responseIsNotModified () {
 		$RequestHeaders = $this->Headers;
@@ -480,5 +480,15 @@ class Request {
 		}
 
 		return $hasCondition;
+	}
+
+
+	/**
+	 * Defines a If-Modified-Since header
+	 * 
+	 * @param string/Datetime $datetime
+	 */
+	public function setIfModifiedSince ($datetime) {
+		$this->Headers->setDateTime('If-Modified-Since', $datetime);
 	}
 }
