@@ -11,6 +11,56 @@ abstract class App {
 	public $Parent;
 
 
+	public static function buildCliOptions (array $arguments) {
+		$options = [
+			'num' => [],
+			'name' => []
+		];
+
+		while ($arguments) {
+			$option = array_shift($arguments);
+
+			if (preg_match('#^(-+)([\w]+)$#', $option, $match)) {
+				$option = $match[2];
+				$options['name'][$option] = $arguments ? array_shift($arguments) : true;
+			} else {
+				$options['num'][] = $option;
+			}
+		}
+
+		return $options;
+	}
+
+
+	/**
+	 * Executes a method
+	 * 
+	 * @param string $method The method name
+	 * @param array $arguments The variables passed to the method.
+	 */
+	public function invoke ($method, array $arguments) {
+		if (method_exists($this, $method)) {
+			$options = static::buildCliOptions($arguments);
+
+			$Method = new \ReflectionMethod($this, $method);
+
+			$arguments = array();
+
+			foreach ($Method->getParameters() as $Parameter) {
+				if (isset($options['name'][$Parameter->getName()])) {
+					$arguments[] = $options['name'][$Parameter->getName()];
+				} else if ($options['num']) {
+					$arguments[] = array_shift($options['num']);
+				} else if ($Parameter->isDefaultValueAvailable()) {
+					$arguments[] = $Parameter->getDefaultValue();
+				}
+			}
+
+			$Method->invokeArgs($this, $arguments);
+		}
+	}
+
+
 	/**
 	 * Magic function to get some special properties.
 	 * Instead calculate this on the __constructor, is better use __get to do not obligate to call this constructor in the extensions of this class
