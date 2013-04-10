@@ -108,7 +108,7 @@ class Router {
 	public function handle (\Fol\App $App, Request $Request) {
 		try {
 			if (($Route = $this->match($Request)) === false) {
-				throw new HttpException(Headers::$status[404], 404);
+				throw new HttpException(ResponseHeaders::$status[404], 404);
 			} else {
 				$Route->execute($App, $Request);
 			}
