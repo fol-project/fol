@@ -132,7 +132,7 @@ abstract class App {
 
 			if (($Route = $Router->getByName('error'))) {
 				$Request->Response->setContent('');
-				$Request->Response->appendContent($this->executeRoute($Route, [$Request]));
+				$Request->Response->appendContent($this->executeRoute($Route, [$Request, $Exception]));
 			} else {
 				$Request->Response->setContent($Exception->getMessage());
 			}
