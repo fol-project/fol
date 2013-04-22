@@ -129,41 +129,4 @@ class Route {
 
 		return BASE_URL.$url;
 	}
-
-
-	/**
-	 * Executes the route target
-	 * 
-	 * @param Fol\App $App The app object
-	 * @param Fol\Http\Request $Request The request used
-	 * @param array $extra_arguments Extra arguments passed to the controller (after $Request and $App)
-	 * 
-	 * @return Fol\Http\Response The response of the controller
-	 */
-	public function execute (\Fol\App $App, Request $Request, array $extra_arguments = array()) {
-		ob_start();
-
-		$arguments = $extra_arguments;
-		$target = $this->target;
-
-		$Request->Parameters->set($this->parameters);
-
-		if (is_callable($target)) {
-			array_unshift($arguments, $Request, $App);
-
-			$return = call_user_func_array($target, $arguments);
-		} elseif (is_string($target) && (strpos($target, '::') !== false)) {
-			list($class, $method) = explode('::', $target, 2);
-			array_unshift($arguments, $Request);
-
-			$class = $App->namespace.'\\Controllers\\'.$class;
-
-			$Class = new $class($App, $Request);
-
-			$return = call_user_func_array([$Class, $method], $arguments);
-		}
-
-		$Request->Response->prependContent($return);
-		$Request->Response->prependContent(ob_get_clean());
-	}
 }

@@ -24,7 +24,6 @@ class Request {
 	private $format = 'html';
 
 
-
 	/**
 	 * Creates a new request object from global values
 	 * 
@@ -34,6 +33,38 @@ class Request {
 		$path = parse_url(preg_replace('|^'.preg_quote(BASE_URL).'|i', '', urldecode($_SERVER['REQUEST_URI'])), PHP_URL_PATH);
 
 		return new static($path, array(), (array)filter_input_array(INPUT_GET), (array)filter_input_array(INPUT_POST), $_FILES, (array)filter_input_array(INPUT_COOKIE), (array)filter_input_array(INPUT_SERVER));
+	}
+
+
+	/**
+	 * Creates a new request object from global values
+	 * 
+	 * @return Fol\Http\Request The object with the global data
+	 */
+	static public function createFromCli (array $args) {
+		$file = array_shift($args);
+		$path = array_shift($args);
+		$method = 'GET';
+		$parameters = [];
+
+		if ($args) {
+			if (in_array($args[0], ['GET', 'POST'])) {
+				$method = array_shift($args);
+			}
+
+			while ($args) {
+				$option = array_shift($args);
+
+				if (preg_match('#^(-+)([\w]+)$#', $option, $match)) {
+					$option = $match[2];
+					$parameters[$option] = $args ? array_shift($args) : true;
+				} else {
+					$parameters[] = $option;
+				}
+			}
+		}
+
+		return static::create($path, $method, $parameters);
 	}
 
 
@@ -280,7 +311,7 @@ class Request {
 	 * Gets the requested format.
 	 * The format is get from the path (the extension of the requested file), or from the Accept http header
 	 * 
-	 * @return string The current format (html, xml, css, etc) or the default format
+	 * @return string The current format (html, xml, css, etc)
 	 */
 	public function getFormat () {
 		return $this->format;

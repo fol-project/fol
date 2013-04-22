@@ -7,58 +7,14 @@
 
 namespace Fol;
 
+use Fol\Http\Router;
+use Fol\Http\Route;
+use Fol\Http\Request;
+use Fol\Http\HttpException;
+
 abstract class App {
 	public $Parent;
-
-
-	public static function buildCliOptions (array $arguments) {
-		$options = [
-			'num' => [],
-			'name' => []
-		];
-
-		while ($arguments) {
-			$option = array_shift($arguments);
-
-			if (preg_match('#^(-+)([\w]+)$#', $option, $match)) {
-				$option = $match[2];
-				$options['name'][$option] = $arguments ? array_shift($arguments) : true;
-			} else {
-				$options['num'][] = $option;
-			}
-		}
-
-		return $options;
-	}
-
-
-	/**
-	 * Executes a method
-	 * 
-	 * @param string $method The method name
-	 * @param array $arguments The variables passed to the method.
-	 */
-	public function invoke ($method, array $arguments) {
-		if (method_exists($this, $method)) {
-			$options = static::buildCliOptions($arguments);
-
-			$Method = new \ReflectionMethod($this, $method);
-
-			$arguments = array();
-
-			foreach ($Method->getParameters() as $Parameter) {
-				if (isset($options['name'][$Parameter->getName()])) {
-					$arguments[] = $options['name'][$Parameter->getName()];
-				} else if ($options['num']) {
-					$arguments[] = array_shift($options['num']);
-				} else if ($Parameter->isDefaultValueAvailable()) {
-					$arguments[] = $Parameter->getDefaultValue();
-				}
-			}
-
-			$Method->invokeArgs($this, $arguments);
-		}
-	}
+	private $services;
 
 
 	/**
@@ -70,6 +26,11 @@ abstract class App {
 	 * @return string The property value or null
 	 */
 	public function __get ($name) {
+		//Registered services
+		if (isset($this->services[$name])) {
+			return $this->$name = $this->services[$name]();
+		}
+
 		//The app name. (Web)
 		if ($name === 'name') {
 			return $this->name = substr(strrchr($this->namespace, '\\'), 1);
@@ -110,5 +71,102 @@ abstract class App {
 	public function setParent (App $Parent) {
 		$this->Parent = $Parent;
 	}
+
+
+	/**
+	 * Register a new service
+	 * 
+	 * @param string $name The service name
+	 * @param Closure $resolver A function that returns a service instance
+	 */
+	public function register ($name, \Closure $resolver = null) {
+		if (is_array($name)) {
+			foreach ($name as $name => $resolver) {
+				$this->register($name, $resolver);
+			}
+
+			return;
+		}
+
+		$this->services[$name] = $resolver;
+	}
+
+
+	/**
+	 * Deletes a service
+	 * 
+	 * @param string $name The service name
+	 */
+	public function unregister ($name) {
+		unset($this->services[$name]);
+	}
+
+
+	/**
+	 * Handle a request and returns a response
+	 * 
+	 * @param  Fol\Http\Request $Request The request to handle
+	 * @param  string $name Set a route name to force to use this route instead detect by url
+	 * 
+	 * @return Fol\Http\Response The resulted response
+	 */
+	public function handleRequest (Router $Router, Request $Request, $name = null) {
+		try {
+			$Route = ($name === null) ? $Router->match($Request) : $Router->getByName($name);
+
+			if ($Route) {
+				try {
+					$Request->Response->appendContent($this->executeRoute($Route, [$Request]));
+				} catch (\Exception $Exception) {
+					if ($Exception instanceof HttpException) {
+						throw $Exception;
+					} else {
+						throw new HttpException('Error Processing Request', 500, $Exception);
+					}
+				}
+			} else {
+				throw new HttpException('This route does not exits', 404);
+			}
+		} catch (HttpException $Exception) {
+			$Request->Response->setStatus($Exception->getCode());
+
+			if (($Route = $Router->getByName('error'))) {
+				$Request->Response->setContent('');
+				$Request->Response->appendContent($this->executeRoute($Route, [$Request]));
+			} else {
+				$Request->Response->setContent($Exception->getMessage());
+			}
+		}
+
+		return $Request->Response;
+	}
+
+
+	/**
+	 * Executes a route target
+	 * 
+	 * @param Fol\Http\Route $Route The route to execute
+	 * @param array $arguments The arguments passed to the controller
+	 * 
+	 * @return string The return of the controller
+	 */
+	protected function executeRoute (Route $Route, array $arguments = array()) {
+		ob_start();
+
+		$target = $Route->getTarget();
+
+		if (is_callable($target)) {
+			$return = call_user_func_array($target, $arguments);
+		} elseif (is_string($target) && (strpos($target, '::') !== false)) {
+			list($class, $method) = explode('::', $target, 2);
+
+			$class = $this->namespace.'\\Controllers\\'.$class;
+
+			$Class = new $class($this);
+
+			$return = call_user_func_array([$Class, $method], $arguments);
+		}
+
+		return ob_get_clean().$return;
+	}
 }
-?>

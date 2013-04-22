@@ -6,7 +6,7 @@
  */
 namespace Fol\Http;
 
-class Container {
+class Container implements ContainerInterface {
 	protected $items = array();
 
 
@@ -122,4 +122,4 @@ class Container {
 		return array_key_exists($name, $this->items);
 	}
 }
-?>
+

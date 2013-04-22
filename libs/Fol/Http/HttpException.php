@@ -14,8 +14,8 @@ class HttpException extends \Exception {
 	 * @param string $message The http message
 	 * @param integer $code The http error code. By default is 500
 	 */
-	public function __construct ($message, $code = 500) {
-		parent::__construct($message, $code);
+	public function __construct ($message, $code = 500, $previous = null) {
+		parent::__construct($message, $code, $previous);
 	}
 }
 ?>

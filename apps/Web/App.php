@@ -11,12 +11,8 @@ class App extends \Fol\App {
 		$this->Router->map('index', '/', 'Index::index');
 	}
 
-	public function handle () {
-		$Request = Request::createFromGlobals();
-
-		$this->Router->handle($this, $Request);
-
-		return $Request->Response;
+	public function handle (Request $Request, $name = null) {
+		return $this->handleRequest($this->Router, $Request, $name);
 	}
 }
 ?>

@@ -48,12 +48,10 @@ class Router {
 	* @param array $config Array of optional arguments.
 	*/
 	public function map ($name, $url, $target = '', array $config = array()) {
-		$Route = new Route($name, $this->baseUrl.$url, $target, $config);
-
 		if ($name === null) {
-			$this->routes[] = $Route;
+			$this->routes[] = new Route($name, $url, $target, $config);
 		} else {
-			$this->routes[$name] = $Route;
+			$this->routes[$name] = new Route($name, $url, $target, $config);
 		}
 	}
 
@@ -74,58 +72,43 @@ class Router {
 	}
 
 
+	/**
+	 * Search a router by name
+	 * 
+	 * @param string $name The route name
+	 * 
+	 * @return Fol\Http\Route The route found or false
+	 */
+	public function getByName ($name) {
+		if (!isset($this->routes[$name])) {
+			return false;
+		}
+
+		return $this->routes[$name];
+	}
+
+
 	
 	/**
 	 * Reverse route a named route
 	 * 
-	 * @param string $routeName The name of the route to reverse route.
+	 * @param string $name The name of the route to reverse route.
 	 * @param array $params Optional array of parameters to use in URL
 	 * @param boolean $absolute Set true to generate absolute urls
 	 * 
 	 * @return string The url to the route
 	 */
-	public function generate ($routeName, array $params = array(), $absolute = false) {
-		if (!isset($this->routes[$routeName])) {
-			throw new Exception("No route with the name $routeName has been found.");
+	public function generate ($name, array $params = array(), $absolute = false) {
+		if (!isset($this->routes[$name])) {
+			throw new Exception("No route with the name $name has been found.");
 		}
+
+		$Route = $this->routes[$name];
 
 		if ($absolute === true) {
-			return $this->absoluteUrl.$this->routes[$routeName]->generate($params, $absolute);
+			return $this->absoluteUrl.$Route->generate($params, $absolute);
 		}
 
-		return $this->routes[$routeName]->generate($params, $absolute);
-	}
-
-
-	/**
-	 * Handle a http request: search a controller and execute it
-	 * 
-	 * @param Fol\App $App The instance of the application
-	 * @param Fol\Http\Request $Request The request object
-	 * 
-	 * @return Fol\Http\Response The response object with the controller result
-	 */
-	public function handle (\Fol\App $App, Request $Request) {
-		try {
-			if (($Route = $this->match($Request)) === false) {
-				throw new HttpException(ResponseHeaders::$status[404], 404);
-			} else {
-				$Route->execute($App, $Request);
-			}
-		} catch (HttpException $Exception) {
-			if (!isset($this->routes['error'])) {
-				$Request->Response->setContent($Exception->getMessage());
-				$Request->Response->setStatus($Exception->getCode());
-			} else {
-				$this->routes['error']->execute($App, $Request, [$Exception]);
-			}
-		} catch (\Exception $Exception) {
-			if (!isset($this->routes['error'])) {
-				$Request->Response->setContent($Exception->getMessage());
-				$Request->Response->setStatus(500);
-			} else {
-				$this->routes['error']->execute($App, $Request, [$Exception]);
-			}
-		}
+		return $Route->generate($params, $absolute);
 	}
 }
