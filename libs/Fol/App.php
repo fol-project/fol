@@ -116,7 +116,7 @@ abstract class App {
 
 			if ($Route) {
 				try {
-					$Request->parameters->set($Route->getParameters());
+					$Request->Parameters->set($Route->getParameters());
 					$Request->Response->appendContent($this->executeRoute($Route, [$Request]));
 				} catch (\Exception $Exception) {
 					if ($Exception instanceof HttpException) {
