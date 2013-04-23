@@ -12,6 +12,11 @@ class Index {
 		return new Response('Ola mundo');
 	}
 
+	public function files ($Request) {
+		$file = preg_replace('#^'.preg_quote($this->App->assetsUrl.'/cache/', '#').'#', '', $Request->getUrl(false));
+		$method = $Request->getFormat();
+	}
+
 	public function error ($Request, HttpException $Exception) {
 		return new Response($Exception->getMessage(), 500);
 	}

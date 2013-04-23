@@ -174,10 +174,7 @@ class App extends \Fol\App {
 	}
 
 	public function handle ($Request) {
-		//Resolvemos a petición actual
-		$this->Router->handle($this, $Request);
-
-		//Devolvemos a resposta xerada por esa petición
-		return $Request->Response;
+		//Resolvemos a petición actual e devolvemos o resultado
+		return $this->handleRequest($this->Router, $Request);
 	}
 }
