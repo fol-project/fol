@@ -38,6 +38,8 @@ class Request {
 
 	/**
 	 * Creates a new request object from global values
+	 *
+	 * @param array $args The $argv variable with the arguments
 	 * 
 	 * @return Fol\Http\Request The object with the global data
 	 */

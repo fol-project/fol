@@ -15,6 +15,7 @@ class Route {
 	private $filters = array();
 	private $parameters = array();
 	private $regex = null;
+	private $onlyCli = false;
 
 	public function __construct ($name, $url, $target, array $config = array()) {
 		$this->name = $name;
@@ -31,6 +32,10 @@ class Route {
 
 		if (isset($config['parameters'])) {
 			$this->parameters = (array)$config['parameters'];
+		}
+
+		if (isset($config['only-cli'])) {
+			$this->onlyCli = (bool)$config['only-cli'];
 		}
 	}
 
@@ -81,6 +86,10 @@ class Route {
 	 * @return boolean True if it match, false if not
 	 */
 	public function match ($Request) {
+		if (($this->onlyCli === true) && (php_sapi_name() !== 'cli')) {
+			return false;
+		}
+
 		if (!in_array($Request->getMethod(), $this->methods)) {
 			return false;
 		}
