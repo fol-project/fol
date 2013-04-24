@@ -169,7 +169,7 @@ class App extends \Fol\App {
 		$this->Router = new Router($this->url);
 
 		//Definimos as distintas rutas (nome da ruta, url e controlador)
-		$this->Router->map('index', '/', 'Index::index');
+		$this->Router->map('index', '/', 'Index::index', ['methods' => 'GET']);
 		$this->Router->map('contacto', '/about', 'Index::about');
 	}
 
@@ -178,3 +178,29 @@ class App extends \Fol\App {
 		return $this->handleRequest($this->Router, $Request);
 	}
 }
+
+Cada petición http que se fai comezase executando o arquivo index.php que é o que inicializa as variables necesarias e instancia a app por defecto. Ese arquivo tamén se pode executar en liña de comandos o que facilita a execución de determinadas operacións directamente ou usando crons.
+
+Execución dunha ruta en liña de comandos (/posts/list):
+
+```
+$ php index.php /posts/list
+```
+
+Execución dunha ruta con parámetros get (/posts/lists?order=id&page=2)
+
+```
+$ php index.php /posts/lists GET --order id --page 2
+```
+
+Execución dunha ruta con parámetros post:
+
+```
+$ php index.php /posts/create POST --title "Título do posts"
+```
+
+Para definir unha ruta que solo se execute en consola podes indicalo nas preferencias da ruta co parámetro "only-cli":
+
+```php
+$Router->map('users/list', 'Index::listUsers', ['only-cli' => true]);
+```
