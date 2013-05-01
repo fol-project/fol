@@ -202,5 +202,5 @@ $ php index.php /posts/create POST --title "Título do posts"
 Para definir unha ruta que solo se execute en consola podes indicalo nas preferencias da ruta co parámetro "only-cli":
 
 ```php
-$Router->map('users/list', 'Index::listUsers', ['only-cli' => true]);
+$Router->map('lista-usuarios', 'users/list', 'Index::listUsers', ['only-cli' => true]);
 ```
