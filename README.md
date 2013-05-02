@@ -190,6 +190,10 @@ $ php index.php /posts/list
 Execución dunha ruta con parámetros get (/posts/lists?order=id&page=2)
 
 ```
+$ php index.php "/posts/lists?order=id&page=2"
+```
+ou tamén:
+```
 $ php index.php /posts/lists GET --order id --page 2
 ```
 
