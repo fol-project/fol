@@ -12,6 +12,7 @@ class Templates {
 	protected $renders;
 	protected $templates;
 	protected $templatesPath = array();
+	protected $currentPath;
 	protected $helpers = array();
 
 
@@ -134,6 +135,10 @@ class Templates {
 			$template = $this->templates[$template];
 		}
 
+		if (($template[0] !== '/') && !empty($this->currentPath) && is_file($this->currentPath.'/'.$template)) {
+			return $this->currentPath.'/'.$template;
+		}
+
 		foreach ($this->templatesPath as $path) {
 			if (is_file($path.$template)) {
 				return $path.$template;
@@ -154,13 +159,20 @@ class Templates {
 	 * @return string The file content
 	 */
 	protected function renderFile ($_file, array $_data = null) {
+		$_previousPath = $this->currentPath;
+		$this->currentPath = dirname($_file);
+
 		if ($_data !== null) {
 			extract((array)$_data, EXTR_SKIP);
 		}
 
+		unset($_data);
+
 		ob_start();
 
 		include($_file);
+
+		$this->currentPath = $_previousPath;
 
 		return ob_get_clean();
 	}
