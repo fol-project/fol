@@ -16,6 +16,7 @@ class Response {
 	protected $content;
 	protected $status;
 	protected $content_type;
+	protected $headers_sent = false;
 
 
 	public static function __set_state ($array) {
@@ -188,8 +189,28 @@ class Response {
 	 * Sends the headers and the content
 	 */
 	public function send () {
-		$this->sendHeaders();
+		if (!$this->headers_sent) {
+			$this->sendHeaders();
+			$this->headers_sent = true;
+		}
+
 		$this->sendContent();
+	}
+
+
+	/**
+	 * Send the output buffer and empty the response content
+	 */
+	public function flush () {
+		$this->send();
+		
+		flush();
+
+		if (ob_get_level() > 0) {
+			ob_flush();
+		}
+
+		$this->content = '';
 	}
 
 
