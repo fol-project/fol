@@ -100,7 +100,7 @@ class Router {
 	 */
 	public function generate ($name, array $params = array(), $absolute = false) {
 		if (!isset($this->routes[$name])) {
-			throw new Exception("No route with the name $name has been found.");
+			throw new \Exception("No route with the name $name has been found.");
 		}
 
 		$Route = $this->routes[$name];
