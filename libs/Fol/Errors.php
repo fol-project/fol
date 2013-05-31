@@ -2,26 +2,61 @@
 /**
  * Fol\Errors
  * 
- * A simple class to handle all errors.
+ * A simple class to handle all php errors.
  */
 namespace Fol;
 
 class Errors {
-	static private $level;
-	static private $handler;
+	static protected $handlers = array();
+	static protected $isRegistered = false;
+	static protected $displayErrors = false;
+
+
+	/**
+	 * Enable or disable the error displaying
+	 *
+	 * @param boolean $display True to display, false to not
+	 */
+	static public function displayErrors ($display = true) {
+		static::$displayErrors = $display;
+	}
+
+
+	/**
+	 * Pushes a handler to the end of the stack.
+	 *
+	 * @param callable $handler The callback to execute
+	 */
+	static public function pushHandler ($handler) {
+		if (!is_callable($handler)) {
+			throw new \InvalidArgumentException('The argument to ' . __METHOD__ . ' is not callable');
+		}
+
+		static::$handlers[] = $handler;
+	}
+
+
+	/**
+	 * Removes the last handler and returns it
+	 *
+	 * @return callable or null
+	 */
+	static public function popHandler () {
+		return array_pop(static::$handlers);
+	}
 
 
 	/**
 	 * Register the error handler.
-	 * 
-	 * Fol\Errors::register(E_ALL);
-	 * 
-	 * @param int $level The error level you want to notify
 	 */
-	static public function register ($level = null) {
-		self::setLevel($level);
+	static public function register () {
+		if (!static::$isRegistered) {
+			set_error_handler(__NAMESPACE__.'\\Errors::handleError');
+			set_exception_handler(__NAMESPACE__.'\\Errors::handleException');
+			register_shutdown_function(__NAMESPACE__.'\\Errors::handleShutdown');
 
-		set_error_handler(__NAMESPACE__.'\\Errors::handle');
+			static::$isRegistered = true;
+		}
 	}
 
 
@@ -29,57 +64,37 @@ class Errors {
 	 * Unregister the error handler. Restore the error handler to previous status.
 	 */
 	static public function unregister () {
-		restore_error_handler();
+		if (static::$isRegistered) {
+			restore_error_handler();
+			restore_exception_handler();
+
+			static::$isRegistered = false;
+		}
 	}
 
 
 	/**
-	 * Show or hide the errors in the screen
-	 * 
-	 * @param boolean $show True to show the errors, false to not
-	 */
-	static public function displayErrors ($display) {
-		ini_set('display_errors', ($display === true) ? 'On' : 'Off');
-		ini_set('display_startup_errors', ($display === true) ? 'On' : 'Off');
-	}
-
-
-	/**
-	 * Sets the error level. The errors lower than the level will be silentiated
-	 * 
-	 * @param int $level The error level you want to notify
-	 */
-	static public function setLevel ($level) {
-		self::$level = is_null($level) ? error_reporting() : $level;
-	}
-
-
-	/**
-	 * Throws ErrorException when error_reporting returns error and the error level is equal or upper.
+	 * Converts a php error to an exception and handle it
 	 * 
 	 * @param int $level The error level
 	 * @param string $message The error message
 	 * @param string $file The file when the error is
 	 * @param int $file The number of the line when the error is
-	 * 
-	 * @return false
 	 */
-	static public function handle ($level, $message, $file, $line) {
-		if (self::$level === 0) {
-			return false;
+	static public function handleError ($level, $message, $file = null, $line = null) {
+		if (error_reporting() & $level) {
+			static::handleException(new \ErrorException($message, $level, 0, $file, $line));
 		}
+	}
 
-		if ((error_reporting() & $level) && (self::$level & $level)) {
-			$Exception = new \ErrorException($message, $level, $level, $file, $line);
 
-			if (isset(self::$handler)) {
-				call_user_func(self::$handler, $Exception);
-			} else {
-				throw $Exception;
-			}
+	/**
+	 * Converts a php shutdown error to an exception and handle it
+	 */
+	static public function handleShutdown () {
+		if (static::$isRegistered && ($error = error_get_last())) {
+			static::handleError($error['type'], $error['message'], $error['file'], $error['line']);
 		}
-
-		return false;
 	}
 
 
@@ -88,16 +103,35 @@ class Errors {
 	 * 
 	 * @param callable The callback executed
 	 */
-	static public function setHandler (callable $callback) {
-		self::$handler = $callback;
-		set_exception_handler($callback);
+	static public function handleException (\Exception $Exception) {
+		foreach (static::$handlers as $handler) {
+			$handler($Exception);
+		}
+
+		if (static::$displayErrors) {
+			echo static::printException($Exception);
+		}
 	}
 
-	/**
-	 * Restore the execption handler to previous status
-	 */
-	static public function restoreHandler () {
-		restore_exception_handler();
+	static protected function printException (\Exception $Exception) {
+		if (($Previous = $Exception->getPrevious())) {
+			$previous = self::printException($Previous);
+		} else {
+			$previous = '';
+		}
+
+		$class = get_class($Exception);
+
+		echo <<<EOT
+<section id="ErrorException">
+	<h1>{$Exception->getMessage()} ({$Exception->getCode()})</h1>
+	<p>
+		<em>{$class}</em><br>
+		{$Exception->getFile()}:{$Exception->getLine()}
+	</p>
+	<pre>{$Exception->getTraceAsString()}</pre>
+	{$previous}
+</section>
+EOT;
 	}
 }
-?>

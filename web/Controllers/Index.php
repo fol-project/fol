@@ -9,7 +9,7 @@ class Index {
 	}
 
 	public function index ($Request) {
-		return new Response('Ola mundo');
+		return new Respons('Ola mundo');
 	}
 
 	public function files ($Request) {

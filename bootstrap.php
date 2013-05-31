@@ -17,7 +17,9 @@ include(BASE_PATH.'/libs/Fol/Loader.php');
 Loader::register();
 Loader::setLibrariesPath(BASE_PATH.'/libs');
 Loader::registerComposer();
-Loader::registerNamespace('Apps', BASE_PATH.'/apps');
 
-Errors::register(E_ALL);
-Errors::displayErrors(true);
+//Register the apps
+Loader::registerNamespace('Apps\\Web', BASE_PATH.'/web');
+
+Errors::register();
+Errors::displayErrors();
