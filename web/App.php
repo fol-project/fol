@@ -9,6 +9,7 @@ class App extends \Fol\App {
 		$this->Router = new Router($this->url);
 
 		$this->Router->map('index', '/', 'Index::index');
+		$this->Router->map('phpinfo', '/phpinfo', 'Index::phpinfo');
 	}
 
 	public function handle (Request $Request, $name = null) {

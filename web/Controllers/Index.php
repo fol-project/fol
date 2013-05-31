@@ -6,10 +6,19 @@ use Fol\Http\HttpException;
 
 class Index {
 	public function __construct ($App) {
+		$this->App = $App;
 	}
 
 	public function index ($Request) {
-		return new Respons('Ola mundo');
+		echo '<html><body>';
+		echo '<h1>FOL funciona estupendamente <br>(ou acaso o dubidabas?)</h1>';
+		echo '<p><a href="phpinfo">Ver o phpinfo</a></p>';
+		echo '</body></html>';
+
+	}
+
+	public function phpinfo ($Request) {
+		phpinfo();
 	}
 
 	public function files ($Request) {
