@@ -99,9 +99,9 @@ class Errors {
 
 
 	/**
-	 * Execute a callback on error or not catched exception
+	 * Execute all registered callbacks
 	 * 
-	 * @param callable The callback executed
+	 * @param Exception The exception passed to the callbacks
 	 */
 	static public function handleException (\Exception $Exception) {
 		foreach (static::$handlers as $handler) {
@@ -113,6 +113,11 @@ class Errors {
 		}
 	}
 
+	/**
+	 * Print the exception info as html
+	 * 
+	 * @param Exception $Exception
+	 */
 	static protected function printException (\Exception $Exception) {
 		if (($Previous = $Exception->getPrevious())) {
 			$previous = self::printException($Previous);

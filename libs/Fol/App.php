@@ -158,18 +158,22 @@ abstract class App {
 
 		if (is_callable($target)) {
 			$return = call_user_func_array($target, $arguments);
-		} elseif (is_string($target) && (strpos($target, '::') !== false)) {
-			list($class, $method) = explode('::', $target, 2);
+		} elseif (is_string($target)) {
+			if (strpos($target, '::') !== false) {
+				list($class, $method) = explode('::', $target, 2);
 
-			$Class = new \ReflectionClass($this->namespace.'\\Controllers\\'.$class);
-			$Controller = $Class->newInstanceWithoutConstructor();
-			$Controller->App = $this;
+				$Class = new \ReflectionClass($this->namespace.'\\Controllers\\'.$class);
+				$Controller = $Class->newInstanceWithoutConstructor();
+				$Controller->App = $this;
 
-			if (($Constructor = $Class->getConstructor())) {
-				$Constructor->invokeArgs($Controller, $constructor_arguments);
+				if (($Constructor = $Class->getConstructor())) {
+					$Constructor->invokeArgs($Controller, $constructor_arguments);
+				}
+
+				$return = $Class->getMethod($method)->invokeArgs($Controller, $arguments);
+			} else {
+				$return = call_user_func_array([$this, $target], $arguments);
 			}
-
-			$return = $Class->getMethod($method)->invokeArgs($Controller, $arguments);
 		}
 
 		return ob_get_clean().$return;
