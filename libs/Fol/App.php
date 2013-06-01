@@ -151,7 +151,7 @@ abstract class App {
 	 * 
 	 * @return string The return of the controller
 	 */
-	protected function executeRoute (Route $Route, array $arguments = array()) {
+	protected function executeRoute (Route $Route, array $arguments = array(), array $constructor_arguments = array()) {
 		ob_start();
 
 		$target = $Route->getTarget();
@@ -161,11 +161,15 @@ abstract class App {
 		} elseif (is_string($target) && (strpos($target, '::') !== false)) {
 			list($class, $method) = explode('::', $target, 2);
 
-			$class = $this->namespace.'\\Controllers\\'.$class;
+			$Class = new \ReflectionClass($this->namespace.'\\Controllers\\'.$class);
+			$Controller = $Class->newInstanceWithoutConstructor();
+			$Controller->App = $this;
 
-			$Class = new $class($this);
+			if (($Constructor = $Class->getConstructor())) {
+				$Constructor->invokeArgs($Controller, $constructor_arguments);
+			}
 
-			$return = call_user_func_array([$Class, $method], $arguments);
+			$return = $Class->getMethod($method)->invokeArgs($Controller, $arguments);
 		}
 
 		return ob_get_clean().$return;

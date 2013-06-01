@@ -5,10 +5,6 @@ use Fol\Http\Response;
 use Fol\Http\HttpException;
 
 class Index {
-	public function __construct ($App) {
-		$this->App = $App;
-	}
-
 	public function index ($Request) {
 		echo '<html><body>';
 		echo '<h1>FOL funciona estupendamente <br>(ou acaso o dubidabas?)</h1>';
