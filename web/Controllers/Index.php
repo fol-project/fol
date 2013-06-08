@@ -7,7 +7,7 @@ use Fol\Http\HttpException;
 class Index {
 	public function index ($Request) {
 		echo '<html><body>';
-		echo '<h1>FOL funciona estupendamente <br>(ou acaso o dubidabas?)</h1>';
+		echo '<h1>Ola mundo!!</h1>';
 		echo '<p><a href="phpinfo">Ver o phpinfo</a></p>';
 		echo '</body></html>';
 

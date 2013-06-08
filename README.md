@@ -258,3 +258,38 @@ Para definir unha ruta que solo se execute en consola podes indicalo nas prefere
 ```php
 $Router->map('lista-usuarios', 'users/list', 'Index::listUsers', ['only-cli' => true]);
 ```
+
+INSTALACIÓN
+===========
+
+En Apache
+---------
+Unha vez descargado o FOL, xa debería funcionar, non hai que facer nada especial.
+
+En Nginx
+--------
+Hai que configurar o rewrite, polo que tes que editar o arquivo de configuración (nginx/sites-enabled/default):
+
+```
+server {
+	listen 80;
+
+	charset utf-8;
+
+	location / {
+		rewrite ^(.*)$ /index.php last;
+	}
+
+	#App rewrite
+
+	location /web/assets/ {
+		rewrite ^(/web/assets/.*)$ $1 break;
+	}
+
+	location /web/assets/cache/ {
+		if (!-f $request_filename) {
+			rewrite ^/web/assets/cache/(.*)$ /web/assets/cache/index.php last;
+		}
+	}
+}
+```

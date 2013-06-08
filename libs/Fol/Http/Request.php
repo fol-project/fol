@@ -75,11 +75,12 @@ class Request {
 	 * 
 	 * @param string $url The url request
 	 * @param string $method The method of the request (GET, POST, PUT, DELETE)
-	 * @param array $parameters The parameters of the request (GET, POST, etc)
+	 * @param array $vars The parameters of the request (GET, POST, etc)
+	 * @param array $parameters The extra parameters of the request
 	 * 
 	 * @return Fol\Http\Request The object with the specified data
 	 */
-	static public function create ($url, $method = 'GET', array $parameters = array()) {
+	static public function create ($url, $method = 'GET', array $vars = array(), array $parameters = array()) {
 		$defaults = array(
 			'SERVER_NAME' => 'localhost',
 			'SERVER_PORT' => 80,
@@ -120,10 +121,10 @@ class Request {
 		$post = $get = array();
 
 		if (in_array(strtoupper($method), array('POST', 'PUT', 'DELETE'))) {
-			$post = $parameters;
+			$post = $vars;
 			$defaults['CONTENT_TYPE'] = 'application/x-www-form-urlencoded';
 		} else {
-			$get = $parameters;
+			$get = $vars;
 		}
 
 		if ($components['query']) {
@@ -139,7 +140,7 @@ class Request {
 			'QUERY_STRING' => $components['query'],
 		));
 
-		return new static($components['path'], array(), $get, $post, array(), array(), $server);
+		return new static($components['path'], $parameters, $get, $post, array(), array(), $server);
 	}
 
 
@@ -191,11 +192,15 @@ class Request {
 		if (isset($this->Session)) {
 			$this->Session = clone $this->Session;
 		}
+
+		if (isset($this->Response)) {
+			unset($this->Response);
+		}
 	}
 
 
 	/**
-	 * Magic function to initialize some internal objects
+	 * Magic function to initialize some properties in lazy mode
 	 */
 	public function __get ($name) {
 		if ($name === 'Session') {
@@ -223,6 +228,36 @@ class Request {
 		$text .= "\nHeaders:\n".$this->Headers;
 
 		return $text;
+	}
+
+
+	/**
+	 * Creates a clone of the current request with some modifications
+	 *
+	 * @param string $path New path for the cloned request
+	 *
+	 * @return Fol\Http\Request
+	 */
+	public function copy ($path = null, array $parameters = null) {
+		$Request = clone $this;
+
+		if ($path !== null) {
+			$Request->setPath($path);
+		}
+
+		if ($parameters !== null) {
+			$Request->Parameters->set($parameters);
+		}
+
+		//Use the response cookies as reference
+		$Request->Response->Cookies = $this->Response->Cookies;
+
+		//Use the same session if exists
+		if (isset($this->Session)) {
+			$Request->Session = $this->Session;
+		}
+
+		return $Request;
 	}
 
 
