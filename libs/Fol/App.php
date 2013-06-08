@@ -74,6 +74,18 @@ abstract class App {
 
 
 	/**
+	 * Returns the name of any class with the same namespace of the app
+	 * 
+	 * @example $app->getClass('Models', 'Posts'); //Returns Apps\Web\Models\Posts
+	 * 
+	 * @return string
+	 */
+	public function getClass ($class) {
+		return $this->namespace.'\\'.implode('\\', func_get_args());
+	}
+
+
+	/**
 	 * Register a new service
 	 * 
 	 * @param string $name The service name
