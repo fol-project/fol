@@ -6,7 +6,7 @@
  */
 namespace Fol\Http;
 
-class Container implements ContainerInterface {
+class Container {
 	protected $items = array();
 
 
