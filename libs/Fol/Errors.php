@@ -6,8 +6,12 @@
  */
 namespace Fol;
 
+use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
+
 class Errors {
 	static protected $handlers = array();
+	static protected $Logger;
 	static protected $isRegistered = false;
 	static protected $displayErrors = false;
 
@@ -22,6 +26,11 @@ class Errors {
 	}
 
 
+	static public function setLogger (LoggerInterface $Logger) {
+		static::$Logger = $Logger;
+	}
+
+
 	/**
 	 * Pushes a handler to the end of the stack.
 	 *
@@ -29,7 +38,7 @@ class Errors {
 	 */
 	static public function pushHandler ($handler) {
 		if (!is_callable($handler)) {
-			throw new \InvalidArgumentException('The argument to ' . __METHOD__ . ' is not callable');
+			throw new \InvalidArgumentException('The argument to '.__METHOD__.' is not callable');
 		}
 
 		static::$handlers[] = $handler;
@@ -111,6 +120,10 @@ class Errors {
 		if (static::$displayErrors) {
 			echo static::printException($Exception);
 		}
+
+		if (isset(static::$Logger)) {
+			static::saveLog($Exception);
+		}
 	}
 
 	/**
@@ -138,5 +151,48 @@ class Errors {
 	{$previous}
 </section>
 EOT;
+	}
+
+	static protected function saveLog (\Exception $Exception) {
+		$level = $Exception->getCode();
+
+		switch ($level) {
+			case 100:
+				$level = LogLevel::DEBUG;
+				break;
+
+			case 200:
+				$level = LogLevel::INFO;
+				break;
+
+			case 250:
+				$level = LogLevel::NOTICE;
+				break;
+
+			case 300:
+				$level = LogLevel::WARNING;
+				break;
+
+			case 400:
+				$level = LogLevel::ERROR;
+				break;
+
+			case 500:
+				$level = LogLevel::CRITICAL;
+				break;
+
+			case 550:
+				$level = LogLevel::ALERT;
+				break;
+
+			case 600:
+				$level = LogLevel::EMERGENCY;
+				break;
+
+			default:
+				$level = LogLevel::ERROR;
+		}
+
+		static::$Logger->log($level, $Exception->getMessage(), ['exception' => $Exception]);
 	}
 }
