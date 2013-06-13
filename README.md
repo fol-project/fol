@@ -56,7 +56,7 @@ Loader::registerComposer(); //Executa o autoloader de Composer (se o atopa)
 
 Errors
 ------
-A clase Errors rexistra todos os erros que se produzan ao longo da execución do script e lanza callbacks. Deste modo centralízanse nun só lugar todos os distintos tipos de erros que se produzan para poder manexalos moito mellor.
+A clase Errors rexistra os erros que se poidan producir na execución dos scripts e lanza callbacks. Deste modo centralízanse todos os erros para poder manexalos mellor.
 
 #### Exemplo
 
@@ -73,7 +73,7 @@ Errors::pushHandler(function ($Exception) {
 Errors::displayErrors();
 ```
 
-Tamén podes rexistrar unha clase logger (Recomendo esta: https://github.com/Seldaek/monolog). Para iso debes definir a clase instanciada que se ocupe de xestionar os logs. O único requerimento é que a clase debe implementar a interface Psr\Log\LoggerInterface (https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-3-logger-interface.md)
+Tamén se pode rexistrar unha clase logger para gardar os erros en logs (Recomendo esta: https://github.com/Seldaek/monolog). Para iso debes definir a clase instanciada que se ocupe de xestionar os logs. O único requerimento é que a clase debe implementar a interface Psr\Log\LoggerInterface (https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-3-logger-interface.md)
 
 Exemplo usando monolog:
 
@@ -95,16 +95,16 @@ $log->pushHandler(new StreamHandler(BASE_PATH.'/logs/debug.log', Logger::DEBUG))
 Errors::setLogger($log);
 ```
 
-O estándar Psr\Log 8 niveles de login, que se identifican con estes números:
+O estándar Psr\Log ten 8 niveles de login, que se identifican con estes números:
 
-DEBUG (100)
-INFO (200)
-NOTICE (250)
-WARNING (300)
-ERROR (400)
-CRITICAL (500)
-ALERT (550)
-EMERGENCY (600)
+* DEBUG (100)
+* INFO (200)
+* NOTICE (250)
+* WARNING (300)
+* ERROR (400)
+* CRITICAL (500)
+* ALERT (550)
+* EMERGENCY (600)
 
 Cando se produce un erro, a clase Errors mirará o code da excepción xerada. Se corresponde con algun deses números gardará o erro como ese nivel, en caso contrario usa por defecto ERROR.
 
