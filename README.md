@@ -116,7 +116,7 @@ As aplicacións manexan o código do noso sitio web. Podes meter todo o sitio we
 
 * $App->name: Devolve o nome da aplicación ("Web")
 * $App->namespace: Devolve o namespace donde está aloxada a aplicación ("Apps\Web")
-* $App->path: Devolve a ruta onde está aloxada a aplicación no servidor ("/var/www/apps/Web/")
+* $App->path: Devolve a ruta onde está aloxada a aplicación no servidor ("/var/www/web")
 * $App->url: Devolve a url para acceder á raiz desa aplicación (p.e: "/")
 * $App->assetsPath: Devolve a ruta onde está aloxada a carpeta de assets no servidor ("/var/www/web/assets").
 * $App->assetsUrl: Devolve a url onde está aloxada a carpeta de assets ("/web/assets")
