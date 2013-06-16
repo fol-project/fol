@@ -210,7 +210,7 @@ EOT;
 	 * @param  array  $context
 	 */
 	static public function log ($level, $message, array $context = array()) {
-		if (static::$logger) {
+		if (static::$Logger) {
 			static::$Logger->log($level, $Exception->getMessage(), ['exception' => $Exception]);
 		}
 	}
