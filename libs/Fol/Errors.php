@@ -122,7 +122,7 @@ class Errors {
 		}
 
 		if (isset(static::$Logger)) {
-			static::saveLog($Exception);
+			static::saveExceptionLog($Exception);
 		}
 	}
 
@@ -153,7 +153,13 @@ class Errors {
 EOT;
 	}
 
-	static protected function saveLog (\Exception $Exception) {
+
+	/**
+	 * Saves a exception in the logger
+	 * 
+	 * @param  Exception $Exception
+	 */
+	static public function saveExceptionLog (\Exception $Exception) {
 		$level = $Exception->getCode();
 
 		switch ($level) {
@@ -193,6 +199,19 @@ EOT;
 				$level = LogLevel::ERROR;
 		}
 
-		static::$Logger->log($level, $Exception->getMessage(), ['exception' => $Exception]);
+		static::log($level, $Exception->getMessage(), ['exception' => $Exception]);
+	}
+
+	/**
+	 * Save a log in the logger
+	 * 
+	 * @param mixed $level
+	 * @param string $message
+	 * @param  array  $context
+	 */
+	static public function log ($level, $message, array $context = array()) {
+		if (static::$logger) {
+			static::$Logger->log($level, $Exception->getMessage(), ['exception' => $Exception]);
+		}
 	}
 }
