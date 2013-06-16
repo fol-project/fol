@@ -211,7 +211,7 @@ EOT;
 	 */
 	static public function log ($level, $message, array $context = array()) {
 		if (static::$Logger) {
-			static::$Logger->log($level, $Exception->getMessage(), ['exception' => $Exception]);
+			static::$Logger->log($level, $message, $context);
 		}
 	}
 }
