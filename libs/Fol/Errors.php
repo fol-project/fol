@@ -122,16 +122,17 @@ class Errors {
 		}
 
 		if (isset(static::$Logger)) {
-			static::saveExceptionLog($Exception);
+			static::$Logger->error($Exception->getMessage(), ['exception' => $Exception]);
 		}
 	}
+
 
 	/**
 	 * Print the exception info as html
 	 * 
 	 * @param Exception $Exception
 	 */
-	static protected function printException (\Exception $Exception) {
+	static public function printException (\Exception $Exception) {
 		if (($Previous = $Exception->getPrevious())) {
 			$previous = self::printException($Previous);
 		} else {
@@ -151,67 +152,5 @@ class Errors {
 	{$previous}
 </section>
 EOT;
-	}
-
-
-	/**
-	 * Saves a exception in the logger
-	 * 
-	 * @param  Exception $Exception
-	 */
-	static public function saveExceptionLog (\Exception $Exception) {
-		$level = $Exception->getCode();
-
-		switch ($level) {
-			case 100:
-				$level = LogLevel::DEBUG;
-				break;
-
-			case 200:
-				$level = LogLevel::INFO;
-				break;
-
-			case 250:
-				$level = LogLevel::NOTICE;
-				break;
-
-			case 300:
-				$level = LogLevel::WARNING;
-				break;
-
-			case 400:
-				$level = LogLevel::ERROR;
-				break;
-
-			case 500:
-				$level = LogLevel::CRITICAL;
-				break;
-
-			case 550:
-				$level = LogLevel::ALERT;
-				break;
-
-			case 600:
-				$level = LogLevel::EMERGENCY;
-				break;
-
-			default:
-				$level = LogLevel::ERROR;
-		}
-
-		static::log($level, $Exception->getMessage(), ['exception' => $Exception]);
-	}
-
-	/**
-	 * Save a log in the logger
-	 * 
-	 * @param mixed $level
-	 * @param string $message
-	 * @param  array  $context
-	 */
-	static public function log ($level, $message, array $context = array()) {
-		if (static::$Logger) {
-			static::$Logger->log($level, $message, $context);
-		}
 	}
 }
