@@ -129,7 +129,15 @@ abstract class App {
 			if ($Route) {
 				try {
 					$Request->Parameters->set($Route->getParameters());
-					$Request->Response->appendContent($this->executeRoute($Route, [$Request]));
+					$Response = $Request->generateResponse();
+
+					$resp = $this->executeRoute($Route, [$Request, $Response]);
+
+					if ($resp instanceof Response) {
+						$Response = $resp;
+					} else if (is_string($resp)) {
+						$Response->appendContent($resp);
+					}
 				} catch (\Exception $Exception) {
 					if ($Exception instanceof HttpException) {
 						throw $Exception;
@@ -141,17 +149,26 @@ abstract class App {
 				throw new HttpException('This route does not exits', 404);
 			}
 		} catch (HttpException $Exception) {
-			$Request->Response->setStatus($Exception->getCode());
+			if (!isset($Response)) {
+				$Response = $Request->generateResponse();
+			}
+
+			$Response->setStatus($Exception->getCode());
 
 			if (($Route = $Router->getByName('error'))) {
-				$Request->Response->setContent('');
-				$Request->Response->appendContent($this->executeRoute($Route, [$Request, $Exception]));
-			} else {
-				$Request->Response->setContent($Exception->getMessage());
+				$Request->Parameters->set('Exception', $Exception);
+
+				return $this->handleRequest($Router, $Request, 'error');
 			}
+
+			$Response = $Request->generateResponse();
+			$Response->setStatus($Exception->getCode());
+			$Response->setContent($Exception->getMessage());
+
+			return $Response;
 		}
 
-		return $Request->Response;
+		return $Response;
 	}
 
 

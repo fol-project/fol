@@ -191,7 +191,7 @@ Aínda que se pode crear unha instancia de maneira individual, a clase Request x
 
 ```php
 //Collemos o response xenerado polo request:
-$Response = $Request->Response;
+$Response = $Request->generateResponse();
 
 //A clase Response contén dentro outros obxectos para xestionar partes específicas:
 $Response->Headers; //Para enviar cabeceiras

@@ -192,10 +192,6 @@ class Request {
 		if (isset($this->Session)) {
 			$this->Session = clone $this->Session;
 		}
-
-		if (isset($this->Response)) {
-			unset($this->Response);
-		}
 	}
 
 
@@ -205,10 +201,6 @@ class Request {
 	public function __get ($name) {
 		if ($name === 'Session') {
 			return $this->Session = new Session();
-		}
-
-		if ($name === 'Response') {
-			return $this->getResponse();
 		}
 	}
 
@@ -248,9 +240,6 @@ class Request {
 		if ($parameters !== null) {
 			$Request->Parameters->set($parameters);
 		}
-
-		//Use the response cookies as reference
-		$Request->Response->Cookies = $this->Response->Cookies;
 
 		//Use the same session if exists
 		if (isset($this->Session)) {
@@ -506,48 +495,15 @@ class Request {
 
 
 	/**
-	 * Returns the response instance for this request
+	 * Generate a response instance for this request
 	 * 
 	 * @return Fol\Http\Response
 	 */
-	public function getResponse ($content = '', $status = 200, array $headers = array()) {
-		if (!isset($this->Response)) {
-			$this->Response = new Response($content, $status, $headers);
-			$this->Response->setContentType($this->getFormat());
-		}
+	public function generateResponse ($content = '', $status = 200, array $headers = array()) {
+		$Response = new Response($content, $status, $headers);
+		$Response->setContentType($this->getFormat());
 
-		return $this->Response;
-	}
-
-
-	/**
-	 * Check if the response has been modified or not
-	 * 
-	 * @return boolean True if the response is not modified, false if is modified or there isn't cache headers
-	 */
-	public function responseIsNotModified () {
-		$RequestHeaders = $this->Headers;
-		$ResponseHeaders = $this->Response->Headers;
-
-		$hasCondition = false;
-
-		if ($RequestHeaders->has('If-Modified-Since')) {
-			$hasCondition = true;
-
-			if ($RequestHeaders->getDateTime('If-Modified-Since')->getTimestamp() < $ResponseHeaders->getDateTime('Last-Modified')->getTimestamp()) {
-				return false;
-			}
-		}
-
-		if ($ResponseHeaders->has('Expires')) {
-			$hasCondition = true;
-
-			if ($ResponseHeaders->getDateTime('Expires')->getTimestamp() < time()) {
-				return false;
-			}
-		}
-
-		return $hasCondition;
+		return $Response;
 	}
 
 
