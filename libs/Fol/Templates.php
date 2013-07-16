@@ -13,7 +13,6 @@ class Templates {
 	protected $templates;
 	protected $templatesPath = array();
 	protected $currentPath;
-	protected $helpers = array();
 
 
 
@@ -53,69 +52,27 @@ class Templates {
 
 
 	/**
-	 * Register a new helper
-	 * 
-	 * @param string $name The helper name
-	 * @param Closure $helper The function that execute this helper
-	 */
-	public function setHelper ($name, \Closure $helper) {
-		$this->helpers[$name] = $helper;
-	}
-
-
-
-	/**
-	 * Register various helpers
-	 * 
-	 * @param array $helpers The helpers to register
-	 */
-	public function setHelpers (array $helpers) {
-		$this->helpers = array_replace($this->helpers, $helpers);
-	}
-
-
-
-	/**
-	 * Magic function to execute the registered helpers
-	 */
-	public function __call ($name, $arguments) {
-		if (isset($this->helpers[$name])) {
-			return call_user_func_array($this->helpers[$name], $arguments);
-		}
-	}
-
-
-
-	/**
 	 * Register a new template file with a name
 	 * You can define an array of name => file
 	 * 
 	 * @param string $name The template name (for example: menu)
 	 * @param string $file The file path of the template (for example: menu.php)
-	 * @param array $data An optional array of data used in the template. If the array is numerical, renders the template once for each item
 	 */
-	public function register ($name, $file = null, array $data = null) {
-		if (is_array($name)) {
-			foreach ($name as $name => $file) {
-				$this->templates[$name] = $file;
-			}
-		} else if ($data === null) {
-			$this->templates[$name] = $file;
-		} else {
-			$this->renders[$name] = $this->render($file, $data);
-		}
+	public function registerFile ($name, $file = null) {
+		$this->templates[$name] = $file;
 	}
 
 
 
 	/**
-	 * Unregister a template file
+	 * Render a file and save the result
 	 * 
-	 * @param string $name The template name
+	 * @param string $name The template name (for example: menu)
+	 * @param string $file The file path of the template (for example: menu.php)
+	 * @param array $data An optional array of data used in the template. If the array is numerical, renders the template once for each item
 	 */
-	public function unregister ($name) {
-		unset($this->templates[$name]);
-		unset($this->renders[$name]);
+	public function registerRender ($name, $file = null, array $data = null) {
+		$this->renders[$name] = $this->render($file, $data);
 	}
 
 
@@ -123,14 +80,14 @@ class Templates {
 	/**
 	 * Gets a template file by name or filename
 	 * 
-	 * $templates->getFile('menu');
-	 * $templates->getFile('menu.php');
+	 * $templates->file('menu');
+	 * $templates->file('menu.php');
 	 * 
 	 * @param string $template The template name or file
 	 * 
 	 * Returns string The template file path or false if does not exists
 	 */
-	public function getFile ($template) {
+	public function file ($template) {
 		if (isset($this->templates[$template])) {
 			$template = $this->templates[$template];
 		}
@@ -206,11 +163,10 @@ class Templates {
 			return $result;
 		}
 
-		if (($template = $this->getFile($template)) === false) {
+		if (($template = $this->file($template)) === false) {
 			return false;
 		}
 
 		return $this->renderFile($template, $data);
 	}
 }
-?>
