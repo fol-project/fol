@@ -92,7 +92,7 @@ class Errors {
 	 */
 	static public function handleError ($level, $message, $file = null, $line = null) {
 		if (error_reporting() & $level) {
-			static::handleException(new \ErrorException($message, $level, 0, $file, $line));
+			throw new \ErrorException($message, $level, 0, $file, $line);
 		}
 	}
 
