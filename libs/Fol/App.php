@@ -38,7 +38,13 @@ abstract class App {
 
 		//The request
 		if ($name === 'request') {
-			return $this->request = (php_sapi_name() === 'cli') ? Request::createFromCli($argv) : Request::createFromGlobals();
+			if (php_sapi_name() === 'cli') {
+				global $argv;
+
+				return $this->request = Request::createFromCli($argv);
+			}
+
+			return $this->request = Request::createFromGlobals();
 		}
 
 		//The app name. (Web)
