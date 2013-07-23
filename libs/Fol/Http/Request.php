@@ -189,8 +189,8 @@ class Request {
 		$this->server = clone $this->server;
 		$this->headers = clone $this->headers;
 
-		if (isset($this->Session)) {
-			$this->Session = clone $this->Session;
+		if (isset($this->session)) {
+			$this->session = clone $this->session;
 		}
 	}
 
@@ -199,8 +199,8 @@ class Request {
 	 * Magic function to initialize some properties in lazy mode
 	 */
 	public function __get ($name) {
-		if ($name === 'Session') {
-			return $this->Session = new Session();
+		if ($name === 'session') {
+			return $this->session = new Session();
 		}
 	}
 
@@ -242,8 +242,8 @@ class Request {
 		}
 
 		//Use the same session if exists
-		if (isset($this->Session)) {
-			$Request->Session = $this->Session;
+		if (isset($this->session)) {
+			$Request->session = $this->session;
 		}
 
 		return $Request;
