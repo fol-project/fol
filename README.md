@@ -10,14 +10,6 @@ Características:
 * Rápido e lixeiro.
 * Escrito en PHP 5.4.
 * Pensado para combinar con bibliotecas externas e compatible con Composer.
-
-Por claridade, todas as instancias de clases comezan por maiúscula e o resto de variables en minúscula (camelCase). Ou sexa:
-
-```php
-$Request = new Request();
-$request = 'hello';
-
-$Request->Get->get(); //"Get" é un obxecto e "get" unha funcion
 ```
 
 
@@ -64,8 +56,8 @@ A clase Errors rexistra os erros que se poidan producir na execución dos script
 Errors::register(); //Inicia o rexistro de erros
 
 //Rexistra unha función que se execute cando hai un erro. (podes rexistrar cantas funcións queiras)
-Errors::pushHandler(function ($Exception) {
-	var_dump($Exception);
+Errors::pushHandler(function ($exception) {
+	var_dump($exception);
 	die();
 });
 
@@ -106,7 +98,7 @@ O estándar Psr\Log ten 8 niveles de login, que se identifican con estes número
 * ALERT (550)
 * EMERGENCY (600)
 
-Cando se produce un erro, a clase Errors mirará o code da excepción xerada. Se corresponde con algun deses números gardará o erro como ese nivel, en caso contrario usa por defecto ERROR.
+Cando se produce un erro, a clase Errors mirará sempre garda os errors como ERROR.
 
 
 Apps
@@ -114,6 +106,8 @@ Apps
 
 As aplicacións manexan o código do noso sitio web. Podes meter todo o sitio web nunha soa aplicación ou dividilo en distintas aplicacións (unha para o blog, outra para galeria de fotos, etc). Unha aplicación non é máis que unha clase que se instancia e se executa. Isto permite executar aplicacións unha dentro doutra, extendelas, etc. As aplicacións deben extender á clase Fol\App para que teñan dispoñibles as seguintes propiedades:
 
+* $App->router: Devolve a clase que manexa as rutas
+* $App->request: Devolve o obxecto request creado de xeito global
 * $App->name: Devolve o nome da aplicación ("Web")
 * $App->namespace: Devolve o namespace donde está aloxada a aplicación ("Apps\Web")
 * $App->path: Devolve a ruta onde está aloxada a aplicación no servidor ("/var/www/web")
@@ -131,20 +125,17 @@ class App extends \Fol\App {
 	public function __construct () {
 		//Contructor da applicación (cargar a configuración, instanciar clases básicas, etc)
 	}
-
-	public function handle ($Request) {
-		//Función para manexar peticións (por exemplo nun sistema MVC)
-	}
 }
 
 //Debemos rexistrar a ubicación da aplicación (por defecto xa está feito en bootstrap.php)
 Loader::registerNamespace('Apps\\Web', BASE_PATH.'/web');
 
 //Agora instanciamos a aplicación:
-$Aplicacion = new \Apps\Web\App();
+$aplicacion = new \Apps\Web\App();
 
-//E executamos a aplicación
-$Aplicacion->handle(\Fol\Http\Request::createFromGlobals());
+//executamos a aplicación e mandamos o resultado
+$response = $aplicacion->handleRequest();
+$response->send();
 ```
 
 Ten en conta que as aplicacións se cargan co estándar PSR-0, igual que calquera outra biblioteca. A única diferencia é que se aloxan noutra carpeta distinta a libs. Polo tanto, a aplicación \Apps\Web\App, estaría no arquivo "/web/App.php". Se queres aloxar as aplicacións noutro directorio distinto, só tes que configurar a clase Loader para que busque o namespace "Apps\\Web" noutro directorio distinto. Esa configuración atópase en bootstrap.php, na raíz:
@@ -164,22 +155,22 @@ Request
 Con esta clase podemos recoller os datos dunha petición http e acceder a eles. Para crear o obxecto Request, podemos usar a función estática createFromGlobals():
 
 ```php
-$Request = Fol\Http\Request::createFromGlobals();
+$request = Fol\Http\Request::createFromGlobals();
 
 //Agora xa podemos acceder a todos os datos desta petición:
 
-$Request->Get; //Obxecto que contén todos os parámetros enviados por GET
-$Request->Get->get('nome'); //Devolve o parámetro enviado por GET 'nome'
-$Request->Get->set('nome', 'novo-valor'); //Modifica o valor do parámetro 'nome'
+$request->get; //Obxecto que contén todos os parámetros enviados por GET
+$request->get->get('nome'); //Devolve o parámetro enviado por GET 'nome'
+$request->get->set('nome', 'novo-valor'); //Modifica o valor do parámetro 'nome'
 
 //Outros obxectos dentro de Request son:
 
-$Request->Post; //Para os parámetros POST
-$Request->Server; //Para as variables do servidor (o equivalente a $_SERVER)
-$Request->Headers; //Para as cabeceiras http
-$Request->Cookies; //Cookies enviadas
-$Request->Files; //Arquivos enviados
-$Request->Parameters; //Para gardar parámetros manualmente
+$request->post; //Para os parámetros POST
+$request->server; //Para as variables do servidor (o equivalente a $_SERVER)
+$request->headers; //Para as cabeceiras http
+$request->cookies; //Cookies enviadas
+$request->files; //Arquivos enviados
+$request->parameters; //Para gardar parámetros manualmente
 ```
 
 
@@ -191,17 +182,17 @@ Aínda que se pode crear unha instancia de maneira individual, a clase Request x
 
 ```php
 //Collemos o response xenerado polo request:
-$Response = $Request->generateResponse();
+$response = $request->generateResponse();
 
 //A clase Response contén dentro outros obxectos para xestionar partes específicas:
-$Response->Headers; //Para enviar cabeceiras
-$Response->Cookies; //Para enviar cookies
+$response->headers; //Para enviar cabeceiras
+$response->cookies; //Para enviar cookies
 
 //Tamén podemos engadirlle o contido ou body da resposta:
-$Response->setContent('texto de resposta');
+$response->setContent('texto de resposta');
 
 //E finalmente para enviar a resposta ao servidor, podemos usar a función "send":
-$Response->send();
+$response->send();
 ```
 
 Rutas
@@ -217,22 +208,15 @@ use Fol\Http\Router;
 class App extends \Fol\App {
 
 	public function __construct () {
-		//Instanciamos o enrutador, pasandolle a url base da aplicación.
-		$this->Router = new Router($this->url);
 
 		//Definimos as distintas rutas (nome da ruta, url, controlador e outras opcions)
-		$this->Router->map('index', '/', 'Index::index', ['methods' => 'GET']);
-		$this->Router->map('contacto', '/about', 'Index::about');
-	}
-
-	public function handle ($Request) {
-		//Resolvemos a petición actual e devolvemos o resultado
-		return $this->handleRequest($this->Router, $Request);
+		$this->router->map('index', '/', 'Index::index', ['methods' => 'GET']);
+		$this->router->map('contacto', '/about', 'Index::about');
 	}
 }
 ```
 
-Podemos definir os controladores (as funcións que se executan en cada ruta) de tres maneiras distintas: cunha función anónima (Closure), un controlador externo (por exemplo "Index::about" instanciaría Apps\Web\Controllers\Index e executaría o método "about") e podemos poñer só o nome dun método para executar directamente un método da propia App, sen instanciar controladores externos (por exemplo "about" executaría $App->about):
+Podemos definir os controladores (as funcións que se executan en cada ruta) de tres maneiras distintas: cunha función anónima (Closure), un controlador externo (por exemplo "Index::about" instanciaría Apps\Web\Controllers\Index e executaría o método "about") e podemos poñer só o nome dun método para executar directamente un método da propia App, sen instanciar controladores externos (por exemplo "about" executaría $app->about):
 
 ```php
 namespace Apps\Web;
@@ -242,23 +226,16 @@ use Fol\Http\Router;
 class App extends \Fol\App {
 
 	public function __construct () {
-		//Instanciamos o enrutador, pasandolle a url base da aplicación.
-		$this->Router = new Router($this->url);
-
 		//Definimos as distintas rutas (nome da ruta, url, controlador e outras opcions)
-		$this->Router->map('index', '/', 'index'); //Executa o método "index" deste propio obxecto
-		$this->Router->map('contacto', '/about', 'Index::about'); //Instancia Apps\Web\Controllers\Index e executa o método "about"
+		$this->router->map('index', '/', 'index'); //Executa o método "index" deste propio obxecto
+		$this->router->map('contacto', '/about', 'Index::about'); //Instancia Apps\Web\Controllers\Index e executa o método "about"
 
-		$this->Router->map('saludo', '/ola', function ($Request) { //Executa unha función directamente
+		$this->router->map('saludo', '/ola', function ($request) { //Executa unha función directamente
 			echo 'Ola!';
 		});
 	}
 
-	public function handle ($Request) {
-		return $this->handleRequest($this->Router, $Request);
-	}
-
-	public function index ($Request) {
+	public function index ($request) {
 		echo 'Este é un controlador que se pon directamente aqui';
 	}
 }
@@ -291,7 +268,7 @@ $ php index.php /posts/create POST --title "Título do posts"
 Para definir unha ruta que solo se execute en consola podes indicalo nas preferencias da ruta co parámetro "only-cli":
 
 ```php
-$Router->map('lista-usuarios', 'users/list', 'Index::listUsers', ['only-cli' => true]);
+$router->map('lista-usuarios', 'users/list', 'Index::listUsers', ['only-cli' => true]);
 ```
 
 INSTALACIÓN

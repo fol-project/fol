@@ -11,7 +11,7 @@ use Psr\Log\LogLevel;
 
 class Errors {
 	static protected $handlers = array();
-	static protected $Logger;
+	static protected $logger;
 	static protected $isRegistered = false;
 	static protected $displayErrors = false;
 
@@ -26,8 +26,8 @@ class Errors {
 	}
 
 
-	static public function setLogger (LoggerInterface $Logger) {
-		static::$Logger = $Logger;
+	static public function setLogger (LoggerInterface $logger) {
+		static::$logger = $logger;
 	}
 
 
@@ -121,8 +121,8 @@ class Errors {
 			echo static::printException($exception);
 		}
 
-		if (isset(static::$Logger)) {
-			static::$Logger->error($exception->getMessage(), ['exception' => $exception]);
+		if (isset(static::$logger)) {
+			static::$logger->error($exception->getMessage(), ['exception' => $exception]);
 		}
 	}
 
