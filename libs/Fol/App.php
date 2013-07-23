@@ -13,7 +13,7 @@ use Fol\Http\Request;
 use Fol\Http\HttpException;
 
 abstract class App {
-	public $Parent;
+	public $parent;
 	private $services;
 
 
@@ -29,6 +29,16 @@ abstract class App {
 		//Registered services
 		if (isset($this->services[$name])) {
 			return $this->$name = $this->services[$name]();
+		}
+
+		//The router
+		if ($name === 'router') {
+			return $this->router = new Router($this->url);
+		}
+
+		//The request
+		if ($name === 'request') {
+			return $this->request = (php_sapi_name() === 'cli') ? Request::createFromCli($argv) : Request::createFromGlobals();
 		}
 
 		//The app name. (Web)
@@ -68,8 +78,8 @@ abstract class App {
 	 * 
 	 * @param Fol\App $Parent An App instance
 	 */
-	public function setParent (App $Parent) {
-		$this->Parent = $Parent;
+	public function setParent (App $parent) {
+		$this->parent = $parent;
 	}
 
 
@@ -117,73 +127,77 @@ abstract class App {
 	/**
 	 * Handle a request and returns a response
 	 * 
-	 * @param  Fol\Http\Request $Request The request to handle
+	 * @param  Fol\Http\Request $request The request to handle
 	 * @param  string $name Set a route name to force to use this route instead detect by url
 	 * 
 	 * @return Fol\Http\Response The resulted response
 	 */
-	public function handleRequest (Router $Router, Request $Request, $name = null) {
+	public function handleRequest (Request $request = null, $name = null) {
+		if ($request === null) {
+			$request = $this->request;
+		}
+
 		try {
-			$Route = ($name === null) ? $Router->match($Request) : $Router->getByName($name);
+			$route = ($name === null) ? $this->router->match($request) : $this->router->getByName($name);
 
-			if ($Route) {
+			if ($route) {
 				try {
-					$Request->Parameters->set($Route->getParameters());
-					$Response = $Request->generateResponse();
+					$request->parameters->set($route->getParameters());
+					$response = $request->generateResponse();
 
-					$resp = $this->executeRoute($Route, [$Request, $Response]);
+					$resp = $this->executeRoute($route, [$request, $response]);
 
 					if ($resp instanceof Response) {
-						$Response = $resp;
+						$response = $resp;
 					} else if (is_string($resp)) {
-						$Response->appendContent($resp);
+						$response->appendContent($resp);
 					}
-				} catch (\Exception $Exception) {
-					if ($Exception instanceof HttpException) {
-						throw $Exception;
+				} catch (\Exception $exception) {
+					if ($exception instanceof HttpException) {
+						throw $exception;
 					} else {
-						throw new HttpException('Error Processing Request', 500, $Exception);
+						throw new HttpException('Error Processing Request', 500, $exception);
 					}
 				}
 			} else {
 				throw new HttpException('This route does not exits', 404);
 			}
-		} catch (HttpException $Exception) {
-			if (!isset($Response)) {
-				$Response = $Request->generateResponse();
+		} catch (HttpException $exception) {
+			if (!isset($response)) {
+				$response = $request->generateResponse();
 			}
 
-			$Response->setStatus($Exception->getCode());
+			$response->setStatus($exception->getCode());
 
-			if (($Route = $Router->getByName('error'))) {
-				$Request->Parameters->set('Exception', $Exception);
+			if (($route = $this->router->getByName('error'))) {
+				$request->parameters->set('exception', $exception);
 
-				return $this->handleRequest($Router, $Request, 'error');
+				return $this->handleRequest($request, 'error');
 			}
 
-			$Response = $Request->generateResponse();
-			$Response->setStatus($Exception->getCode());
-			$Response->setContent($Exception->getMessage());
+			$response = $request->generateResponse();
+			$response->setStatus($exception->getCode());
+			$response->setContent($exception->getMessage());
 
-			return $Response;
+			return $response;
 		}
 
-		return $Response;
+		return $response;
 	}
 
 
 	/**
 	 * Executes a route target
 	 * 
-	 * @param Fol\Http\Route $Route The route to execute
+	 * @param Fol\Http\Route $route The route to execute
 	 * @param array $arguments The arguments passed to the controller
 	 * 
 	 * @return string The return of the controller
 	 */
-	protected function executeRoute (Route $Route, array $arguments = array(), array $constructor_arguments = array()) {
+	protected function executeRoute (Route $route, array $arguments = array(), array $constructor_arguments = array()) {
 		ob_start();
 
-		$target = $Route->getTarget();
+		$target = $route->getTarget();
 
 		if (is_callable($target)) {
 			$return = call_user_func_array($target, $arguments);
@@ -191,15 +205,15 @@ abstract class App {
 			if (strpos($target, '::') !== false) {
 				list($class, $method) = explode('::', $target, 2);
 
-				$Class = new \ReflectionClass($this->namespace.'\\Controllers\\'.$class);
-				$Controller = $Class->newInstanceWithoutConstructor();
-				$Controller->App = $this;
+				$class = new \ReflectionClass($this->namespace.'\\Controllers\\'.$class);
+				$controller = $class->newInstanceWithoutConstructor();
+				$controller->App = $this;
 
-				if (($Constructor = $Class->getConstructor())) {
-					$Constructor->invokeArgs($Controller, $constructor_arguments);
+				if (($Constructor = $class->getConstructor())) {
+					$Constructor->invokeArgs($controller, $constructor_arguments);
 				}
 
-				$return = $Class->getMethod($method)->invokeArgs($Controller, $arguments);
+				$return = $class->getMethod($method)->invokeArgs($controller, $arguments);
 			} else {
 				$return = call_user_func_array([$this, $target], $arguments);
 			}

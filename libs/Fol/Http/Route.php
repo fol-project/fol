@@ -81,20 +81,20 @@ class Route {
 	/**
 	 * Check if the Request match with the route
 	 *
-	 * @param Fol\Http\Request $Request The request object
+	 * @param Fol\Http\Request $request The request object
 	 *
 	 * @return boolean True if it match, false if not
 	 */
-	public function match ($Request) {
+	public function match ($request) {
 		if (($this->onlyCli === true) && (php_sapi_name() !== 'cli')) {
 			return false;
 		}
 
-		if (!in_array($Request->getMethod(), $this->methods)) {
+		if (!in_array($request->getMethod(), $this->methods)) {
 			return false;
 		}
 
-		if (!preg_match($this->getRegex(), $Request->getPath(), $matches)) {
+		if (!preg_match($this->getRegex(), $request->getPath(), $matches)) {
 			return false;
 		}
 

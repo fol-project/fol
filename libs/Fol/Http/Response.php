@@ -10,8 +10,8 @@ use Fol\Http\Headers;
 use Fol\Http\Cookies;
 
 class Response {
-	public $Headers;
-	public $Cookies;
+	public $headers;
+	public $cookies;
 
 	protected $content;
 	protected $status;
@@ -23,8 +23,8 @@ class Response {
 		$Response = new static($array['content'], $array['status'][0]);
 		$Response->setContentType($array['content_type']);
 
-		$Response->Headers = $array['Headers'];
-		$Response->Cookies = $array['Cookies'];
+		$Response->headers = $array['headers'];
+		$Response->cookies = $array['cookies'];
 
 		return $Response;
 	}
@@ -42,11 +42,11 @@ class Response {
 		$this->setStatus($status);
 		$this->setContentType('text/html');
 
-		$this->Headers = new ResponseHeaders($headers);
-		$this->Cookies = new Cookies();
+		$this->headers = new ResponseHeaders($headers);
+		$this->cookies = new Cookies();
 
-		if (!$this->Headers->has('Date')) {
-			$this->Headers->setDateTime('Date', new \DateTime());
+		if (!$this->headers->has('Date')) {
+			$this->headers->setDateTime('Date', new \DateTime());
 		}
 	}
 
@@ -56,8 +56,8 @@ class Response {
 	 * Magic function to clone the internal objects
 	 */
 	public function __clone () {
-		$this->Headers = clone $this->Headers;
-		$this->Cookies = clone $this->Cookies;
+		$this->headers = clone $this->headers;
+		$this->cookies = clone $this->cookies;
 	}
 
 
@@ -168,7 +168,7 @@ class Response {
 	 */
 	public function redirect ($url, $status = 302) {
 		$this->setStatus($status);
-		$this->Headers->set('location', $url);
+		$this->headers->set('location', $url);
 	}
 
 
@@ -180,7 +180,7 @@ class Response {
 		$this->setContent('');
 
 		foreach (array('Allow', 'Content-Encoding', 'Content-Language', 'Content-Length', 'Content-MD5', 'Content-Type', 'Last-Modified') as $name) {
-			$this->Headers->remove($header);
+			$this->headers->remove($header);
 		}
 	}
 
@@ -227,8 +227,8 @@ class Response {
 		header(sprintf('HTTP/1.1 %s', $this->status[0], $this->status[1]));
 		header(sprintf('Content-Type:%s;charset=utf-8', $this->content_type));
 
-		$this->Headers->send();
-		$this->Cookies->send();
+		$this->headers->send();
+		$this->cookies->send();
 
 		return true;
 	}
@@ -248,7 +248,7 @@ class Response {
 	 * @param string/Datetime $datetime
 	 */
 	public function setLastModified ($datetime) {
-		$this->Headers->setDateTime('Last-Modified', $datetime);
+		$this->headers->setDateTime('Last-Modified', $datetime);
 	}
 
 
@@ -259,7 +259,7 @@ class Response {
 	 * @param string/Datetime $datetime
 	 */
 	public function setExpires ($datetime) {
-		$this->Headers->setDateTime('Expires', $datetime);
+		$this->headers->setDateTime('Expires', $datetime);
 	}
 
 
@@ -270,11 +270,11 @@ class Response {
 	 * @return integer The age in seconds
 	 */
 	public function getAge () {
-		if ($this->Headers->has('Age')) {
-			return (int)$this->Headers->get('Age');
+		if ($this->headers->has('Age')) {
+			return (int)$this->headers->get('Age');
 		}
 
-		return max(time() - $this->Headers->getDateTime('Date')->getTimestamp(), 0);
+		return max(time() - $this->headers->getDateTime('Date')->getTimestamp(), 0);
 	}
 
 
@@ -285,14 +285,14 @@ class Response {
 	 * @param int $shared_max_age The shared max age in seconds
 	 */
 	public function setMaxAge ($max_age, $shared_max_age = null) {
-		$cacheControl = $this->Headers->getParsed('Cache-Control');
+		$cacheControl = $this->headers->getParsed('Cache-Control');
 		$cacheControl['max-age'] = (int)$max_age;
 
 		if ($shared_max_age !== null) {
 			$cacheControl['s-maxage'] = (int)$shared_max_age;
 		}
 
-		$this->Headers->setParsed('Cache-Control', $cacheControl);
+		$this->headers->setParsed('Cache-Control', $cacheControl);
 	}
 
 
@@ -302,7 +302,7 @@ class Response {
 	 * @return int $age The age in seconds
 	 */
 	public function getMaxAge () {
-		$cacheControl = $this->Headers->getParsed('Cache-Control');
+		$cacheControl = $this->headers->getParsed('Cache-Control');
 
 		if (isset($cacheControl['s-maxage'])) {
 			return (int)$cacheControl['s-maxage'];
@@ -316,10 +316,10 @@ class Response {
 	 * Defines the response as public in Cache-Control directive
 	 */
 	public function setPublic () {
-		$cacheControl = $this->Headers->getParsed('Cache-Control');
+		$cacheControl = $this->headers->getParsed('Cache-Control');
 		$cacheControl['public'] = true;
 		unset($cacheControl['private']);
-		$this->Headers->setParsed('Cache-Control', $cacheControl);
+		$this->headers->setParsed('Cache-Control', $cacheControl);
 	}
 
 
@@ -327,10 +327,10 @@ class Response {
 	 * Defines the response as private in Cache-Control directive
 	 */
 	public function setPrivate () {
-		$cacheControl = $this->Headers->getParsed('Cache-Control');
+		$cacheControl = $this->headers->getParsed('Cache-Control');
 		$cacheControl['private'] = true;
 		unset($cacheControl['public']);
-		$this->Headers->setParsed('Cache-Control', $cacheControl);
+		$this->headers->setParsed('Cache-Control', $cacheControl);
 	}
 
 
@@ -338,9 +338,9 @@ class Response {
 	 * Check if the response must be revalidated by the origin
 	 */
 	public function mustRevalidate () {
-		$cacheControl = $this->Headers->getParsed('Cache-Control');
+		$cacheControl = $this->headers->getParsed('Cache-Control');
 
-		return (!empty($cacheControl['must-revalidate']) || $this->Headers->has('proxy-revalidate'));
+		return (!empty($cacheControl['must-revalidate']) || $this->headers->has('proxy-revalidate'));
 	}
 
 
@@ -348,8 +348,8 @@ class Response {
 	 * Add a must-revalidate cache control directive
 	 */
 	public function setMustRevalidate () {
-		$cacheControl = $this->Headers->getParsed('Cache-Control');
+		$cacheControl = $this->headers->getParsed('Cache-Control');
 		$cacheControl['must-revalidate'] = true;
-		$this->Headers->setParsed('Cache-Control', $cacheControl);
+		$this->headers->setParsed('Cache-Control', $cacheControl);
 	}
 }

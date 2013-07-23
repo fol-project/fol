@@ -10,7 +10,7 @@ class Loader {
 	static private $libraries_path;
 	static private $classes = array();
 	static private $namespaces = array();
-	static private $Composer;
+	static private $composer;
 
 
 	/**
@@ -167,15 +167,14 @@ class Loader {
 	 * Register the composer autoloader
 	 */
 	static function registerComposer () {
-		if (isset(self::$Composer)) {
+		if (isset(self::$composer)) {
 			return;
 		}
 
 		$file = self::$libraries_path.'autoload.php';
 
 		if (is_readable($file)) {
-			self::$Composer = include_once(self::$libraries_path.'autoload.php');
+			self::$composer = include_once(self::$libraries_path.'autoload.php');
 		}
 	}
 }
-?>

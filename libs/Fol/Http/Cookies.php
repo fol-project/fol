@@ -14,10 +14,10 @@ class Cookies {
 	 * Magic function to recover the object exported by var_export
 	 */
 	public static function __set_state ($array) {
-		$Cookies = new static();
-		$Cookies->setState($array['items']);
+		$cookies = new static();
+		$cookies->setState($array['items']);
 
-		return $Cookies;
+		return $cookies;
 	}
 
 

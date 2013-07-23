@@ -263,19 +263,19 @@ class Headers {
 	 * Define a header using a Datetime object and returns it
 	 * 
 	 * @param string $name The header name
-	 * @param Datetime|string $Datetime The datetime object. You can define also an string so the Datetime object will be created
+	 * @param Datetime|string $datetime The datetime object. You can define also an string so the Datetime object will be created
 	 * 
 	 * @return Datetime The datetime object
 	 */
-	public function setDateTime ($name, $Datetime = null) {
-		if (!($Datetime instanceof \Datetime)) {
-			$Datetime = new \DateTime($Datetime);
+	public function setDateTime ($name, $datetime = null) {
+		if (!($datetime instanceof \Datetime)) {
+			$datetime = new \DateTime($datetime);
 		}
 
-		$Datetime->setTimezone(new \DateTimeZone('UTC'));
-		$this->set($name, $Datetime->format('D, d M Y H:i:s').' GMT');
+		$datetime->setTimezone(new \DateTimeZone('UTC'));
+		$this->set($name, $datetime->format('D, d M Y H:i:s').' GMT');
 
-		return $Datetime;
+		return $datetime;
 	}
 
 

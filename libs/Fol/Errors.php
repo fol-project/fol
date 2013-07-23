@@ -112,17 +112,17 @@ class Errors {
 	 * 
 	 * @param Exception The exception passed to the callbacks
 	 */
-	static public function handleException (\Exception $Exception) {
+	static public function handleException (\Exception $exception) {
 		foreach (static::$handlers as $handler) {
-			$handler($Exception);
+			$handler($exception);
 		}
 
 		if (static::$displayErrors) {
-			echo static::printException($Exception);
+			echo static::printException($exception);
 		}
 
 		if (isset(static::$Logger)) {
-			static::$Logger->error($Exception->getMessage(), ['exception' => $Exception]);
+			static::$Logger->error($exception->getMessage(), ['exception' => $exception]);
 		}
 	}
 
@@ -130,25 +130,25 @@ class Errors {
 	/**
 	 * Print the exception info as html
 	 * 
-	 * @param Exception $Exception
+	 * @param Exception $exception
 	 */
-	static public function printException (\Exception $Exception) {
-		if (($Previous = $Exception->getPrevious())) {
+	static public function printException (\Exception $exception) {
+		if (($Previous = $exception->getPrevious())) {
 			$previous = self::printException($Previous);
 		} else {
 			$previous = '';
 		}
 
-		$class = get_class($Exception);
+		$class = get_class($exception);
 
 		echo <<<EOT
 <section id="ErrorException">
-	<h1>{$Exception->getMessage()} ({$Exception->getCode()})</h1>
+	<h1>{$exception->getMessage()} ({$exception->getCode()})</h1>
 	<p>
 		<em>{$class}</em><br>
-		{$Exception->getFile()}:{$Exception->getLine()}
+		{$exception->getFile()}:{$exception->getLine()}
 	</p>
-	<pre>{$Exception->getTraceAsString()}</pre>
+	<pre>{$exception->getTraceAsString()}</pre>
 	{$previous}
 </section>
 EOT;

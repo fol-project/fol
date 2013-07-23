@@ -61,10 +61,10 @@ class Router {
 	 * If so, return route's target
 	 * If called multiple times
 	 */
-	public function match ($Request) {
-		foreach ($this->routes as $Route) {
-			if ($Route->match($Request)) {
-				return $Route;
+	public function match ($request) {
+		foreach ($this->routes as $route) {
+			if ($route->match($request)) {
+				return $route;
 			}
 		}
 
@@ -103,12 +103,12 @@ class Router {
 			throw new \Exception("No route with the name $name has been found.");
 		}
 
-		$Route = $this->routes[$name];
+		$route = $this->routes[$name];
 
 		if ($absolute === true) {
-			return $this->absoluteUrl.$Route->generate($params, $absolute);
+			return $this->absoluteUrl.$route->generate($params, $absolute);
 		}
 
-		return $Route->generate($params, $absolute);
+		return $route->generate($params, $absolute);
 	}
 }

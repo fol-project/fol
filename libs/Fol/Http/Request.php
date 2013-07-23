@@ -12,13 +12,13 @@ use Fol\Http\Files;
 use Fol\Http\Headers;
 
 class Request {
-	public $Parameters;
-	public $Get;
-	public $Post;
-	public $Files;
-	public $Cookies;
-	public $Headers;
-	public $Server;
+	public $parameters;
+	public $get;
+	public $post;
+	public $files;
+	public $cookies;
+	public $headers;
+	public $server;
 
 	private $path;
 	private $format = 'html';
@@ -157,15 +157,15 @@ class Request {
 	 * @param array $server The SERVER parameters
 	 */
 	public function __construct ($path = '', array $parameters = array(), array $get = array(), array $post = array(), array $files = array(), array $cookies = array(), array $server = array()) {
-		$this->Parameters = new Container($parameters);
-		$this->Get = new Input($get);
-		$this->Post = new Input($post);
-		$this->Files = new Files($files);
-		$this->Cookies = new Input($cookies);
-		$this->Server = new Container($server);
-		$this->Headers = new RequestHeaders(RequestHeaders::getHeadersFromServer($server));
+		$this->parameters = new Container($parameters);
+		$this->get = new Input($get);
+		$this->post = new Input($post);
+		$this->files = new Files($files);
+		$this->cookies = new Input($cookies);
+		$this->server = new Container($server);
+		$this->headers = new RequestHeaders(RequestHeaders::getHeadersFromServer($server));
 
-		foreach (array_keys($this->Headers->getParsed('Accept')) as $mimetype) {
+		foreach (array_keys($this->headers->getParsed('Accept')) as $mimetype) {
 			if ($format = Headers::getFormat($mimetype)) {
 				$this->format = $format;
 				break;
@@ -181,13 +181,13 @@ class Request {
 	 * Magic function to clone the internal objects
 	 */
 	public function __clone () {
-		$this->Parameters = clone $this->Parameters;
-		$this->Get = clone $this->Get;
-		$this->Post = clone $this->Post;
-		$this->Files = clone $this->Files;
-		$this->Cookies = clone $this->Cookies;
-		$this->Server = clone $this->Server;
-		$this->Headers = clone $this->Headers;
+		$this->parameters = clone $this->parameters;
+		$this->get = clone $this->get;
+		$this->post = clone $this->post;
+		$this->files = clone $this->files;
+		$this->cookies = clone $this->cookies;
+		$this->server = clone $this->server;
+		$this->headers = clone $this->headers;
 
 		if (isset($this->Session)) {
 			$this->Session = clone $this->Session;
@@ -211,13 +211,13 @@ class Request {
 	public function __toString () {
 		$text = "Path: ".$this->getPath();
 		$text .= "\nFormat: ".$this->getFormat();
-		$text .= "\nParameters:\n".$this->Parameters;
-		$text .= "\nGet:\n".$this->Get;
-		$text .= "\nPost:\n".$this->Post;
-		$text .= "\nFiles:\n".$this->Files;
-		$text .= "\nCookies:\n".$this->Cookies;
-		$text .= "\nServer:\n".$this->Server;
-		$text .= "\nHeaders:\n".$this->Headers;
+		$text .= "\nParameters:\n".$this->parameters;
+		$text .= "\nGet:\n".$this->get;
+		$text .= "\nPost:\n".$this->post;
+		$text .= "\nFiles:\n".$this->files;
+		$text .= "\nCookies:\n".$this->cookies;
+		$text .= "\nServer:\n".$this->server;
+		$text .= "\nHeaders:\n".$this->headers;
 
 		return $text;
 	}
@@ -238,7 +238,7 @@ class Request {
 		}
 
 		if ($parameters !== null) {
-			$Request->Parameters->set($parameters);
+			$Request->parameters->set($parameters);
 		}
 
 		//Use the same session if exists
@@ -292,7 +292,7 @@ class Request {
 			$url .= '.'.$format;
 		}
 
-		if (($query === true) && ($query = $this->Get->get())) {
+		if (($query === true) && ($query = $this->get->get())) {
 			$url .= '?'.http_build_query($query);
 		}
 
@@ -368,7 +368,7 @@ class Request {
 	 * @return string The preferred language
 	 */
 	public function getLanguage (array $valid_languages = null) {
-		$user_languages = array_keys($this->Headers->getParsed('Accept-Language'));
+		$user_languages = array_keys($this->headers->getParsed('Accept-Language'));
 
 		if (is_null($valid_languages)) {
 			return $user_languages[0];
@@ -394,7 +394,7 @@ class Request {
 	 * @return mixed The value of the variable or the default value
 	 */
 	public function get ($name, $default = null) {
-		return $this->Post->get($name, $this->Files->get($name, $this->Get->get($name, $this->Parameters->get($name, $default))));
+		return $this->post->get($name, $this->files->get($name, $this->get->get($name, $this->parameters->get($name, $default))));
 	}
 
 
@@ -405,10 +405,10 @@ class Request {
 	 * @param string $name The variable name to remove
 	 */
 	public function remove ($name) {
-		$this->Post->remove($name);
-		$this->Files->remove($name);
-		$this->Get->remove($name);
-		$this->Parameters->remove($name);
+		$this->post->remove($name);
+		$this->files->remove($name);
+		$this->get->remove($name);
+		$this->parameters->remove($name);
 	}
 
 
@@ -421,7 +421,7 @@ class Request {
 	 * @return boolean TRUE if the variable exists in any of the parameters and FALSE if doesn't
 	 */
 	public function has ($name) {
-		return ($this->Post->has($name) || $this->Files->has($name) || $this->Get->has($name) || $this->Parameters->has($name)) ? true : false;
+		return ($this->post->has($name) || $this->files->has($name) || $this->get->has($name) || $this->parameters->has($name)) ? true : false;
 	}
 
 
@@ -431,7 +431,7 @@ class Request {
 	 * @return string The client IP
 	 */
 	public function getIp () {
-		return $this->Server->get('HTTP_CLIENT_IP', $this->Server->get('HTTP_X_FORWARDED_FOR', $this->Server->get('REMOTE_ADDR')));
+		return $this->server->get('HTTP_CLIENT_IP', $this->server->get('HTTP_X_FORWARDED_FOR', $this->server->get('REMOTE_ADDR')));
 	}
 
 
@@ -441,7 +441,7 @@ class Request {
 	 * @return boolean TRUE if the request if ajax, FALSE if not
 	 */
 	public function isAjax () {
-		return (strtolower($this->Server->get('HTTP_X_REQUESTED_WITH')) === 'xmlhttprequest') ? true : false;
+		return (strtolower($this->server->get('HTTP_X_REQUESTED_WITH')) === 'xmlhttprequest') ? true : false;
 	}
 
 
@@ -451,7 +451,7 @@ class Request {
 	 * @return string The request scheme (http or https)
 	 */
 	public function getScheme () {
-		return ($this->Server->get('HTTPS') === 'on') ? 'https' : 'http';
+		return ($this->server->get('HTTPS') === 'on') ? 'https' : 'http';
 	}
 
 
@@ -462,7 +462,7 @@ class Request {
 	 * @return string The request host
 	 */
 	public function getHost () {
-		return $this->Server->get('SERVER_NAME');
+		return $this->server->get('SERVER_NAME');
 	}
 
 
@@ -473,7 +473,7 @@ class Request {
 	 * @return int The port number
 	 */
 	public function getPort () {
-		return intval($this->Server->get('X_FORWARDED_PORT') ?: $this->Server->get('SERVER_PORT'));
+		return intval($this->server->get('X_FORWARDED_PORT') ?: $this->server->get('SERVER_PORT'));
 	}
 
 
@@ -484,10 +484,10 @@ class Request {
 	 * @return string The request method (in uppercase: GET, POST, etc)
 	 */
 	public function getMethod () {
-		$method = $this->Server->get('REQUEST_METHOD', 'GET');
+		$method = $this->server->get('REQUEST_METHOD', 'GET');
 	
 		if ($method === 'POST') {
-			$this->method = strtoupper($this->Server->get('X_HTTP_METHOD_OVERRIDE', 'POST'));
+			$this->method = strtoupper($this->server->get('X_HTTP_METHOD_OVERRIDE', 'POST'));
 		}
 
 		return $method;
@@ -513,6 +513,6 @@ class Request {
 	 * @param string/Datetime $datetime
 	 */
 	public function setIfModifiedSince ($datetime) {
-		$this->Headers->setDateTime('If-Modified-Since', $datetime);
+		$this->headers->setDateTime('If-Modified-Since', $datetime);
 	}
 }
