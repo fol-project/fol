@@ -106,14 +106,14 @@ Apps
 
 As aplicacións manexan o código do noso sitio web. Podes meter todo o sitio web nunha soa aplicación ou dividilo en distintas aplicacións (unha para o blog, outra para galeria de fotos, etc). Unha aplicación non é máis que unha clase que se instancia e se executa. Isto permite executar aplicacións unha dentro doutra, extendelas, etc. As aplicacións deben extender á clase Fol\App para que teñan dispoñibles as seguintes propiedades:
 
-* $App->router: Devolve a clase que manexa as rutas
-* $App->request: Devolve o obxecto request creado de xeito global
-* $App->name: Devolve o nome da aplicación ("Web")
-* $App->namespace: Devolve o namespace donde está aloxada a aplicación ("Apps\Web")
-* $App->path: Devolve a ruta onde está aloxada a aplicación no servidor ("/var/www/web")
-* $App->url: Devolve a url para acceder á raiz desa aplicación (p.e: "/")
-* $App->assetsPath: Devolve a ruta onde está aloxada a carpeta de assets no servidor ("/var/www/web/assets").
-* $App->assetsUrl: Devolve a url onde está aloxada a carpeta de assets ("/web/assets")
+* $app->router: Devolve a clase que manexa as rutas
+* $app->request: Devolve o obxecto request creado de xeito global
+* $app->name: Devolve o nome da aplicación ("Web")
+* $app->namespace: Devolve o namespace donde está aloxada a aplicación ("Apps\Web")
+* $app->path: Devolve a ruta onde está aloxada a aplicación no servidor ("/var/www/web")
+* $app->url: Devolve a url para acceder á raiz desa aplicación (p.e: "/")
+* $app->assetsPath: Devolve a ruta onde está aloxada a carpeta de assets no servidor ("/var/www/web/assets").
+* $app->assetsUrl: Devolve a url onde está aloxada a carpeta de assets ("/web/assets")
 
 Para crear unha aplicación, podemos crear un directorio novo e meter dentro un arquivo chamado App.php. Tamén podemos usar a aplicación que existe por defecto (chamada "Web") e que está dentro da carpeta "/web":
 
