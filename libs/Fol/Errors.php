@@ -141,6 +141,13 @@ class Errors {
 
 		$class = get_class($exception);
 
+		if (php_sapi_name() === 'cli') {
+			echo "======================= \n";
+			echo "{$exception->getMessage()} ({$exception->getCode()})\n";
+			echo "{$class} | {$exception->getFile()}:{$exception->getLine()}\n\n";
+			echo $exception->getTraceAsString();
+			echo str_replace("\n", "\n\t", $previous);
+		} else {
 		echo <<<EOT
 <section id="ErrorException">
 	<h1>{$exception->getMessage()} ({$exception->getCode()})</h1>
@@ -152,5 +159,6 @@ class Errors {
 	{$previous}
 </section>
 EOT;
+		}
 	}
 }
