@@ -143,52 +143,39 @@ abstract class App {
 			$request = $this->request;
 		}
 
-		try {
-			$route = ($name === null) ? $this->router->match($request) : $this->router->getByName($name);
+		$route = ($name === null) ? $this->router->match($request) : $this->router->getByName($name);
 
-			if ($route) {
-				try {
-					$request->parameters->set($route->getParameters());
-					$response = $request->generateResponse();
-
-					$resp = $this->executeRoute($route, [$request, $response]);
-
-					if ($resp instanceof Response) {
-						$response = $resp;
-					} else if (is_string($resp)) {
-						$response->appendContent($resp);
-					}
-				} catch (\Exception $exception) {
-					if ($exception instanceof HttpException) {
-						throw $exception;
-					} else {
-						throw new HttpException('Error Processing Request', 500, $exception);
-					}
-				}
-			} else {
-				throw new HttpException('This route does not exits', 404);
-			}
-		} catch (HttpException $exception) {
-			if (!isset($response)) {
-				$response = $request->generateResponse();
-			}
-
-			$response->setStatus($exception->getCode());
-
-			if (($route = $this->router->getByName('error'))) {
-				$request->parameters->set('exception', $exception);
-
-				return $this->handleRequest($request, 'error');
-			}
-
+		if ($route) {
+			$request->parameters->set($route->getParameters());
 			$response = $request->generateResponse();
-			$response->setStatus($exception->getCode());
-			$response->setContent($exception->getMessage());
+			$return = $this->executeRoute($route, [$request, $response]);
+
+			//Error controller
+			if ($return instanceof HttpException) {
+				$response = $request->generateResponse();
+				$response->setStatus($return->getCode());
+
+				if (($route = $this->router->getByName('error'))) {
+					$request->parameters->set('exception', $return);
+
+					$return = $this->executeRoute($route, [$request, $response]);
+				}
+
+				if ($return instanceof HttpException) {
+					throw new \Exception('Error processing error', 0, $return);
+				}
+			}
+
+			if ($return instanceof Response) {
+				return $return;
+			}
+
+			if (is_string($return)) {
+				$response->appendContent($return);
+			}
 
 			return $response;
 		}
-
-		return $response;
 	}
 
 
@@ -203,26 +190,44 @@ abstract class App {
 	protected function executeRoute (Route $route, array $arguments = array(), array $constructor_arguments = array()) {
 		ob_start();
 
+		$return = '';
 		$target = $route->getTarget();
 
-		if (is_callable($target)) {
-			$return = call_user_func_array($target, $arguments);
-		} elseif (is_string($target)) {
-			if (strpos($target, '::') !== false) {
-				list($class, $method) = explode('::', $target, 2);
+		try {
+			if (is_callable($target)) {
+				$return = call_user_func_array($target, $arguments);
+			} elseif (is_string($target)) {
+				if (strpos($target, '::') !== false) {
+					list($class, $method) = explode('::', $target, 2);
 
-				$class = new \ReflectionClass($this->namespace.'\\Controllers\\'.$class);
-				$controller = $class->newInstanceWithoutConstructor();
-				$controller->App = $this;
+					$class = new \ReflectionClass($this->namespace.'\\Controllers\\'.$class);
+					$controller = $class->newInstanceWithoutConstructor();
+					$controller->App = $this;
 
-				if (($Constructor = $class->getConstructor())) {
-					$Constructor->invokeArgs($controller, $constructor_arguments);
+					if (($Constructor = $class->getConstructor())) {
+						$Constructor->invokeArgs($controller, $constructor_arguments);
+					}
+
+					$return = $class->getMethod($method)->invokeArgs($controller, $arguments);
+
+				} else {
+					$return = call_user_func_array([$this, $target], $arguments);
 				}
-
-				$return = $class->getMethod($method)->invokeArgs($controller, $arguments);
-			} else {
-				$return = call_user_func_array([$this, $target], $arguments);
 			}
+		} catch (\Exception $exception) {
+			ob_clean();
+
+			if ($exception instanceof HttpException) {
+				return $exception;
+			}
+
+			return new HttpException('Error processing request', 500, $exception);
+		}
+
+		if ($return instanceof Response) {
+			$return->appendContent(ob_get_clean());
+			
+			return $return;
 		}
 
 		return ob_get_clean().$return;

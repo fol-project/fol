@@ -64,6 +64,9 @@ class Errors {
 			set_exception_handler(__NAMESPACE__.'\\Errors::handleException');
 			register_shutdown_function(__NAMESPACE__.'\\Errors::handleShutdown');
 
+			ini_set('display_errors', '0');
+			ini_set('display_startup_errors', '0');
+
 			static::$isRegistered = true;
 		}
 	}
@@ -76,6 +79,9 @@ class Errors {
 		if (static::$isRegistered) {
 			restore_error_handler();
 			restore_exception_handler();
+
+			ini_set('display_errors', get_cfg_var('display_errors'));
+			ini_set('display_startup_errors', get_cfg_var('display_startup_errors'));
 
 			static::$isRegistered = false;
 		}
@@ -92,7 +98,7 @@ class Errors {
 	 */
 	static public function handleError ($level, $message, $file = null, $line = null) {
 		if (error_reporting() & $level) {
-			throw new \ErrorException($message, $level, 0, $file, $line);
+			static::handleException(new \ErrorException($message, $level, 0, $file, $line));
 		}
 	}
 
@@ -118,7 +124,11 @@ class Errors {
 		}
 
 		if (static::$displayErrors) {
-			echo static::printException($exception);
+			if (php_sapi_name() === 'cli') {
+				echo static::getTextException($exception);
+			} else {
+				echo static::getHtmlException($exception);
+			}
 		}
 
 		if (isset(static::$logger)) {
@@ -128,37 +138,44 @@ class Errors {
 
 
 	/**
-	 * Print the exception info as html
+	 * Returns a exception info as HTML
 	 * 
 	 * @param Exception $exception
 	 */
-	static public function printException (\Exception $exception) {
-		if (($Previous = $exception->getPrevious())) {
-			$previous = self::printException($Previous);
-		} else {
-			$previous = '';
-		}
-
+	static public function getHtmlException (\Exception $exception, $deep = 0) {
+		$previous = ($previousException = $exception->getPrevious()) ? self::getHtmlException($previousException, $deep + 1) : '';
 		$class = get_class($exception);
+		$date = ($deep === 0) ? '<time>'.date('r').'</time><br>' : '';
 
-		if (php_sapi_name() === 'cli') {
-			echo "======================= \n";
-			echo "{$exception->getMessage()} ({$exception->getCode()})\n";
-			echo "{$class} | {$exception->getFile()}:{$exception->getLine()}\n\n";
-			echo $exception->getTraceAsString();
-			echo str_replace("\n", "\n\t", $previous);
-		} else {
-		echo <<<EOT
+		return <<<EOT
 <section id="ErrorException">
+	{$date}
 	<h1>{$exception->getMessage()} ({$exception->getCode()})</h1>
 	<p>
 		<em>{$class}</em><br>
-		{$exception->getFile()}:{$exception->getLine()}
+		{$exception->getFile()}:{$exception->getLine()}<br>
 	</p>
 	<pre>{$exception->getTraceAsString()}</pre>
 	{$previous}
 </section>
 EOT;
-		}
+	}
+
+
+	/**
+	 * Returns a exception info as text (for CLI)
+	 * 
+	 * @param Exception $exception
+	 */
+	static public function getTextException (\Exception $exception, $deep = 0) {
+		$previous = ($previousException = $exception->getPrevious()) ? self::getTextException($previousException, $deep + 1) : '';
+		$class = get_class($exception);
+
+		return (($deep === 0) ? "\n=======================\n".date('r')."\n\n" : "\n----------\n")
+			."{$exception->getMessage()} ({$exception->getCode()})\n"
+			."{$class} | {$exception->getFile()}:{$exception->getLine()}\n\n"
+			.$exception->getTraceAsString()
+			.$previous
+			.(($deep === 0) ? "\n=======================\n" : "\n");
 	}
 }

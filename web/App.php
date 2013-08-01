@@ -8,6 +8,7 @@ class App extends \Fol\App {
 	public function __construct () {
 		$this->router->map('index', '/', 'Index::index');
 		$this->router->map('phpinfo', '/phpinfo', 'Index::phpinfo');
+		$this->router->map('error', null, 'Index::error');
 	}
 }
 ?>
