@@ -12,6 +12,9 @@ use Fol\Http\Files;
 use Fol\Http\Headers;
 
 class Request {
+	const TYPE_MASTER_REQUEST = 0;
+	const TYPE_SUB_REQUEST = 1;
+
 	public $parameters;
 	public $get;
 	public $post;
@@ -22,6 +25,7 @@ class Request {
 
 	private $path;
 	private $format = 'html';
+	private $type;
 
 
 	/**
@@ -165,6 +169,8 @@ class Request {
 		$this->server = new Container($server);
 		$this->headers = new RequestHeaders(RequestHeaders::getHeadersFromServer($server));
 
+		$this->type = static::TYPE_MASTER_REQUEST;
+
 		foreach (array_keys($this->headers->getParsed('Accept')) as $mimetype) {
 			if ($format = Headers::getFormat($mimetype)) {
 				$this->format = $format;
@@ -220,6 +226,26 @@ class Request {
 		$text .= "\nHeaders:\n".$this->headers;
 
 		return $text;
+	}
+
+
+	/**
+	 * Change the type of the request
+	 *
+	 * @param int $type The request type: self::TYPE_MASTER_REQUEST or self::TYPE_SUB_REQUEST
+	 */
+	public function setType ($type) {
+		$this->type = $type;
+	}
+
+
+	/**
+	 * Returns true if the request is a subrequest
+	 * 
+	 * @return boolean
+	 */
+	public function isSubrequest () {
+		return ($this->type === static::TYPE_SUB_REQUEST);
 	}
 
 
