@@ -1,12 +1,10 @@
 <?php
 /**
- * Fol\Http\Session
+ * Fol\Session
  * 
  * Class to manage the session
  */
-namespace Fol\Http;
-
-use Fol\Http\Container;
+namespace Fol;
 
 class Session {
 

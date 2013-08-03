@@ -47,6 +47,11 @@ abstract class App {
 			return $this->request = Request::createFromGlobals();
 		}
 
+		//The session
+		if ($name === 'session') {
+			return $this->session = new Session();
+		}
+
 		//The app name. (Web)
 		if ($name === 'name') {
 			return $this->name = substr(strrchr($this->namespace, '\\'), 1);
@@ -149,33 +154,35 @@ abstract class App {
 			$request->parameters->set($route->getParameters());
 			$response = $request->generateResponse();
 			$return = $this->executeRoute($route, [$request, $response]);
-
-			//Error controller
-			if ($return instanceof HttpException) {
-				$response = $request->generateResponse();
-				$response->setStatus($return->getCode());
-
-				if (($route = $this->router->getByName('error'))) {
-					$request->parameters->set('exception', $return);
-
-					$return = $this->executeRoute($route, [$request, $response]);
-				}
-
-				if ($return instanceof HttpException) {
-					throw new \Exception('Error processing error', 0, $return);
-				}
-			}
-
-			if ($return instanceof Response) {
-				return $return;
-			}
-
-			if (is_string($return)) {
-				$response->appendContent($return);
-			}
-
-			return $response;
+		} else {
+			$return = new HttpException('Page not found', 404);
 		}
+
+		//Error controller
+		if ($return instanceof HttpException) {
+			$response = $request->generateResponse();
+			$response->setStatus($return->getCode());
+
+			if (($route = $this->router->getByName('error'))) {
+				$request->parameters->set('exception', $return);
+
+				$return = $this->executeRoute($route, [$request, $response]);
+			}
+
+			if ($return instanceof HttpException) {
+				throw new \Exception('Error processing error', 0, $return);
+			}
+		}
+
+		if ($return instanceof Response) {
+			return $return;
+		}
+
+		if (is_string($return)) {
+			$response->appendContent($return);
+		}
+
+		return $response;
 	}
 
 

@@ -194,20 +194,6 @@ class Request {
 		$this->cookies = clone $this->cookies;
 		$this->server = clone $this->server;
 		$this->headers = clone $this->headers;
-
-		if (isset($this->session)) {
-			$this->session = clone $this->session;
-		}
-	}
-
-
-	/**
-	 * Magic function to initialize some properties in lazy mode
-	 */
-	public function __get ($name) {
-		if ($name === 'session') {
-			return $this->session = new Session();
-		}
 	}
 
 
@@ -267,14 +253,8 @@ class Request {
 			$Request->parameters->set($parameters);
 		}
 
-		//Use the same session if exists
-		if (isset($this->session)) {
-			$Request->session = $this->session;
-		}
-
 		return $Request;
 	}
-
 
 
 	/**
@@ -285,7 +265,6 @@ class Request {
 	public function getId () {
 		return md5($this->getUrl(true, true, true).' '.$this->getMethod());
 	}
-
 
 
 	/**
