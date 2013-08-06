@@ -140,23 +140,19 @@ class Templates {
 	 * Render a template and return its content
 	 * 
 	 * @param string $template The template name or file path
-	 * @param array $data An optional array of data used in the template. If the array is numerical, renders the template once for each item
+	 * @param array/Iterator/IteratorAggregate $data An optional array of object extending Iterator/IteratorAggregate data used in the template. If the array is numerical or the object extends Iterator/IteratorAggregate interfaces, renders the template once for each item
 	 *
 	 * @return string The template rendered
 	 */
-	public function render ($template, array $data = null) {
+	public function render ($template, $data = null) {
 		if (($data === null) && isset($this->renders[$template])) {
 			return $this->renders[$template];
 		}
 
-		if (($data !== null) && (!$data || isset($data[0]))) {
+		if (($data !== null) && static::isIterable($data)) {
 			$result = '';
-			$total = count($data);
 
-			foreach ($data as $index => $value) {
-				$value['_index'] = $index;
-				$value['_total'] = $total;
-
+			foreach ($data as $value) {
 				$result .= "\n".$this->render($template, $value, $wrap);
 			}
 
@@ -168,5 +164,21 @@ class Templates {
 		}
 
 		return $this->renderFile($template, $data);
+	}
+
+
+	/**
+	 * Simple method to detect if a value must be iterabled or not
+	 */
+	private static function isIterable ($items) {
+		if (is_array($items)) {
+			return (empty($items) || isset($data[0]));
+		}
+
+		if (($items instanceof \Iterator) || ($items instanceof \IteratorAggregate)) {
+			return true;
+		}
+
+		return false;
 	}
 }
