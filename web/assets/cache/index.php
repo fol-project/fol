@@ -1,7 +1,7 @@
 <?php
 use Fol\Loader;
 
-include('../../../../bootstrap.php');
+include('../../../bootstrap.php');
 
 //Register the apps
 Loader::registerNamespace('Apps\\Web', BASE_PATH.'/web');
