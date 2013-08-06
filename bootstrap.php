@@ -18,8 +18,4 @@ Loader::register();
 Loader::setLibrariesPath(BASE_PATH.'/libs');
 Loader::registerComposer();
 
-//Register the apps
-Loader::registerNamespace('Apps\\Web', BASE_PATH.'/web');
-
 Errors::register();
-Errors::displayErrors();
