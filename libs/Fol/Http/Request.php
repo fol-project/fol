@@ -34,6 +34,12 @@ class Request {
 	 * @return Fol\Http\Request The object with the global data
 	 */
 	static public function createFromGlobals () {
+		if (php_sapi_name() === 'cli') {
+			global $argv;
+
+			return Request::createFromCli($argv);
+		}
+
 		$path = parse_url(preg_replace('|^'.preg_quote(BASE_URL).'|i', '', urldecode($_SERVER['REQUEST_URI'])), PHP_URL_PATH);
 
 		return new static($path, array(), (array)filter_input_array(INPUT_GET), (array)filter_input_array(INPUT_POST), $_FILES, (array)filter_input_array(INPUT_COOKIE), (array)filter_input_array(INPUT_SERVER));
