@@ -41,11 +41,6 @@ abstract class App {
 			return $this->request = Request::createFromGlobals();
 		}
 
-		//The session
-		if ($name === 'session') {
-			return $this->session = new Session();
-		}
-
 		//The app name. (Web)
 		if ($name === 'name') {
 			return $this->name = substr(strrchr($this->namespace, '\\'), 1);
