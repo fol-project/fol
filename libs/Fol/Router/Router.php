@@ -9,6 +9,7 @@ namespace Fol\Router;
 
 use Fol\Http\Response;
 use Fol\Http\HttpException;
+use Fol\App;
 
 class Router {
 	private $routes = array();
@@ -101,24 +102,24 @@ class Router {
 		$route = $this->routes[$name];
 
 		if ($absolute === true) {
-			return $this->absoluteUrl.$route->generate($params);
+			return $this->absoluteUrl.BASE_URL.$route->generate($params);
 		}
 
-		return $route->generate($params);
+		return BASE_URL.$route->generate($params);
 	}
 
 
-	public function handle ($request) {
+	public function handle ($request, App $app) {
 		if (($route = $this->match($request))) {
 			try {
-				$response = $route->execute($this, $request);
+				$response = $route->execute($app, $request);
 			} catch (HttpException $exception) {
-				return $this->errorController->execute($this, $exception, $request);
+				return $this->errorController->execute($app, $exception, $request);
 			}
 
 			return $response;
 		}
 
-		return $this->errorController->execute($this, new HttpException('Not found', 404), $request);
+		return $this->errorController->execute($app, new HttpException('Not found', 404), $request);
 	}
 }

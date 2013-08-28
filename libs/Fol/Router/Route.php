@@ -130,13 +130,16 @@ class Route {
 	 */
 	public function generate (array $parameters = array()) {
 		$replace = [];
-		$parameters = array_merge($this->parameters, $parameters);
+
+		if ($this->parameters) {
+			$parameters = array_merge($this->parameters, $parameters);
+		}
 
 		foreach ($parameters as $key => $val) {
 			$replace["{:$key}"] = rawurlencode($val);
 		}
 
-		return BASE_URL.strtr($this->path, $replace);
+		return strtr($this->path, $replace);
 	}
 
 
@@ -189,7 +192,7 @@ class Route {
 				$constructor->invoke($controller);
 			}
 
-			$return = $class->getMethod($method)->invoke($controller, $this, $request, $response);
+			$return = $class->getMethod($method)->invoke($controller, $request, $response);
 		} catch (\Exception $exception) {
 			ob_clean();
 
