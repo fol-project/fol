@@ -198,45 +198,33 @@ $response->send();
 Rutas
 -----
 
-Para xenerar as distintas rutas do noso documento, podemos usar a clase Fol\Http\Router. Por exemplo, na nosa applicación, no constructor podemos definir as rutas:
+Para xenerar as distintas rutas do noso documento, podemos usar a clase Fol\Router\Router. Por exemplo, na nosa applicación, no constructor podemos definir as rutas:
 
 ```php
 namespace Apps\Web;
 
-use Fol\Http\Router;
+use Fol\Http\Request;
+use Fol\Router\Router;
+use Fol\Router\RouteFactory;
 
 class App extends \Fol\App {
 
 	public function __construct () {
+		//Creamos o enrutador
+		$routeFactory = new RouteFactory($this);
+		$this->router = new Router($routeFactory);
 
 		//Definimos as distintas rutas (nome da ruta, url, controlador e outras opcions)
 		$this->router->map('index', '/', 'Index::index', ['methods' => 'GET']);
 		$this->router->map('contacto', '/about', 'Index::about');
 	}
-}
-```
 
-Podemos definir os controladores (as funcións que se executan en cada ruta) de tres maneiras distintas: cunha función anónima (Closure), un controlador externo (por exemplo "Index::about" instanciaría Apps\Web\Controllers\Index e executaría o método "about") e podemos poñer só o nome dun método para executar directamente un método da propia App, sen instanciar controladores externos (por exemplo "about" executaría $app->about):
+	public function handleRequest () {
+		//Creamos o request collendo os datos globais
+		$request = Request::createFromGlobals();
 
-```php
-namespace Apps\Web;
-
-use Fol\Http\Router;
-
-class App extends \Fol\App {
-
-	public function __construct () {
-		//Definimos as distintas rutas (nome da ruta, url, controlador e outras opcions)
-		$this->router->map('index', '/', 'index'); //Executa o método "index" deste propio obxecto
-		$this->router->map('contacto', '/about', 'Index::about'); //Instancia Apps\Web\Controllers\Index e executa o método "about"
-
-		$this->router->map('saludo', '/ola', function ($request) { //Executa unha función directamente
-			echo 'Ola!';
-		});
-	}
-
-	public function index ($request) {
-		echo 'Este é un controlador que se pon directamente aqui';
+		//Executamos a ruta e devolvemos a resposta
+		return $this->router->handle($request, $this);
 	}
 }
 ```
@@ -265,11 +253,6 @@ Execución dunha ruta con parámetros post:
 $ php index.php /posts/create POST --title "Título do posts"
 ```
 
-Para definir unha ruta que solo se execute en consola podes indicalo nas preferencias da ruta co parámetro "only-cli":
-
-```php
-$router->map('lista-usuarios', 'users/list', 'Index::listUsers', ['only-cli' => true]);
-```
 
 INSTALACIÓN
 ===========
