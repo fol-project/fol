@@ -23,4 +23,3 @@ class Index {
 		$response->setContent($exception->getMessage());
 	}
 }
-?>

@@ -7,13 +7,14 @@
 
 namespace Fol;
 
-use Fol\Http\Router;
+use Fol\Router\Map;
 use Fol\Http\Route;
 use Fol\Http\Request;
 use Fol\Http\HttpException;
 
 abstract class App {
 	public $parent;
+
 	private $services;
 
 
@@ -29,16 +30,6 @@ abstract class App {
 		//Registered services
 		if (isset($this->services[$name])) {
 			return $this->$name = $this->services[$name]();
-		}
-
-		//The router
-		if ($name === 'router') {
-			return $this->router = new Router($this->url);
-		}
-
-		//The request
-		if ($name === 'request') {
-			return $this->request = Request::createFromGlobals();
 		}
 
 		//The app name. (Web)
@@ -121,111 +112,5 @@ abstract class App {
 	 */
 	public function unregister ($name) {
 		unset($this->services[$name]);
-	}
-
-
-	/**
-	 * Handle a request and returns a response
-	 * 
-	 * @param  Fol\Http\Request $request The request to handle
-	 * @param  string $name Set a route name to force to use this route instead detect by url
-	 * 
-	 * @return Fol\Http\Response The resulted response
-	 */
-	public function handleRequest (Request $request = null, $name = null) {
-		if ($request === null) {
-			$request = $this->request;
-		}
-
-		$route = ($name === null) ? $this->router->match($request) : $this->router->getByName($name);
-
-		if ($route) {
-			$request->parameters->set($route->getParameters());
-			$response = $request->generateResponse();
-			$return = $this->executeRoute($route, [$request, $response]);
-		} else {
-			$return = new HttpException('Page not found', 404);
-		}
-
-		//Error controller
-		if ($return instanceof HttpException) {
-			$response = $request->generateResponse();
-			$response->setStatus($return->getCode());
-
-			if (($route = $this->router->getByName('error'))) {
-				$request->parameters->set('exception', $return);
-
-				$return = $this->executeRoute($route, [$request, $response]);
-			}
-
-			if ($return instanceof HttpException) {
-				throw new \Exception('Error processing error', 0, $return);
-			}
-		}
-
-		if ($return instanceof Response) {
-			return $return;
-		}
-
-		if (is_string($return)) {
-			$response->appendContent($return);
-		}
-
-		return $response;
-	}
-
-
-	/**
-	 * Executes a route target
-	 * 
-	 * @param Fol\Http\Route $route The route to execute
-	 * @param array $arguments The arguments passed to the controller
-	 * 
-	 * @return string The return of the controller
-	 */
-	protected function executeRoute (Route $route, array $arguments = array(), array $constructor_arguments = array()) {
-		ob_start();
-
-		$return = '';
-		$target = $route->getTarget();
-
-		try {
-			if (is_callable($target)) {
-				$return = call_user_func_array($target, $arguments);
-			} elseif (is_string($target)) {
-				if (strpos($target, '::') !== false) {
-					list($class, $method) = explode('::', $target, 2);
-
-					$class = new \ReflectionClass($this->namespace.'\\Controllers\\'.$class);
-					$controller = $class->newInstanceWithoutConstructor();
-					$controller->App = $this;
-
-					if (($Constructor = $class->getConstructor())) {
-						$Constructor->invokeArgs($controller, $constructor_arguments);
-					}
-
-					$return = $class->getMethod($method)->invokeArgs($controller, $arguments);
-
-				} else {
-					$return = call_user_func_array([$this, $target], $arguments);
-				}
-			}
-		} catch (\Exception $exception) {
-			ob_clean();
-
-			if ($exception instanceof HttpException) {
-				return $exception;
-			}
-
-			return new HttpException('Error processing request', 500, $exception);
-		}
-
-		if ($return instanceof Response) {
-			$return->appendContent(ob_get_clean());
-			
-			return $return;
-		}
-
-		return ob_get_clean().$return;
 	}
 }
