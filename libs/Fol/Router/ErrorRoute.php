@@ -29,6 +29,7 @@ class ErrorRoute {
 		$class = new \ReflectionClass($class);
 		$controller = $class->newInstanceWithoutConstructor();
 		$controller->app = $app;
+		$controller->route = $this;
 
 		if (($constructor = $class->getConstructor())) {
 			$constructor->invoke($controller);
