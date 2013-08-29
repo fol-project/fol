@@ -181,6 +181,10 @@ class Route {
 		$return = '';
 		$response = $request->generateResponse();
 
+		if ($this->parameters) {
+			$request->parameters->set($this->parameters);
+		}
+
 		try {
 			list($class, $method) = $this->target;
 
