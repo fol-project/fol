@@ -26,4 +26,3 @@ class App extends \Fol\App {
 		return $this->router->handle($request, $this);
 	}
 }
-?>

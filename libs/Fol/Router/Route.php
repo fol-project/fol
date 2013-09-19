@@ -198,6 +198,8 @@ class Route {
 			}
 
 			$return = $class->getMethod($method)->invoke($controller, $request, $response);
+
+			unset($controller);
 		} catch (\Exception $exception) {
 			ob_clean();
 
