@@ -23,6 +23,7 @@ class ErrorRoute {
 
 		$return = '';
 		$response = $request->generateResponse();
+		$response->setStatus($exception->getCode() ?: 500);
 
 		list($class, $method) = $this->target;
 

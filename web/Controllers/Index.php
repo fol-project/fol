@@ -19,7 +19,6 @@ class Index {
 	public function error ($request, $response) {
 		$exception = $request->parameters->get('exception');
 
-		$response->setStatus($exception->getCode() ?: 500);
 		$response->setContent($exception->getMessage());
 	}
 }
