@@ -194,7 +194,7 @@ class Route {
 			$controller->route = $this;
 
 			if (($constructor = $class->getConstructor())) {
-				$constructor->invoke($controller);
+				$constructor->invoke($controller, $request, $response);
 			}
 
 			$return = $class->getMethod($method)->invoke($controller, $request, $response);
