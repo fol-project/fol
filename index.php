@@ -4,8 +4,7 @@ use Fol\Errors;
 
 include('bootstrap.php');
 
-//Register the apps
-Loader::registerNamespace('Apps\\Web', BASE_PATH.'/web');
+//Register the apps here
 
 //Show errors
 Errors::displayErrors();
