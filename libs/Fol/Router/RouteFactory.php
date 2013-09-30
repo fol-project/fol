@@ -17,7 +17,13 @@ class RouteFactory {
 	}
 
 	private function getTarget ($target) {
-		$target = list($class, $method) = explode('::', $target, 2);
+		if (strpos($target, '::') === false) {
+			$class = $target;
+			$method = null;
+		} else {
+			list($class, $method) = explode('::', $target, 2);
+		}
+
 		$class = $this->app->namespace.'\\Controllers\\'.$class;
 
 		return [$class, $method];

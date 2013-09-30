@@ -38,7 +38,11 @@ class ErrorRoute {
 			$constructor->invoke($controller, $request, $response);
 		}
 
-		$return = $class->getMethod($method)->invoke($controller, $request, $response);
+		if ($method) {
+			$return = $class->getMethod($method)->invoke($controller, $request, $response);
+		} else {
+			$return = $controller($request, $response);
+		}
 
 		if ($return instanceof Response) {
 			$return->appendContent(ob_get_clean());

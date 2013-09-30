@@ -197,7 +197,11 @@ class Route {
 				$constructor->invoke($controller, $request, $response);
 			}
 
-			$return = $class->getMethod($method)->invoke($controller, $request, $response);
+			if ($method) {
+				$return = $class->getMethod($method)->invoke($controller, $request, $response);
+			} else {
+				$return = $controller($request, $response);
+			}
 
 			unset($controller);
 		} catch (\Exception $exception) {

@@ -10,4 +10,5 @@ include('bootstrap.php');
 Errors::displayErrors();
 
 //Handle the request and send the response
-(new Apps\Web\App)->handleRequest()->send();
+$app = new Apps\Web\App;
+$app()->send();

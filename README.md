@@ -125,6 +125,10 @@ class App extends \Fol\App {
 	public function __construct () {
 		//Contructor da applicación (cargar a configuración, instanciar clases básicas, etc)
 	}
+
+	public function __invoke () {
+		//Función que se executa ao invocar a app
+	}
 }
 
 //Debemos rexistrar a ubicación da aplicación (por defecto xa está feito en bootstrap.php)
@@ -134,8 +138,7 @@ Loader::registerNamespace('Apps\\Web', BASE_PATH.'/web');
 $aplicacion = new \Apps\Web\App();
 
 //executamos a aplicación e mandamos o resultado
-$response = $aplicacion->handleRequest();
-$response->send();
+$aplicacion()->send();
 ```
 
 Ten en conta que as aplicacións se cargan co estándar PSR-0, igual que calquera outra biblioteca. A única diferencia é que se aloxan noutra carpeta distinta a libs. Polo tanto, a aplicación \Apps\Web\App, estaría no arquivo "/web/App.php". Se queres aloxar as aplicacións noutro directorio distinto, só tes que configurar a clase Loader para que busque o namespace "Apps\\Web" noutro directorio distinto. Esa configuración atópase en bootstrap.php, na raíz:
@@ -219,7 +222,7 @@ class App extends \Fol\App {
 		$this->router->map('contacto', '/about', 'Index::about');
 	}
 
-	public function handleRequest () {
+	public function __invoke () {
 		//Creamos o request collendo os datos globais
 		$request = Request::createFromGlobals();
 
