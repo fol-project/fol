@@ -106,8 +106,6 @@ Apps
 
 As aplicacións manexan o código do noso sitio web. Podes meter todo o sitio web nunha soa aplicación ou dividilo en distintas aplicacións (unha para o blog, outra para galeria de fotos, etc). Unha aplicación non é máis que unha clase que se instancia e se executa. Isto permite executar aplicacións unha dentro doutra, extendelas, etc. As aplicacións deben extender á clase Fol\App para que teñan dispoñibles as seguintes propiedades:
 
-* $app->router: Devolve a clase que manexa as rutas
-* $app->request: Devolve o obxecto request creado de xeito global
 * $app->name: Devolve o nome da aplicación ("Web")
 * $app->namespace: Devolve o namespace donde está aloxada a aplicación ("Apps\Web")
 * $app->path: Devolve a ruta onde está aloxada a aplicación no servidor ("/var/www/web")
