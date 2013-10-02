@@ -294,14 +294,8 @@ class Request {
 				$url .= ':'.$this->getPort();
 			}
 		}
-		
-		$path = $this->getPath();
 
-		$url .= BASE_URL.$path;
-
-		if (($format === true) && ($path !== '/') && ($format = $this->getFormat())) {
-			$url .= '.'.$format;
-		}
+		$url .= BASE_URL.$this->getPath($format);
 
 		if (($query === true) && ($query = $this->get->get())) {
 			$url .= '?'.http_build_query($query);
@@ -314,10 +308,16 @@ class Request {
 
 	/**
 	 * Gets the current path
+	 *
+	 * @param boolean $format True to add the format of the request at the end of the path
 	 * 
 	 * @return string The path
 	 */
-	public function getPath () {
+	public function getPath ($format = false) {
+		if (($format === true) && ($this->path !== '/') && ($format = $this->getFormat())) {
+			return $this->path.'.'.$format;
+		}
+
 		return $this->path;
 	}
 

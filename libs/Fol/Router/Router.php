@@ -13,6 +13,7 @@ use Fol\App;
 
 class Router {
 	private $routes = array();
+	private $fileRoutes = array();
 	private $errorController;
 	private $routeFactory;
 	private $absoluteUrl;
@@ -35,7 +36,7 @@ class Router {
 	* Maps the given URL to the given target.
 	* @param string $name string The route name.
 	* @param string $url string
-	* @param mixed $target The target of this route. Can be anything. You'll have to provide your own method to turn *      this into a filename, controller / action pair, etc..
+	* @param mixed $target The target of this route.
 	* @param array $config Array of optional arguments.
 	*/
 	public function map ($name, $url, $target = '', array $config = array()) {
@@ -44,6 +45,18 @@ class Router {
 		} else {
 			$this->routes[$name] = $this->routeFactory->createRoute($name, $url, $target, $config);
 		}
+	}
+
+
+	/**
+	* FileRoute factory method
+	*
+	* Maps the given URL to the given target.
+	* @param string $path string
+	* @param mixed $target The target of this route
+	*/
+	public function mapFile ($path, $target = '') {
+		$this->fileRoutes[] = $this->routeFactory->createFileRoute($path, $target);
 	}
 
 
@@ -58,6 +71,12 @@ class Router {
 	 * If called multiple times
 	 */
 	public function match ($request) {
+		foreach ($this->fileRoutes as $route) {
+			if ($route->match($request)) {
+				return $route;
+			}
+		}
+
 		foreach ($this->routes as $route) {
 			if ($route->match($request)) {
 				return $route;

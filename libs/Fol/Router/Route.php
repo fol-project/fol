@@ -144,11 +144,7 @@ class Route {
 
 
 	public function match ($request) {
-		$match = $this->checkRegex($request)
-			  && $this->checkMethod($request)
-			  && $this->checkSecure($request);
-
-		if (!$match) {
+		if (!($this->checkRegex($request) || $this->checkMethod($request) || $this->checkSecure($request))) {
 			return false;
 		}
 

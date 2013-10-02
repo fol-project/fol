@@ -5,6 +5,7 @@ use Fol\Errors;
 include('bootstrap.php');
 
 //Register the apps here
+Loader::registerNamespace('Apps\\Web', BASE_PATH.'/web');
 
 //Show errors
 Errors::displayErrors();

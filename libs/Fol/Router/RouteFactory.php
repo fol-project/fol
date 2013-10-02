@@ -33,6 +33,10 @@ class RouteFactory {
 		return new Route($name, $path, $this->getTarget($target), $config);
 	}
 
+	public function createFileRoute ($path, $target) {
+		return new FileRoute($path, $this->getTarget($target));
+	}
+
 	public function createErrorRoute ($target) {
 		return new ErrorRoute($this->getTarget($target));
 	}
