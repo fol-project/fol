@@ -1,6 +1,6 @@
 {
 	"name": "fol/fol",
-	"type": "project",
+	"type": "library",
 	"description": "PHP framework",
 	"keywords": ["framework"],
 	"homepage": "https://github.com/oscarotero/fol",
@@ -20,9 +20,6 @@
 	"require": {
 		"php": ">=5.4.0"
 	},
-	"suggest": {
-		"fol/web": "A template to build your first app"
- 	},
 	"config": {
 		"vendor-dir": "libs",
 		"bin-dir": "libs/bin"

@@ -5,40 +5,44 @@
  * This is a simple class to load configuration data from php files
  * You must define a base folder and the class search for the files inside automatically.
  * 
- * Example:
- * $Config->get('database');
- * 
- * config_folder/database.php
- * 
- * You can define an environment (for example localhost) to load different data in different environments:
- * 
- * $Config->environment = 'localhost';
- * $Config->get('database');
- * 
- * config_folder/localhost/database.php
- * config_folder/database.php
- * 
- * The class will search the database configuration in this two files. If the first file is found, stops and don't search in the second.
+ * The class will search the database configuration in this two files.
  */
 namespace Fol;
 
 class Config {
-	public $environment;
-
-	private $folder;
-	private $items = array();
+	protected $configPaths = [];
+	protected $items = [];
 
 
 	/**
-	 * Constructor. You can define the folder where search the data
-	 *
-	 * $data = new Fol\Config('apps/my_app/config')
+	 * Constructor method. You must define the base folder where the config files are stored
 	 * 
-	 * @param string $folder The folder where the data files are placed.
+	 * @param string/array $paths The base folder paths
 	 */
-	public function __construct ($folder = null) {
-		if ($folder !== null) {
-			$this->setFolder($folder);
+	public function __construct ($paths) {
+		$this->addFolders($paths);
+	}
+
+
+	/**
+	 * Adds new base folders where search for the config files
+	 * 
+	 * @param string/array $paths The base folder paths
+	 * @param boolean $prepend If it's true, insert the new folder at begining of the array.
+	 */
+	public function addFolders ($paths, $prepend = true) {
+		$paths = (array)$paths;
+
+		foreach ($paths as &$path) {
+			if (substr($path, -1) !== '/') {
+				$path .= '/';
+			}
+		}
+
+		if ($prepend === true) {
+			$this->configPaths = array_merge($paths, $this->configPaths);
+		} else {
+			$this->configPaths = array_merge($this->configPaths, $paths);
 		}
 	}
 
@@ -66,40 +70,6 @@ class Config {
 
 
 	/**
-	 * Define the base folder where all files will be searched
-	 *
-	 * @param string $folder The folder path
-	 * 
-	 * @return true if the folder is valid. If it's not valid, throws an ErrorException.
-	 */
-	public function setFolder ($folder) {
-		if (is_dir($folder)) {
-			if ($folder[strlen($folder) - 1] !== '/') {
-				$folder .= '/';
-			}
-
-			$this->folder = $folder;
-
-			return true;
-		}
-
-		throw new \ErrorException('The folder "'.$folder.'" does not exists');
-	}
-
-
-
-	/**
-	 * Returns the current base folder
-	 *
-	 * @return string The folder path
-	 */
-	public function getFolder () {
-		return $this->folder;
-	}
-
-
-
-	/**
 	 * Read data from php file (that returns the value)
 	 * 
 	 * @param string $name The name of the data (must be the name of the files where the data are stored)
@@ -107,21 +77,15 @@ class Config {
 	 * @return mixed The data or null if doesn't exists
 	 */
 	public function read ($name) {
-		if (!$this->folder) {
-			throw new \ErrorException('The base folder is not defined');
-
-			return false;
+		if (substr($name, -4) !== '.php') {
+			$name .= '.php';
 		}
 
-		if ($this->environment && is_file($this->folder.$this->environment.'/'.$name.'.php')) {
-			$data = include($this->folder.$this->environment.'/'.$name.'.php');
-		} else if (is_file($this->folder.$name.'.php')) {
-			$data = include($this->folder.$name.'.php');
-		} else {
-			$data = null;
+		foreach ($this->configPaths as $path) {
+			if (is_file($path.$name)) {
+				return include($path.$name);
+			}
 		}
-
-		return $data;
 	}
 
 
@@ -189,69 +153,13 @@ class Config {
 
 	
 	/**
-	 * Merges the old values with new values
-	 * 
-	 * @param string $name The data name or an array with all data name and value
-	 * @param array $value The value of the data
-	 */
-	public function merge ($name, array $value = null) {
-		if (!isset($this->items[$name])) {
-			$this->items[$name] = $value;
-		} else if (is_array($name)) {
-			$this->items = array_replace_recursive($this->items, $name);
-		} else if ($value !== null) {
-			$this->items[$name] = array_replace_recursive($this->items[$name], $value);
-		}
-	}
-
-
-
-	/**
 	 * Deletes a data value
 	 * 
 	 * $data->delete('database');
 	 * 
-	 * or if you want delete just one sub-value
-	 * 
-	 * $data->delete('database', 'user');
-	 *
 	 * @param string $name The name of the data
-	 * @param string $key The optional key of the data
 	 */
 	public function delete ($name, $key = null) {
-		if ($key === null) {
-			unset($this->items[$name]);
-		} else {
-			unset($this->items[$name][$key]);
-
-			if (!$this->items[$name]) {
-				unset($this->items[$name]);
-			}
-		}
-	}
-
-
-
-	/**
-	 * Checks if some data exists
-	 * 
-	 * $data->has('database');
-	 * 
-	 * or if you want to check just one sub-value
-	 * 
-	 * $data->has('database', 'user');
-	 * 
-	 * @param string $name The name of the data
-	 * @param string $key The optional key of the data
-	 * 
-	 * @return boolean True if the data exists, false if not.
-	 */
-	public function has ($name, $key = null) {
-		if (!array_key_exists($name, $this->items)) {
-			return false;
-		}
-
-		return ($key === null) ? true : array_key_exists($key, $this->items[$name]);
+		unset($this->items[$name]);
 	}
 }
-?>

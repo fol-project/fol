@@ -9,9 +9,9 @@ namespace Fol;
 use Fol\Container;
 
 class Templates {
-	protected $renders;
-	protected $templates;
-	protected $templatesPath = array();
+	protected $renders = [];
+	protected $templates = [];
+	protected $templatesPaths = [];
 	protected $currentPath;
 
 
@@ -43,9 +43,9 @@ class Templates {
 		}
 
 		if ($prepend === true) {
-			$this->templatesPath = array_merge($paths, $this->templatesPath);
+			$this->templatesPaths = array_merge($paths, $this->templatesPaths);
 		} else {
-			$this->templatesPath = array_merge($this->templatesPath, $paths);
+			$this->templatesPaths = array_merge($this->templatesPaths, $paths);
 		}
 	}
 
@@ -96,7 +96,7 @@ class Templates {
 			return $this->currentPath.'/'.$template;
 		}
 
-		foreach ($this->templatesPath as $path) {
+		foreach ($this->templatesPaths as $path) {
 			if (is_file($path.$template)) {
 				return $path.$template;
 			}
