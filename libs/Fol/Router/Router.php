@@ -35,15 +35,26 @@ class Router {
 	*
 	* Maps the given URL to the given target.
 	* @param string $name string The route name.
-	* @param string $url string
+	* @param string $path string
 	* @param mixed $target The target of this route.
 	* @param array $config Array of optional arguments.
 	*/
-	public function map ($name, $url, $target = '', array $config = array()) {
+	public function map ($name, $path = null, $target = null, array $config = array()) {
+		if (is_array($name)) {
+			foreach ($name as $name => $config) {
+				$this->routes[$name] = $this->routeFactory->createRoute($name, $config);
+			}
+
+			return;
+		}
+
+		$config['path'] = $path;
+		$config['target'] = $target;
+
 		if ($name === null) {
-			$this->routes[] = $this->routeFactory->createRoute($name, $url, $target, $config);
+			$this->routes[] = $this->routeFactory->createRoute($name, $config);
 		} else {
-			$this->routes[$name] = $this->routeFactory->createRoute($name, $url, $target, $config);
+			$this->routes[$name] = $this->routeFactory->createRoute($name, $config);
 		}
 	}
 
@@ -56,6 +67,14 @@ class Router {
 	* @param mixed $target The target of this route
 	*/
 	public function mapFile ($path, $target = '') {
+		if (is_array($path)) {
+			foreach ($path as $path => $target) {
+				$this->fileRoutes[] = $this->routeFactory->createFileRoute($path, $target);
+			}
+
+			return;
+		}
+
 		$this->fileRoutes[] = $this->routeFactory->createFileRoute($path, $target);
 	}
 

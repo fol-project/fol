@@ -29,8 +29,10 @@ class RouteFactory {
 		return [$class, $method];
 	}
 
-	public function createRoute ($name, $path, $target, array $config = array()) {
-		return new Route($name, $path, $this->getTarget($target), $config);
+	public function createRoute ($name, array $config = array()) {
+		$config['target'] = $this->getTarget($config['target']);
+
+		return new Route($name, $config);
 	}
 
 	public function createFileRoute ($path, $target) {

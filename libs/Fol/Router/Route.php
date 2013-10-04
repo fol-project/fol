@@ -27,10 +27,11 @@ class Route {
 	private $target;
 	private $wildcard;
 
-	public function __construct ($name, $path, $target, array $config = array()) {
+	public function __construct ($name, array $config = array()) {
 		$this->name = $name;
-		$this->path = $path;
-		$this->target = $target;
+
+		$this->path = $config['path'];
+		$this->target = $config['target'];
 
 		if (isset($config['method'])) {
 			$this->method = (array) $config['method'];
