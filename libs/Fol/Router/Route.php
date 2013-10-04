@@ -60,7 +60,12 @@ class Route {
 		if (preg_match('/\/\{:([\w-]+)([\+\*])\}$/i', $this->path, $matches)) {
 			$this->wildcard = $matches[1];
 			$pos = strrpos($this->path, $matches[0]);
-			$this->path = substr($this->path, 0, $pos)."/{:{$this->wildcard}:(.".$matches[2].")}";
+
+			if ($matches[2] === '*') {
+				$this->path = substr($this->path, 0, $pos)."(/{:{$this->wildcard}:(.*)})?";
+			} else {
+				$this->path = substr($this->path, 0, $pos)."/{:{$this->wildcard}:(.+)}";
+			}
 		}
 
 		preg_match_all("/\{:(.*?)(:(.*?))?\}/", $this->path, $matches, PREG_SET_ORDER);
@@ -156,14 +161,14 @@ class Route {
 
 		if ($this->wildcard) {
 			if (empty($this->parameters[$this->wildcard])) {
-				$this->values[$this->wildcard] = [];
+				$this->parameters[$this->wildcard] = [];
 			} else {
-				$this->values[$this->wildcard] = array_map('rawurldecode', explode('/', $this->values[$this->wildcard]));
+				$this->parameters[$this->wildcard] = array_map('rawurldecode', explode('/', $this->parameters[$this->wildcard]));
 			}
 
 			if ($this->wildcard === '__wildcard__') {
-				$this->values['*'] = $this->values['__wildcard__'];
-				unset($this->values['__wildcard__']);
+				$this->parameters['*'] = $this->parameters['__wildcard__'];
+				unset($this->parameters['__wildcard__']);
 			}
 		}
 		
