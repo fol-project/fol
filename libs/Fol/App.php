@@ -7,14 +7,7 @@
 
 namespace Fol;
 
-use Fol\Router\Map;
-use Fol\Http\Route;
-use Fol\Http\Request;
-use Fol\Http\HttpException;
-
 abstract class App {
-	public $parent;
-
 	private $services;
 
 
@@ -28,8 +21,8 @@ abstract class App {
 	 */
 	public function __get ($name) {
 		//Registered services
-		if (isset($this->services[$name])) {
-			return $this->$name = $this->services[$name]();
+		if (($service = $this->get($name)) !== null) {
+			return $this->$name = $service;
 		}
 
 		//The app name. (Web)
@@ -70,28 +63,6 @@ abstract class App {
 
 
 	/**
-	 * Define a Parent property (the app that contain this app)
-	 * 
-	 * @param Fol\App $Parent An App instance
-	 */
-	public function setParent (App $parent) {
-		$this->parent = $parent;
-	}
-
-
-	/**
-	 * Returns the name of any class with the same namespace of the app
-	 * 
-	 * @example $app->getClass('Models', 'Posts'); //Returns Apps\Web\Models\Posts
-	 * 
-	 * @return string
-	 */
-	public function getClass ($class) {
-		return $this->namespace.'\\'.implode('\\', func_get_args());
-	}
-
-
-	/**
 	 * Register a new service
 	 * 
 	 * @param string $name The service name
@@ -117,5 +88,43 @@ abstract class App {
 	 */
 	public function unregister ($name) {
 		unset($this->services[$name]);
+	}
+
+
+	/**
+	 * Returns a service
+	 *
+	 * @param  string $name The service name
+	 *
+	 * @return mixed The result of the executed closure
+	 */
+	public function get ($name) {
+		if (!isset($this->services[$name])) {
+			return null;
+		}
+
+		if (func_num_args() === 1) {
+			return $this->services[$name]();
+		}
+
+		return (new \ReflectionFunction($this->services[$name]))->invokeArgs(array_slice(func_get_args(), 1));
+	}
+
+
+	/**
+	 * Returns a class instance
+	 *
+	 * @param string $className The class name (must be in the same namespace than the app, for example: 'Controllers\Index' referers to 'Apps\Web\Controllers\Index');
+	 *
+	 * @return object A new instance of this class
+	 */
+	public function getClassInstance ($className) {
+		$className = $this->namespace.'\\'.$className;
+
+		if (func_num_args() === 1) {
+			return new $className;
+		}
+
+		return (new \ReflectionClass($className))->newInstanceArgs(array_slice(func_get_args(), 1));
 	}
 }
