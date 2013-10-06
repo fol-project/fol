@@ -147,17 +147,37 @@ class Router {
 	}
 
 
+	/**
+	 * Handle a request
+	 * 
+	 * @param Fol\Request $request
+	 * @param Fol\App $app The app context of the request
+	 *
+	 * @throws Exception If no errorController is defined and an exception is thrown
+	 * 
+	 * @return Fol\Response
+	 */
 	public function handle ($request, App $app) {
 		if (($route = $this->match($request))) {
 			try {
 				$response = $route->execute($app, $request);
 			} catch (HttpException $exception) {
-				return $this->errorController->execute($app, $exception, $request);
+				if ($this->errorController) {
+					return $this->errorController->execute($app, $exception, $request);
+				}
+
+				throw $exception;
 			}
 
 			return $response;
 		}
 
-		return $this->errorController->execute($app, new HttpException('Not found', 404), $request);
+		$exception = new HttpException('Not found', 404);
+
+		if ($this->errorController) {
+			return $this->errorController->execute($app, $exception, $request);
+		}
+
+		throw $exception;
 	}
 }

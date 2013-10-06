@@ -16,7 +16,7 @@ class Route {
 	private $path;
 	private $method;
 	private $filters;
-	private $parameters;
+	private $parameters = array();
 	private $secure;
 	
 	private $match;
@@ -76,7 +76,7 @@ class Route {
 			$name = $match[1];
 
 			if (isset($match[3])) {
-				$this->filters[$name] = $match[3];
+				$this->filters[$name] = ($match[3] === '?') ? '([^/]+)?' : $match[3];
 				$this->path = str_replace($whole, "{:$name}", $this->path);
 			} elseif (!isset($this->filters[$name])) {
 				$this->filters[$name] = '([^/]+)';
@@ -91,9 +91,16 @@ class Route {
 			foreach ($this->filters as $name => $filter) {
 				if ($filter[0] !== '(') {
 					throw new \Exception("Filter for parameter '$name' must start with '('.");
+				} else if (substr($filter, -1) === '?') {
+					$keys[] = "/{:$name}";
+					$vals[] = "(/(?P<$name>".substr($filter, 1, -1).')?';
 				} else {
 					$keys[] = "{:$name}";
-					$vals[] = "(?P<$name>" . substr($filter, 1);
+					$vals[] = "(?P<$name>".substr($filter, 1);
+				}
+
+				if (!isset($this->parameters[$name])) {
+					$this->parameters[$name] = null;
 				}
 			}
 
