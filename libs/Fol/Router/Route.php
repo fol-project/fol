@@ -144,15 +144,24 @@ class Route {
 	public function generate (array $parameters = array()) {
 		$replace = [];
 
-		if ($this->parameters) {
-			$parameters = array_merge($this->parameters, $parameters);
+		foreach ($this->parameters as $name => $value) {
+			if (isset($parameters[$name])) {
+				$replace["{:$name}"] = rawurlencode($parameters[$name]);
+				unset($parameters[$name]);
+			} else if ($value !== null) {
+				$replace["{:$name}"] = rawurlencode($value);
+			} else {
+				$replace["/{:$name}"] = '';
+			}
 		}
 
-		foreach ($parameters as $key => $val) {
-			$replace["{:$key}"] = rawurlencode($val);
+		$path = strtr($this->path, $replace);
+
+		if ($parameters) {
+			return "$path?".http_build_query($parameters);
 		}
 
-		return strtr($this->path, $replace);
+		return $path;
 	}
 
 
