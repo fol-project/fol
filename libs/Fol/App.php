@@ -107,7 +107,7 @@ abstract class App {
 			return $this->services[$name]();
 		}
 
-		return (new \ReflectionFunction($this->services[$name]))->invokeArgs(array_slice(func_get_args(), 1));
+		return call_user_func_array($this->services[$name], array_slice(func_get_args(), 1));
 	}
 
 
