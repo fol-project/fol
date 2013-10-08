@@ -55,21 +55,40 @@ class Request {
 	 */
 	static public function createFromCli (array $args) {
 		$file = array_shift($args);
-		$path = array_shift($args);
-		$method = 'GET';
+
+		$method = ($args && preg_match('#^[A-Z]+$#', $args[0])) ? array_shift($args) : 'GET';
+		$path = ($args && $args[0][0] === '/') ? array_shift($args) : '/';
 		$parameters = [];
 
 		if ($args) {
-			if (in_array($args[0], ['GET', 'POST'])) {
-				$method = array_shift($args);
-			}
-
 			while ($args) {
 				$option = array_shift($args);
 
-				if (preg_match('#^(-+)([\w]+)$#', $option, $match)) {
+				if (preg_match('#^(-+)([\w]+)(:[\w]+)?$#', $option, $match)) {
 					$option = $match[2];
-					$parameters[$option] = $args ? array_shift($args) : true;
+
+					$value = $args ? array_shift($args) : true;
+
+					if (isset($match[3])) {
+						switch (substr($match[3], 1)) {
+							case 'bool':
+							case 'b':
+								$value = (bool)$value;
+								break;
+
+							case 'int':
+							case 'i':
+								$value = (int)$value;
+								break;
+
+							case 'float':
+							case 'f':
+								$value = (float)$value;
+								break;
+						}
+					}
+
+					$parameters[$option] = $value;
 				} else {
 					$parameters[] = $option;
 				}
