@@ -12,8 +12,9 @@ use Fol\Http\Files;
 use Fol\Http\Headers;
 
 class Request {
-	const TYPE_MASTER_REQUEST = 0;
-	const TYPE_SUB_REQUEST = 1;
+	const TYPE_GLOBAL_REQUEST = 0;
+	const TYPE_MASTER_REQUEST = 1;
+	const TYPE_SUB_REQUEST = 2;
 
 	public $parameters;
 	public $get;
@@ -22,6 +23,7 @@ class Request {
 	public $cookies;
 	public $headers;
 	public $server;
+	public $content;
 
 	private $path;
 	private $format = 'html';
@@ -42,7 +44,24 @@ class Request {
 
 		$path = parse_url(preg_replace('|^'.preg_quote(BASE_URL).'|i', '', urldecode($_SERVER['REQUEST_URI'])), PHP_URL_PATH);
 
-		return new static($path, array(), (array)filter_input_array(INPUT_GET), (array)filter_input_array(INPUT_POST), $_FILES, (array)filter_input_array(INPUT_COOKIE), (array)filter_input_array(INPUT_SERVER));
+		$request = new static($path, array(), (array)filter_input_array(INPUT_GET), (array)filter_input_array(INPUT_POST), $_FILES, (array)filter_input_array(INPUT_COOKIE), (array)filter_input_array(INPUT_SERVER), static::TYPE_GLOBAL_REQUEST);
+
+		switch ($request->headers->get('Content-Type')) {
+			case 'application/x-www-form-urlencoded':
+				if (in_array($request->getMethod(), ['PUT', 'DELETE'])) {
+					parse_str($request->getContent(), $data);
+					$request->post->set($data);
+				}
+				break;
+			
+			case 'application/json':
+				if (in_array($request->getMethod(), ['POST', 'PUT', 'DELETE']) && ($content = $request->getContent())) {
+					$request->post->set(json_decode($content, true));
+				}
+				break;
+		}
+
+		return $request;
 	}
 
 
@@ -95,7 +114,7 @@ class Request {
 			}
 		}
 
-		return static::create($path, $method, $parameters);
+		return static::create($path, $method, $parameters, [], static::TYPE_GLOBAL_REQUEST);
 	}
 
 
@@ -109,7 +128,7 @@ class Request {
 	 * 
 	 * @return Fol\Http\Request The object with the specified data
 	 */
-	static public function create ($url, $method = 'GET', array $vars = array(), array $parameters = array()) {
+	static public function create ($url, $method = 'GET', array $vars = array(), array $parameters = array(), $type = null) {
 		$defaults = array(
 			'SERVER_NAME' => 'localhost',
 			'SERVER_PORT' => 80,
@@ -147,7 +166,7 @@ class Request {
 
 		$components['query'] = isset($components['query']) ? html_entity_decode($components['query']) : '';
 
-		$post = $get = array();
+		$post = $get = [];
 
 		if (in_array(strtoupper($method), array('POST', 'PUT', 'DELETE'))) {
 			$post = $vars;
@@ -169,7 +188,7 @@ class Request {
 			'QUERY_STRING' => $components['query'],
 		));
 
-		return new static($components['path'], $parameters, $get, $post, array(), array(), $server);
+		return new static($components['path'], $parameters, $get, $post, array(), array(), $server, $type);
 	}
 
 
@@ -185,7 +204,7 @@ class Request {
 	 * @param array $cookies The cookies of the request
 	 * @param array $server The SERVER parameters
 	 */
-	public function __construct ($path = '', array $parameters = array(), array $get = array(), array $post = array(), array $files = array(), array $cookies = array(), array $server = array()) {
+	public function __construct ($path = '', array $parameters = array(), array $get = array(), array $post = array(), array $files = array(), array $cookies = array(), array $server = array(), $type = null) {
 		$this->parameters = new Container($parameters);
 		$this->get = new Input($get);
 		$this->post = new Input($post);
@@ -194,7 +213,7 @@ class Request {
 		$this->server = new Container($server);
 		$this->headers = new RequestHeaders(RequestHeaders::getHeadersFromServer($server));
 
-		$this->type = static::TYPE_MASTER_REQUEST;
+		$this->type = ($type === null) ? static::TYPE_MASTER_REQUEST : $type;
 
 		foreach (array_keys($this->headers->getParsed('Accept')) as $mimetype) {
 			if ($format = Headers::getFormat($mimetype)) {
@@ -241,22 +260,50 @@ class Request {
 
 
 	/**
-	 * Change the type of the request
-	 *
-	 * @param int $type The request type: self::TYPE_MASTER_REQUEST or self::TYPE_SUB_REQUEST
-	 */
-	public function setType ($type) {
-		$this->type = $type;
-	}
-
-
-	/**
 	 * Returns true if the request is a subrequest
 	 * 
 	 * @return boolean
 	 */
 	public function isSubrequest () {
 		return ($this->type === static::TYPE_SUB_REQUEST);
+	}
+
+
+	/**
+	 * Returns true if the request is created from global
+	 * 
+	 * @return boolean
+	 */
+	public function isGlobal () {
+		return ($this->type === static::TYPE_GLOBAL_REQUEST);
+	}
+
+
+	/**
+	 * Returns the request payload
+	 *
+	 * @return string
+	 */
+	public function getContent ($asResource = false) {
+		if (!$this->isGlobal()) {
+			throw new \LogicException('getContent() can only be called in global requests.');
+		}
+
+        if (($this->content === false) || (($asResource === true) && ($this->content !== null))) {
+			throw new \LogicException('getContent() can only be called once when using the resource return type.');
+		}
+
+		if ($asResource === true) {
+			$this->content = false;
+
+			return fopen('php://input', 'rb');
+		}
+
+		if ($this->content === null) {
+			$this->content = file_get_contents('php://input');
+		}
+
+		return $this->content;
 	}
 
 
