@@ -46,19 +46,13 @@ class Request {
 
 		$request = new static($path, array(), (array)filter_input_array(INPUT_GET), (array)filter_input_array(INPUT_POST), $_FILES, (array)filter_input_array(INPUT_COOKIE), (array)filter_input_array(INPUT_SERVER), static::TYPE_GLOBAL_REQUEST);
 
-		switch ($request->headers->get('Content-Type')) {
-			case 'application/x-www-form-urlencoded':
-				if (in_array($request->getMethod(), ['PUT', 'DELETE'])) {
-					parse_str($request->getContent(), $data);
-					$request->post->set($data);
-				}
-				break;
-			
-			case 'application/json':
-				if (in_array($request->getMethod(), ['POST', 'PUT', 'DELETE']) && ($content = $request->getContent())) {
-					$request->post->set(json_decode($content, true));
-				}
-				break;
+		$contentType = $request->headers->get('Content-Type');
+
+		if ((strpos($contentType, 'application/x-www-form-urlencoded') === 0) && in_array($request->getMethod(), ['PUT', 'DELETE']) && ($content = $request->getContent())) {
+			parse_str($content, $data);
+			$request->post->set($data);
+		} else if ((strpos($contentType, 'application/json') === 0) && in_array($request->getMethod(), ['POST', 'PUT', 'DELETE']) && ($content = $request->getContent())) {
+			$request->post->set(json_decode($content, true));
 		}
 
 		return $request;
