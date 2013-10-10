@@ -77,31 +77,8 @@ class Request {
 			while ($args) {
 				$option = array_shift($args);
 
-				if (preg_match('#^(-+)([\w]+)(:[\w]+)?$#', $option, $match)) {
-					$option = $match[2];
-
-					$value = $args ? array_shift($args) : true;
-
-					if (isset($match[3])) {
-						switch (substr($match[3], 1)) {
-							case 'bool':
-							case 'b':
-								$value = (bool)$value;
-								break;
-
-							case 'int':
-							case 'i':
-								$value = (int)$value;
-								break;
-
-							case 'float':
-							case 'f':
-								$value = (float)$value;
-								break;
-						}
-					}
-
-					$parameters[$option] = $value;
+				if (preg_match('#^(-+)([\w]+)$#', $option, $match)) {
+					$parameters[$match[2]] = $args ? array_shift($args) : true;
 				} else {
 					$parameters[] = $option;
 				}
