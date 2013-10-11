@@ -1,0 +1,3 @@
+libs/autoload.php
+libs/composer/*
+composer.lock
