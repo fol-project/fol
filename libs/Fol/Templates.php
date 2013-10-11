@@ -159,11 +159,11 @@ class Templates {
 			return $result;
 		}
 
-		if (($template = $this->file($template)) === false) {
-			return false;
+		if (($file = $this->file($template)) === false) {
+			throw new \Exception("The template $template does not exists");
 		}
 
-		return $this->renderFile($template, $data);
+		return $this->renderFile($file, $data);
 	}
 
 
