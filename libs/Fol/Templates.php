@@ -149,18 +149,18 @@ class Templates {
 			return $this->renders[$template];
 		}
 
+		if (($file = $this->file($template)) === false) {
+			throw new \Exception("The template $template does not exists");
+		}
+
 		if (($data !== null) && static::isIterable($data)) {
 			$result = '';
 
 			foreach ($data as $value) {
-				$result .= "\n".$this->render($template, $value, $wrap);
+				$result .= "\n".$this->renderFile($template, $value);
 			}
 
 			return $result;
-		}
-
-		if (($file = $this->file($template)) === false) {
-			throw new \Exception("The template $template does not exists");
 		}
 
 		return $this->renderFile($file, $data);
