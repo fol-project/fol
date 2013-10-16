@@ -52,6 +52,18 @@ class Route {
 		$this->setRegex();
 	}
 
+	public function getName () {
+		return $this->name;
+	}
+
+	public function getPath () {
+		return $this->path;
+	}
+
+	public function getTarget () {
+		return $this->target;
+	}
+
 	private function setRegex () {
 		if (substr($this->path, -2) === '/*') {
 			$this->path = substr($this->path, 0, -2).'/{:__wildcard__:(.*)}';

@@ -141,15 +141,20 @@ class Templates {
 	 * 
 	 * @param string $template The template name or file path
 	 * @param array/Iterator/IteratorAggregate $data An optional array of object extending Iterator/IteratorAggregate data used in the template. If the array is numerical or the object extends Iterator/IteratorAggregate interfaces, renders the template once for each item
+	 * @param bool $failSilent Set true to do not throw the exception if the template does not exists
 	 *
 	 * @return string The template rendered
 	 */
-	public function render ($template, $data = null) {
+	public function render ($template, $data = null, $failSilent = false) {
 		if (($data === null) && isset($this->renders[$template])) {
 			return $this->renders[$template];
 		}
 
 		if (($file = $this->file($template)) === false) {
+			if ($failSilent === true) {
+				return '';
+			}
+
 			throw new \Exception("The template $template does not exists");
 		}
 
