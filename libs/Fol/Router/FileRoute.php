@@ -20,6 +20,18 @@ class FileRoute {
 		$this->target = $target;
 	}
 
+	public function getType () {
+		return 'file';
+	}
+
+	public function getPath () {
+		return $this->path;
+	}
+
+	public function getTarget () {
+		return $this->target;
+	}
+
 	public function match ($request) {
 		return (strpos($request->getPath(true), $this->path) === 0);
 	}

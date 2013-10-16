@@ -18,6 +18,14 @@ class ErrorRoute {
 		$this->target = $target;
 	}
 
+	public function getType () {
+		return 'error';
+	}
+
+	public function getTarget () {
+		return $this->target;
+	}
+
 	public function execute ($app, $exception, $request) {
 		ob_start();
 

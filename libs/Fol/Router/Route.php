@@ -52,6 +52,10 @@ class Route {
 		$this->setRegex();
 	}
 
+	public function getType () {
+		return 'url';
+	}
+
 	public function getName () {
 		return $this->name;
 	}
