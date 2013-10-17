@@ -7,13 +7,15 @@
 namespace Fol;
 
 class Session {
+	protected $cookies;
+	protected $cookieParams;
 
 	/**
 	 * Constructor. Start/resume the latest session.
 	 * 
 	 * @throws an Exception is the session is disabled
 	 */
-	public function __construct () {
+	public function __construct (array $cookies, $id = null, $name = null) {
 		switch (session_status()) {
 			case PHP_SESSION_DISABLED:
 				throw new \Exception('Session are disabled');
@@ -22,15 +24,29 @@ class Session {
 			case PHP_SESSION_NONE:
 				ini_set('session.use_only_cookies', 1);
 
-				$params = session_get_cookie_params();
-				$params['httponly'] = true;
-				$params['path'] = BASE_URL ?: '/';
+				$this->cookieParams = session_get_cookie_params();
 
-				session_set_cookie_params($params['lifetime'], $params['path'], $params['domain'], $params['secure'], $params['httponly']);
+				$this->setCookieParams([
+					'httponly' => true,
+					'path' => BASE_URL ?: '/'
+				]);
 
-				$this->start();
+				$this->start($id, $name);
 				break;
 		}
+
+		$this->cookies = $cookies;
+	}
+
+
+	/**
+	 * Sets the session cookie parameters
+	 * @param array $params The available parameters (lifetime, path, domain, secure, httponly)
+	 */
+	public function setCookieParams (array $params) {
+		$this->cookieParams = array_replace($this->cookieParams, $params);
+
+		session_set_cookie_params($this->cookieParams['lifetime'], $this->cookieParams['path'], $this->cookieParams['domain'], $this->cookieParams['secure'], $this->cookieParams['httponly']);
 	}
 
 
@@ -54,7 +70,7 @@ class Session {
 		}
 
 		$this->close();
-		$this->start($name, sha1(mt_rand()));
+		$this->start(sha1(mt_rand()), $name);
 	}
 
 
@@ -69,18 +85,38 @@ class Session {
 
 
 	/**
+	 * Sets the session cache expire in minutes
+	 * 
+	 * @param int $minutes The time in minutes
+	 */
+	public function setCacheExpire ($minutes) {
+		return session_cache_expire($minutes);
+	}
+
+
+	/**
+	 * Gets the session cache expire in minutes
+	 *
+	 * @return int
+	 */
+	public function getCacheExpire () {
+		return session_cache_expire();
+	}
+
+
+	/**
 	 * Start a session
 	 * 
+	 * @param string $id Set the custom id if the session has not a previous id assigned. Useful to switch from one session to another.
 	 * @param string $name The session name.
-	 * @param string $initial_id Set the custom id if the session has not a previous id assigned. Useful to switch from one session to another.
 	 */
-	public function start ($name = null, $initial_id = null) {
+	public function start ($id = null, $name = null) {
 		if ($name !== null) {
-			session_name($name);
+			$this->setName($name);
 		}
 
-		if ($initial_id !== null) {
-			session_id(isset($_COOKIE[$name]) ? $_COOKIE[$name] : $initial_id);
+		if ($id !== null) {
+			$this->setId(isset($this->cookies[$name]) ? $this->cookies[$name] : $id);
 		}
 
 		session_start();
@@ -91,14 +127,13 @@ class Session {
 	 * Destroy the current session deleting the data
 	 */
 	public function destroy () {
-		$_SESSION = array();
-
-		if (ini_get("session.use_cookies")) {
-			$params = session_get_cookie_params();
-			setcookie(session_name(), '', time() - 42000, $params['path'], $params['domain'], $params['secure'], $params['httponly']);
+		if (!$this->isStarted()) {
+			$this->start();
 		}
 
-		session_destroy();
+		$this->remove();
+
+		return session_destroy();
 	}
 
 
@@ -108,7 +143,7 @@ class Session {
 	 * @return boolean True if it's started, false if not
 	 */
 	public function isStarted () {
-		return (session_status() === PHP_SESSION_ACTIVE) ? true : false;
+		return (session_status() === PHP_SESSION_ACTIVE);
 	}
 
 
@@ -119,6 +154,16 @@ class Session {
 	 */
 	public function getName () {
 		return session_name();
+	}
+
+
+	/**
+	 * Sets the current session name
+	 * 
+	 * @return string The session name
+	 */
+	public function setName ($name) {
+		return session_name($name);
 	}
 
 
@@ -148,7 +193,7 @@ class Session {
 	 * Regenerate the id for the current session
 	 */
 	public function regenerateId () {
-		session_regenerate_id();
+		return session_regenerate_id();
 	}
 
 
@@ -196,7 +241,8 @@ class Session {
 	 */	
 	public function delete ($name = null) {
 		if ($name === null) {
-			$_SESSION = array();
+			$_SESSION = [];
+			session_unset();
 		} else {
 			unset($_SESSION[$name]);
 		}
@@ -226,7 +272,7 @@ class Session {
 	 */
 	public function getFlash ($name = null, $default = null) {
 		if ($name === null) {
-			return isset($_SESSION['_flash']) ? $_SESSION['_flash'] : array();
+			return isset($_SESSION['_flash']) ? $_SESSION['_flash'] : [];
 		}
 
 		if (isset($_SESSION['_flash'][$name])) {
@@ -246,7 +292,7 @@ class Session {
 	 */
 	public function setFlash ($name, $value = null) {
 		if (!isset($_SESSION['_flash'])) {
-			$_SESSION['_flash'] = array();
+			$_SESSION['_flash'] = [];
 		}
 
 		if (is_array($name)) {
@@ -268,4 +314,3 @@ class Session {
 		return (isset($_SESSION['_flash']) && array_key_exists($name, $_SESSION['_flash']));
 	}
 }
-?>

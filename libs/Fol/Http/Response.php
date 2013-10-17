@@ -220,10 +220,6 @@ class Response {
 	 * @return boolean TRUE if the headers are sent and false if headers had been sent before
 	 */
 	public function sendHeaders () {
-		if (headers_sent()) {
-			throw new \Exception('Cannot send headers because they have been send before');
-		}
-
 		header(sprintf('HTTP/1.1 %s', $this->status[0], $this->status[1]));
 		header(sprintf('Content-Type:%s;charset=utf-8', $this->content_type));
 
