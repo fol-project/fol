@@ -2,14 +2,15 @@
 use Fol\Loader;
 use Fol\Errors;
 
-define('FOL_VERSION', '0.5.0');
-define('BASE_PATH', str_replace('\\', '/', __DIR__));
-define('BASE_URL', preg_replace('|/+|', '/', strtolower(preg_replace('|^'.str_replace('\\', '/', realpath($_SERVER['DOCUMENT_ROOT'])).'|i', '', BASE_PATH))));
+define('FOL_VERSION', '0.11.0');
 define('ACCESS_INTERFACE', (php_sapi_name() === 'cli') ? 'cli' : 'http');
+define('BASE_PATH', str_replace('\\', '/', __DIR__));
 
 if (ACCESS_INTERFACE === 'cli') {
+	define('BASE_URL', '');
 	define('BASE_ABSOLUTE_URL', 'http://localhost');
 } else {
+	define('BASE_URL', preg_replace('|/+|', '/', strtolower(preg_replace('|^'.str_replace('\\', '/', realpath($_SERVER['DOCUMENT_ROOT'])).'|i', '', BASE_PATH))));
 	define('BASE_ABSOLUTE_URL', ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? 'https' : 'http').'://'.$_SERVER['HTTP_HOST']);
 }
 
