@@ -12,23 +12,35 @@ Características:
 * Pensado para combinar con bibliotecas externas e compatible con Composer.
 ```
 
+Instalación
+===========
+
+O mellor xeito de instalalo é usando composer, primeiro instalas o framework (con create-project) e logo metes unha app baleira para comezar a traballar:
+
+```
+$ composer create-project fol/fol o-meu-proxecto
+$ cd o-meu-proxecto
+$ composer require fol/web
+```
+
+Unha vez feito isto, deberías poder ver algo no navegador (http://localhost/o-meu-proxecto).
+
 
 Documentación rápida
 ====================
 
 No directorio raíz de FOL existen dúas carpetas: libs e web
 
-* Na carpeta libs gardaranse as bibliotecas externas, dependencias, etc, que uses nos teus proxectos (Podelas instalar con Composer ou manualmente). Tamén se atopan as propias bibliotecas de Fol.
-* Na carpeta web está a aplicación por defecto, ou sexa, o propio código do sitio (plantillas, datos, etc). Podes crear máis aplicacións noutras carpetas.
+* Na carpeta libs gardaranse as bibliotecas externas, dependencias, e o propio código do Fol.
+* Na carpeta web (ou a que escolleras para instalar a app) está a túa aplicación, ou sexa: plantillas, datos, etc, que forman o teu sitio web. Podes crear todas as aplicacións que queiras, cada unha na súa carpeta.
 
 O arquivo bootstrap.php na raíz é o que inicia o framework e define 4 constantes:
 
 * FOL_VERSION: A versión actual do framework
-* BASE_PATH: A ruta base onde está aloxado o teu sitio web (ruta interna do servidor). Por exemplo "/var/www/o-meu-sitio" (sen barra ao final)
-* BASE_URL: A ruta base onde está aloxado o sitio web (ruta http do navegador). Por exemplo se accedemos por http://localhost/o-meu-sitio, o seu valor sería "/o-meu-sitio" (sen barra ao final)
+* BASE_PATH: A ruta base onde está aloxado o teu sitio web (ruta interna do servidor). Por exemplo "/var/www/o-meu-proxecto" (sen barra ao final)
+* BASE_URL: A ruta base onde está aloxado o sitio web (ruta http do navegador). Por exemplo se accedemos por http://localhost/o-meu-proxecto, o seu valor sería "/o-meu-proxecto" (sen barra ao final)
 * BASE_ABSOLUTE_URL: A parte da url para definir urls absolutas (por exemplo: http://localhost)
-
-Ademáis carga as clases Fol\Loader e Fol\Errors, para xestionar a carga de bibliotecas e erros que haxa:
+* ACCESS_INTERFACE: Se estamos executando fol por cli, sería "cli" senón "http"
 
 Loader
 ------
@@ -87,31 +99,17 @@ $log->pushHandler(new StreamHandler(BASE_PATH.'/logs/debug.log', Logger::DEBUG))
 Errors::setLogger($log);
 ```
 
-O estándar Psr\Log ten 8 niveles de login, que se identifican con estes números:
-
-* DEBUG (100)
-* INFO (200)
-* NOTICE (250)
-* WARNING (300)
-* ERROR (400)
-* CRITICAL (500)
-* ALERT (550)
-* EMERGENCY (600)
-
-Cando se produce un erro, a clase Errors mirará sempre garda os errors como ERROR.
-
-
 Apps
 ----
 
-As aplicacións manexan o código do noso sitio web. Podes meter todo o sitio web nunha soa aplicación ou dividilo en distintas aplicacións (unha para o blog, outra para galeria de fotos, etc). Unha aplicación non é máis que unha clase que se instancia e se executa. Isto permite executar aplicacións unha dentro doutra, extendelas, etc. As aplicacións deben extender á clase Fol\App para que teñan dispoñibles as seguintes propiedades:
+As aplicacións manexan o código do noso sitio web. Podes meter todo o sitio web nunha soa aplicación ou dividilo en distintas aplicacións (unha para o blog, outra para galeria de fotos, etc). Unha aplicación non é máis que unha clase que se instancia e se executa. Isto permite executar aplicacións unha dentro doutra, estendelas, etc. As aplicacións deben estender á clase Fol\App para que teñan dispoñibles as seguintes propiedades:
 
 * $app->name: Devolve o nome da aplicación ("Web")
 * $app->namespace: Devolve o namespace donde está aloxada a aplicación ("Apps\Web")
-* $app->path: Devolve a ruta onde está aloxada a aplicación no servidor ("/var/www/web")
-* $app->url: Devolve a url para acceder á raiz desa aplicación (p.e: "/")
+* $app->path: Devolve a ruta absoluta onde está aloxada a aplicación no servidor ("/var/www/web")
+* $app->url: Devolve a url relativa para acceder á raiz desa aplicación (habería que engadirlle ao principio a constante BASE_URL) (p.e: "/")
 * $app->assetsPath: Devolve a ruta onde está aloxada a carpeta de assets no servidor ("/var/www/web/assets").
-* $app->assetsUrl: Devolve a url onde está aloxada a carpeta de assets ("/web/assets")
+* $app->assetsUrl: Devolve a url onde está aloxada a carpeta de assets (habería que engadirlle ao principio a constante BASE_URL) ("/web/assets")
 
 Para crear unha aplicación, podemos crear un directorio novo e meter dentro un arquivo chamado App.php. Tamén podemos usar a aplicación que existe por defecto (chamada "Web") e que está dentro da carpeta "/web":
 
@@ -128,8 +126,12 @@ class App extends \Fol\App {
 		//Función que se executa ao invocar a app
 	}
 }
+```
 
-//Debemos rexistrar a ubicación da aplicación (por defecto xa está feito en bootstrap.php)
+Ten en conta que as aplicacións cárganse co estándar PSR-0, igual que calquera outra biblioteca. A única diferencia é que se aloxan noutra carpeta distinta a libs. Polo tanto, a aplicación \Apps\Web\App, estaría no arquivo "/web/App.php". Se queres aloxar as aplicacións noutro directorio distinto, só tes que configurar a clase Loader para que busque o namespace "Apps\\Web" noutro directorio distinto. Esa configuración atópase no arquivo index.php:
+
+```php
+//Rexistramos a ubicación da raíz da aplicación (todas as aplicacións comezan polo namespace "Apps" + o nome da aplicación):
 Loader::registerNamespace('Apps\\Web', BASE_PATH.'/web');
 
 //Agora instanciamos a aplicación:
@@ -139,19 +141,21 @@ $aplicacion = new \Apps\Web\App();
 $aplicacion()->send();
 ```
 
-Ten en conta que as aplicacións se cargan co estándar PSR-0, igual que calquera outra biblioteca. A única diferencia é que se aloxan noutra carpeta distinta a libs. Polo tanto, a aplicación \Apps\Web\App, estaría no arquivo "/web/App.php". Se queres aloxar as aplicacións noutro directorio distinto, só tes que configurar a clase Loader para que busque o namespace "Apps\\Web" noutro directorio distinto. Esa configuración atópase en bootstrap.php, na raíz:
+Fol proporciona unha serie de utilidades mínimas para comezar a traballar. Se queres algo máis completo, podes instalalo vía composer. As utilidades básicas son clases que permiten crear un sistema MVC, xestionar "requests" e "responses", manexo de sesións, plantillas de php e carga de arquivos de configuración.
 
-```php
-Loader::registerNamespace('Apps\\Web', BASE_PATH.'/novo-directorio-web');
-```
+* Http: Conxunto de clases para manexar requests e responses (con headers, variables, cookies, etc).
+* Router: Conxunto de clases para definir rutas asociadas a controladores
+* App: Clase base estendida por todas as apps
+* Config: Clase para cargar configuracións dende arquivos php
+* Errors: Clase para xestionar erros (silencialos, debuguealos, etc)
+* Session: Clase para manexar a sesión (inicializar, gardar datos, destruír, etc)
+* Templates: Clase para cargar e renderizar plantillas. Son plantillas puras de php.
+* Upload: Clase para xestionar a subida ou carga de arquivos. Soporta subidas por POST (variable $_FILES), cargar dende unha url ou pasandolle directamente o arquivo en base64.
 
-HTTP
-====
+Algunhas das clases máis importantes:
 
-Fol contén dunha serie de clases para traballar con Http, é dicir: recoller os "request" ou peticións http e todas as súas variables (cabeceiras, get, post, cookies, files, etc) e xerar "responses" ou respostas. Para iso temos a clase Fol\Http\Request e Fol\Http\Response.
-
-Request
--------
+Fol\Http\Request
+----------------
 
 Con esta clase podemos recoller os datos dunha petición http e acceder a eles. Para crear o obxecto Request, podemos usar a función estática createFromGlobals():
 
@@ -174,15 +178,24 @@ $request->files; //Arquivos enviados
 $request->parameters; //Para gardar parámetros manualmente
 ```
 
-
-Response
---------
-
-Esta clase xenera as respostas que se enviarán ao navegador do usuario.
-Aínda que se pode crear unha instancia de maneira individual, a clase Request xa xenera automáticamente unha clase response. Por exemplo, se no Request facemos unha petición de json (Content-Type: text/json) a clase Response automaticamente aplica ese content type.
+Tamén podemos crear requests sen usar as variables globais, util para facer subrequests ou testear a aplicación:
 
 ```php
-//Collemos o response xenerado polo request:
+//Creamos unha petición post pasandolle os datos para xerar un novo post
+$request = Fol\Http\Request::create('/posts/create', 'POST', ['titulo' => 'Novo post']);
+
+//Executamos esta petición na nosa app e obtemos a resposta:
+$response = $app($request);
+```
+
+
+Fol\Http\Response
+-----------------
+
+Esta clase xenera as respostas que se enviarán ao navegador do usuario.
+
+```php
+//Xeramos un response dende o request. Isto é útil xa que xa lle mete o content-type adecuado, aínda que poderíamos crear un dende cero se o preferimos asi.
 $response = $request->generateResponse();
 
 //A clase Response contén dentro outros obxectos para xestionar partes específicas:
@@ -196,10 +209,10 @@ $response->setContent('texto de resposta');
 $response->send();
 ```
 
-Rutas
------
+Fol\Router\Router
+-----------------
 
-Para xenerar as distintas rutas do noso documento, podemos usar a clase Fol\Router\Router. Por exemplo, na nosa applicación, no constructor podemos definir as rutas:
+Xenera as distintas rutas do noso sitio web. Podemos definir esas rutas no contructor da nosa app:
 
 ```php
 namespace Apps\Web;
@@ -230,15 +243,15 @@ class App extends \Fol\App {
 }
 ```
 
-Cada petición http que se fai comezase executando o arquivo index.php que é o que inicializa as variables necesarias e instancia a app por defecto. Ese arquivo tamén se pode executar en liña de comandos o que facilita a execución de determinadas operacións directamente ou usando crons.
+Cando se fai unha petición http, o servidor (apache, ngnix, etc) redirixe todo a index.php e dende alí instanciase a nosa app e executase esa petición. A función Request::createFromGlobals() detecta se estamos en "cli" ou en "http" e xenera a petición collendo as variables dende $_GET, $_POST, $_FILES, etc (no caso de http) ou dende a variable $argv (no caso de cli). Iso permitenos executar a nosa web dende liña de comandos e facer tests para ver se todo funciona ben. Para iso debemos executar directamente o arquivo index.php pasándolle o método (GET, POST, PUT, DELETE, etc), a url e outras variables. Se non se especifica método, colle GET por defecto.
 
-Execución dunha ruta en liña de comandos (/posts/list):
+Facer unha petición GET por liña de comandos:
 
 ```
 $ php index.php /posts/list
 ```
 
-Execución dunha ruta con parámetros get (/posts/lists?order=id&page=2)
+Facer unha petición GET por liña de comandos pasándolle parámetros:
 
 ```
 $ php index.php "/posts/lists?order=id&page=2"
@@ -248,7 +261,7 @@ ou tamén:
 $ php index.php /posts/lists GET --order id --page 2
 ```
 
-Execución dunha ruta con parámetros post:
+Facer unha petición POST pasándolle tamén parámetros:
 
 ```
 $ php index.php /posts/create POST --title "Título do posts"
