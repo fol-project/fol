@@ -29,14 +29,15 @@ Unha vez feito isto, deberías poder ver algo no navegador (http://localhost/o-m
 Documentación rápida
 ====================
 
-No directorio raíz de FOL existen dúas carpetas: libs e web
+No directorio raíz de FOL existen dúas carpetas: libs e assets
 
-* Na carpeta libs gardaranse as bibliotecas externas, dependencias, e o propio código do Fol.
-* Na carpeta web (ou a que escolleras para instalar a app) está a túa aplicación, ou sexa: plantillas, datos, etc, que forman o teu sitio web. Podes crear todas as aplicacións que queiras, cada unha na súa carpeta.
+* Na carpeta libs gárdaranse as bibliotecas externas, dependencias, e o propio código do Fol.
+* Na carpeta assets gárdanse arquivos públicos accesibles como imaxes, css, js, etc. Non tes por que gardar todo aí xa que cada app pode ter a súa propia carpeta de assets. Esta sería unha xenérica por se hai cousas que queiras compartir entre varias apps.
+
+Cando instales unha app (por exemplo fol/web) crearáseche unha nova carpeta que se, se non escolleches outra cousa, chamarase "web". Esa é a carpeta onde se garda a túa aplicación, ou sexa: plantillas, datos, etc, que forman o teu sitio web. Podes crear todas as aplicacións que queiras, cada unha na súa carpeta.
 
 O arquivo bootstrap.php na raíz é o que inicia o framework e define 4 constantes:
 
-* FOL_VERSION: A versión actual do framework
 * BASE_PATH: A ruta base onde está aloxado o teu sitio web (ruta interna do servidor). Por exemplo "/var/www/o-meu-proxecto" (sen barra ao final)
 * BASE_URL: A ruta base onde está aloxado o sitio web (ruta http do navegador). Por exemplo se accedemos por http://localhost/o-meu-proxecto, o seu valor sería "/o-meu-proxecto" (sen barra ao final)
 * BASE_ABSOLUTE_URL: A parte da url para definir urls absolutas (por exemplo: http://localhost)
@@ -104,12 +105,10 @@ Apps
 
 As aplicacións manexan o código do noso sitio web. Podes meter todo o sitio web nunha soa aplicación ou dividilo en distintas aplicacións (unha para o blog, outra para galeria de fotos, etc). Unha aplicación non é máis que unha clase que se instancia e se executa. Isto permite executar aplicacións unha dentro doutra, estendelas, etc. As aplicacións deben estender á clase Fol\App para que teñan dispoñibles as seguintes propiedades:
 
-* $app->name: Devolve o nome da aplicación ("Web")
-* $app->namespace: Devolve o namespace donde está aloxada a aplicación ("Apps\Web")
-* $app->path: Devolve a ruta absoluta onde está aloxada a aplicación no servidor ("/var/www/web")
-* $app->url: Devolve a url relativa para acceder á raiz desa aplicación (habería que engadirlle ao principio a constante BASE_URL) (p.e: "/")
-* $app->assetsPath: Devolve a ruta onde está aloxada a carpeta de assets no servidor ("/var/www/web/assets").
-* $app->assetsUrl: Devolve a url onde está aloxada a carpeta de assets (habería que engadirlle ao principio a constante BASE_URL) ("/web/assets")
+* $app->name: Devolve o nome da aplicación (por exemplo: "Web")
+* $app->namespace: Devolve o namespace donde está aloxada a aplicación (por exemplo: "Apps\Web")
+* $app->path: Devolve a ruta relativa (dende a base da instalación, ou sexa BASE_PATH) onde está aloxada a aplicación (Por exemplo: "/web")
+* $app->url: Devolve a url relativa para acceder á raiz desa aplicación (normalmente esta vacia, porque a raíz do sitio xa é BASE_URL)
 
 Para crear unha aplicación, podemos crear un directorio novo e meter dentro un arquivo chamado App.php. Tamén podemos usar a aplicación que existe por defecto (chamada "Web") e que está dentro da carpeta "/web":
 
@@ -150,7 +149,7 @@ Fol proporciona unha serie de utilidades mínimas para comezar a traballar. Se q
 * Errors: Clase para xestionar erros (silencialos, debuguealos, etc)
 * Session: Clase para manexar a sesión (inicializar, gardar datos, destruír, etc)
 * Templates: Clase para cargar e renderizar plantillas. Son plantillas puras de php.
-* Upload: Clase para xestionar a subida ou carga de arquivos. Soporta subidas por POST (variable $_FILES), cargar dende unha url ou pasandolle directamente o arquivo en base64.
+* FileSystem: Clase para xestionar arquivos e directorios. Tamén ten funcións para xestionar a subida de arquivos tanto por POST (variable $_FILES) como a carga dende unha url ou pasando directamente contido en base64.
 
 Algunhas das clases máis importantes:
 

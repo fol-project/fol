@@ -2,7 +2,6 @@
 use Fol\Loader;
 use Fol\Errors;
 
-define('FOL_VERSION', '0.11.1');
 define('ACCESS_INTERFACE', (php_sapi_name() === 'cli') ? 'cli' : 'http');
 define('BASE_PATH', str_replace('\\', '/', __DIR__));
 
