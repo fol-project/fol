@@ -280,24 +280,57 @@ Hai que configurar o rewrite, polo que tes que editar o arquivo de configuració
 
 ```
 server {
-	listen 80;
+	root /var/www/;
 
 	charset utf-8;
+	
+	location ~* \.php$ {
+		fastcgi_split_path_info ^(.+\.php)(/.+)$;
+		fastcgi_pass unix:/var/run/php5-fpm.sock;
+		fastcgi_index index.php;
+		include fastcgi_params;
+	}
 
+	location ~ /\. {
+		deny all;
+	}
+
+	#Redirect all to index.php
 	location / {
 		rewrite ^(.*)$ /index.php last;
 	}
 
-	#App rewrite
-
-	location /web/assets/ {
-		rewrite ^(/web/assets/.*)$ $1 break;
+	#Web assets should be served directly. Use the commented code for more than one folder
+	location ~* /assets/ {
+	#location ~* (/folder1|/folder2)?/assets/ {
+		try_files $uri $uri/ @mycache;
 	}
 
-	location /web/assets/cache/ {
-		if (!-f $request_filename) {
-			rewrite ^/web/assets/cache/(.*)$ /web/assets/cache/index.php last;
-		}
+	#This is the mycache location, called when assets are not found. Use the commented code for more than one folder
+	location @mycache {
+		expires 1y;
+		access_log on;
+		add_header Cache-Control "public";
+		rewrite ^/assets/(.*)$ /assets/cache/index.php last;
+		#rewrite ^(/folder1|/folder2)?/assets/(.*)$ $1/assets/cache/index.php last;
+	}
+
+	#Some specific files in the assets directory. Use the commented code for more than one folder
+	location ~* /assets/.*\.(jpg|jpeg|gif|png|ico|cur|gz|svg|svgz|mp4|ogg|ogv|webm|htc)$ {
+	#location ~* (/folder1|/folder2)?/assets/.*\.(jpg|jpeg|gif|png|ico|cur|gz|svg|svgz|mp4|ogg|ogv|webm|htc)$ {
+		expires 1M;
+		access_log off;
+		add_header Cache-Control "public";
+		try_files $uri $uri/ @mycache;
+	}
+
+	# CSS and Javascript. Use the commented code for more than one folder
+	location ~* /assets/.*\.(css|js)$ {
+	#location ~* (/folder1|/folder2)?/assets/.*\.(css|js)$ {
+		expires 1y;
+		access_log off;
+		add_header Cache-Control "public";
+		try_files $uri $uri/ @mycache;
 	}
 }
 ```
