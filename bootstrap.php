@@ -6,8 +6,8 @@ define('ACCESS_INTERFACE', (php_sapi_name() === 'cli') ? 'cli' : 'http');
 define('BASE_PATH', str_replace('\\', '/', __DIR__));
 
 if (ACCESS_INTERFACE === 'cli') {
-	if (isset($argv[1]) && (strpos($argv[1], '//') !== false) && (($components = parse_url($argv[1])) !== false)) {
-		define('BASE_ABSOLUTE_URL', (isset($components['scheme']) ? $components['scheme'] : 'http').'://'.$components['host']);
+	if (isset($argv[1]) && (strpos($argv[1], '://') !== false) && (($components = parse_url($argv[1])) !== false)) {
+		define('BASE_ABSOLUTE_URL', $components['scheme'].'://'.$components['host']);
 		unset($components);
 	} else {
 		define('BASE_ABSOLUTE_URL', 'http://localhost');
