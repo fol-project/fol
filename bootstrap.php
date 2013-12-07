@@ -12,7 +12,8 @@ if (ACCESS_INTERFACE === 'cli') {
 		'path' => ''
 	];
 
-	if (!empty($argv[1]) && preg_match('|^(\{([^\}]+)\})|', $argv[1], $match)) {
+	if (!empty($argv[1]) && preg_match('|^(\{([^\}]+)\})(.*)$|', $argv[1], $match)) {
+		$argv[1] = $match[2].$match[3];
 		$components = parse_url($match[2]) + $components;
 	}
 	
