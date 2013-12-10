@@ -29,8 +29,9 @@ Unha vez feito isto, deberías poder ver algo no navegador (http://localhost/o-m
 Documentación rápida
 ====================
 
-No directorio raíz de FOL existen dúas carpetas: libs e assets
+No directorio raíz de FOL existen tres carpetas: tests, libs e assets
 
+* Na carpeta tests gárdaranse tests unitarios do Fol asi como unha plantilla para testear a tua propia aplicación
 * Na carpeta libs gárdaranse as bibliotecas externas, dependencias, e o propio código do Fol.
 * Na carpeta assets gárdanse arquivos públicos accesibles como imaxes, css, js, etc. Non tes por que gardar todo aí xa que cada app pode ter a súa propia carpeta de assets. Esta sería unha xenérica por se hai cousas que queiras compartir entre varias apps.
 
@@ -334,3 +335,14 @@ server {
 	}
 }
 ```
+
+TESTS
+=====
+
+No directorio test atópanse unha serie de tests unitarios para comprobar que todo funciona correctamente. Para poder executalos, debes ter instalado phpunit (https://github.com/sebastianbergmann/phpunit/) que o podes facer directamente co composer:
+```
+$ composer global require phpunit/phpunit
+```
+
+En phpunit.xml gárdase a configuración básica de phpunit, ou sexa a direccion do arquivo bootstrap.php necesario para iniciar todo e a listaxe de tests para executar. Hai dous testsuites, un propio do Fol para comprobar que todas as súas clases funcionan ben e outra para testear apps.
+Existe xa un arquivo inicial para escribir rapidamente os teus tests unitarios en app/BasicTest.php. Simplemente tes que editar a liña onde se rexistra a app no Loader e a función setUpBeforeClass onde se instancia esa app, que se usará en todos os tests. O metodo testApp () sería un test de exemplo, onde creamos un request, pasámosllo á nosa app para que nos devolva un response e comprobamos que o que nos devolve é correcto (unha páxina html co status code 200).
