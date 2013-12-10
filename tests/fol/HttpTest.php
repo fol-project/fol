@@ -78,12 +78,9 @@ class HttpTest extends PHPUnit_Framework_TestCase {
 	public function testRequestCli () {
 		$args = [
 			'index.php',
-			'POST',
-			'/item/edit/25',
-			'--title',
-			'New title',
-			'--text',
-			'New text',
+			'POST', '/item/edit/25',
+			'--title', 'New title',
+			'--text', 'New text'
 		];
 
 		$request = Request::createFromCli($args);
