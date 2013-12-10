@@ -1,6 +1,5 @@
 <?php
 use Fol\Loader;
-use Fol\Errors;
 
 define('ACCESS_INTERFACE', (php_sapi_name() === 'cli') ? 'cli' : 'http');
 define('BASE_PATH', str_replace('\\', '/', __DIR__));
@@ -31,5 +30,3 @@ include(BASE_PATH.'/libs/Fol/Loader.php');
 Loader::register();
 Loader::setLibrariesPath(BASE_PATH.'/libs');
 Loader::registerComposer();
-
-Errors::register();
