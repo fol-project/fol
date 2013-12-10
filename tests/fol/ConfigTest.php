@@ -20,7 +20,7 @@ class ConfigTest extends PHPUnit_Framework_TestCase {
 		$c = $config->get('demo');
 
 		$this->assertEquals($c['value1'], 'one');
-		$this->assertEquals($c['value2'], null);
+		$this->assertFalse(isset($c['value2']));
 		$this->assertEquals($c['value3'], 3);
 
 		//Delete and reload again

@@ -10,7 +10,7 @@ class HttpTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($request->getMethod(), 'GET');
 		$this->assertEquals($request->getFormat(), 'html');
 		$this->assertEquals($request->getLanguage(['en']), 'en');
-		$this->assertEquals($request->isAjax(), false);
+		$this->assertFalse($request->isAjax());
 		$this->assertEquals($request->getScheme(), parse_url(BASE_ABSOLUTE_URL, PHP_URL_SCHEME));
 		$this->assertEquals($request->getHost(), parse_url(BASE_ABSOLUTE_URL, PHP_URL_HOST));
 
@@ -42,7 +42,7 @@ class HttpTest extends PHPUnit_Framework_TestCase {
 
 		//Headers
 		$request->headers->set('Http-X-Requested-With', 'xmlhttprequest');
-		$this->assertEquals($request->isAjax(), true);
+		$this->assertTrue($request->isAjax());
 
 		return $request;
 	}
