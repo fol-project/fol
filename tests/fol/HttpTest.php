@@ -41,7 +41,7 @@ class HttpTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($request->getUrl(true, true, true), BASE_ABSOLUTE_URL.BASE_URL.'/index2.json?param1=1&param2=2');
 
 		//Headers
-		$request->headers->set('Http-X-Requested-With', 'xmlhttprequest');
+		$request->headers->set('X-Requested-With', 'xmlhttprequest');
 		$this->assertTrue($request->isAjax());
 
 		return $request;
