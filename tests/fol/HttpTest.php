@@ -45,12 +45,12 @@ class HttpTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($request->isAjax());
 
 		//Language
-		$language = $request->getLanguage(['gl', 'en']);
-		$this->assertEquals($language, 'gl');
+		$language = $request->getLanguage(['gl-es', 'en']);
+		$this->assertEquals($language, 'gl-es', $request->headers->get('Accept-Language'));
 
 		$request->headers->set('Accept-Language', 'en,gl-es,es;q=0.5');
 
-		$language = $request->getLanguage(['gl', 'en']);
+		$language = $request->getLanguage(['gl-es', 'en']);
 		$this->assertEquals($language, 'en');
 
 		return $request;
