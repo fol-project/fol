@@ -7,4 +7,4 @@
  * FOL_BASE_URL: The absolute url used (by default is empty)
 */
 
-putenv('FOL_ENVIRONMENT', 'development');
+putenv('FOL_ENVIRONMENT=development');

@@ -61,14 +61,14 @@ Exemplo de configuración:
 ```php
 
 if ($_SERVER['HTTP_HOST'] === 'localhost') {
-	putenv('FOL_ENVIRONMENT', 'development');
+	putenv('FOL_ENVIRONMENT=development');
 } else {
-	putenv('FOL_ENVIRONMENT', 'production');
+	putenv('FOL_ENVIRONMENT=production');
 }
 
 if (ACCESS_INTERFACE === 'cli') {
-	putenv('FOL_BASE_HOST', 'http://dominio.com');
-	putenv('FOL_BASE_URL', '/sitioweb');
+	putenv('FOL_BASE_HOST=http://dominio.com');
+	putenv('FOL_BASE_URL=/sitioweb');
 }
 ```
 

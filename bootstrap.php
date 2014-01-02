@@ -10,7 +10,7 @@ include 'environment.php';
 define('ENVIRONMENT', getenv('FOL_ENVIRONMENT') ?: 'development');
 
 if (ACCESS_INTERFACE === 'cli') {
-	define('BASE_HOST', getenv('FOL_BASE_HOST') ?: 'http://localhost';
+	define('BASE_HOST', getenv('FOL_BASE_HOST') ?: 'http://localhost');
 	define('BASE_URL', getenv('FOL_BASE_URL') ?: '');
 } else {
 	define('BASE_HOST', getenv('FOL_BASE_HOST') ?: ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? 'https' : 'http').'://'.$_SERVER['HTTP_HOST']);
