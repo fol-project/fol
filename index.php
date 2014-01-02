@@ -2,6 +2,8 @@
 use Fol\Loader;
 use Fol\Errors;
 
+define('ENVIRONMENT', 'development');
+
 include('bootstrap.php');
 
 //Register errors

@@ -4,7 +4,7 @@ Aqui tes o FOL
 
 [![Build Status](https://travis-ci.org/oscarotero/Fol.png?branch=master)](https://travis-ci.org/oscarotero/Fol)
 
-FOL é framework escrito en PHP por Oscar Otero (http://oscarotero.com) como exercicio de deseño e como ferramenta para desenvolver experimentos e proxectos persoais. A intención é ter algo manexable, moi flexible e que permita xuntar librerías externas. Vamos, un microframework.
+FOL é un (micro)framework escrito en PHP por Oscar Otero (http://oscarotero.com) como exercicio de deseño e como ferramenta para desenvolver experimentos e proxectos persoais.
 Como é algo persoal que non pretende ter moita repercusión (hai miles de frameworks en PHP), escribo a documentación en galego por comodidade e por se alguen máis daquí lle interesa o proxecto. Aínda así, a documentación básica que hai en forma de comentarios no código está en inglés (ou algo parecido).
 
 Características:
@@ -39,26 +39,49 @@ No directorio raíz de FOL existen tres carpetas: tests, libs e assets
 
 Cando instales unha app (por exemplo fol/web) crearáseche unha nova carpeta que se, se non escolleches outra cousa, chamarase "web". Esa é a carpeta onde se garda a túa aplicación, ou sexa: plantillas, datos, etc, que forman o teu sitio web. Podes crear todas as aplicacións que queiras, cada unha na súa carpeta.
 
-O arquivo bootstrap.php na raíz é o que inicia o framework e define 4 constantes:
+O arquivo bootstrap.php na raíz é o que inicia o framework e define as seguintes constantes:
 
-* BASE_PATH: A ruta base onde está aloxado o teu sitio web (ruta interna do servidor). Por exemplo "/var/www/o-meu-proxecto" (sen barra ao final)
-* BASE_URL: A ruta base onde está aloxado o sitio web (ruta http do navegador). Por exemplo se accedemos por http://localhost/o-meu-proxecto, o seu valor sería "/o-meu-proxecto" (sen barra ao final)
-* BASE_ABSOLUTE_URL: A parte da url para definir urls absolutas (por exemplo: http://localhost)
+* ENVIRONMENT: O nome do entorno de desenvolvemento actual. Útil por se queres ter distintas configuración (por defecto, sería "development")
 * ACCESS_INTERFACE: Se estamos executando fol por cli, sería "cli" senón "http"
+* BASE_PATH: A ruta base onde está aloxado o teu sitio web (ruta interna do servidor). Por exemplo "/var/www/o-meu-proxecto" (sen barra ao final)
+* BASE_URL: A ruta base onde está aloxado o sitio web (ruta http do navegador). Por exemplo se accedemos por http://localhost/o-meu-proxecto, o seu valor sería "/o-meu-proxecto" (sen barra ao final). Por defecto, en cli está baleiro e en http é detectado automaticamente.
+* BASE_HOST: A parte da url para definir urls absolutas. Por defecto, se estamos en cli sería: http://localhost e se estamos en http detéctao automaticamente.
+
+Traballar con distintos entornos
+--------------------------------
+
+Existe un arquivo chamado environment.php que é cargado por bootstrap.php e que serve para definir o entorno actual asi como algunhas variables relacionadas. Todas esas variables son definidas usando a función putenv() e son as seguintes:
+
+* FOL_ENVIRONMENT: O nome do entorno actual
+* FOL_BASE_URL: Defíneo se queres forzar unha url base concreta
+* FOL_BASE_HOST: Defíneo se queres forzar un dominio concreto
+
+Exemplo de configuración:
+
+```php
+
+if ($_SERVER['HTTP_HOST'] === 'localhost') {
+	putenv('FOL_ENVIRONMENT', 'development');
+} else {
+	putenv('FOL_ENVIRONMENT', 'production');
+}
+
+if (ACCESS_INTERFACE === 'cli') {
+	putenv('FOL_BASE_HOST', 'http://dominio.com');
+	putenv('FOL_BASE_URL', '/sitioweb');
+}
+```
 
 Loader
 ------
 
-Serve para cargar automaticamente o resto de clases empregando o estándar PSR-0. Tamén se ocupa de executar o autoloader de Composer.
+Serve para cargar automaticamente o resto de clases empregando o estándar PSR-0. Tamén se ocupa de executar o autoloader de Composer. Está cargada en bootstrap.php
 
 #### Exemplo
 
 ```php
-include(BASE_PATH.'libs/Fol/Loader.php');
-
-Loader::register(); //Carga o autoload
+Loader::register(); //Rexistra o autoload
 Loader::setLibrariesPath(BASE_PATH.'libs'); //Define o directorio onde se gardan as bibliotecas
-Loader::registerNamespace('Apps\\Web', BASE_PATH.'web'); //Definimos que o namespace Apps\Web é a carpeta apps (para que carge as aplicacións do noso sitio nese directorio)
 Loader::registerComposer(); //Executa o autoloader de Composer (se o atopa)
 ```
 
