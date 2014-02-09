@@ -19,7 +19,7 @@
 	},
 	"require": {
 		"php": ">=5.4.0",
-		"fol/core": "0.*"
+		"fol/core": "dev-master"
 	},
 	"scripts": {
 		"post-create-project-cmd": "Fol\\Composer::postCreateProject"
