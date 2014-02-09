@@ -11,8 +11,8 @@ class HttpTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($request->getFormat(), 'html');
 		$this->assertEquals($request->getLanguage(['en']), 'en');
 		$this->assertFalse($request->isAjax());
-		$this->assertEquals($request->getScheme(), parse_url(BASE_HOST, PHP_URL_SCHEME));
-		$this->assertEquals($request->getHost(), parse_url(BASE_HOST, PHP_URL_HOST));
+		$this->assertEquals($request->getScheme(), parse_url(BASE_URL, PHP_URL_SCHEME));
+		$this->assertEquals($request->getHost(), parse_url(BASE_URL, PHP_URL_HOST));
 
 		//Change paths and formats
 		$request->setPath('index2.XML');
@@ -23,7 +23,8 @@ class HttpTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($request->getFormat(), 'json');
 
 		//Get full url
-		$this->assertEquals($request->getUrl(), BASE_HOST.BASE_URL.'/index2.json');
+		$request->setPath(parse_url(BASE_URL, PHP_URL_PATH).'/index2.json');
+		$this->assertEquals($request->getUrl(), BASE_URL.'/index2.json');
 
 		//GET params
 		$request->get->set([
@@ -38,7 +39,7 @@ class HttpTest extends PHPUnit_Framework_TestCase {
 		]);
 
 		//Get full url with get params
-		$this->assertEquals($request->getUrl(true, true, true), BASE_HOST.BASE_URL.'/index2.json?param1=1&param2=2');
+		$this->assertEquals($request->getUrl(true, true, true), BASE_URL.'/index2.json?param1=1&param2=2');
 
 		//Headers
 		$request->headers->set('X-Requested-With', 'xmlhttprequest');
@@ -84,20 +85,21 @@ class HttpTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testRequestCli () {
+		$path = parse_url(BASE_URL, PHP_URL_PATH).'/item/edit/25';
 		$args = [
 			'index.php',
-			'POST', '/item/edit/25',
+			'POST', $path,
 			'--title', 'New title',
 			'--text', 'New text'
 		];
 
 		$request = Request::createFromCli($args);
 
-		$this->assertEquals($request->getPath(), '/item/edit/25');
+		$this->assertEquals($request->getPath(), $path);
 		$this->assertEquals($request->getMethod(), 'POST');
 		$this->assertEquals($request->post->get('title'), 'New title');
 		$this->assertEquals($request->post->get('text'), 'New text');
-		$this->assertEquals($request->getHost(), parse_url(BASE_HOST, PHP_URL_HOST));
-		$this->assertEquals($request->getUrl(), BASE_HOST.BASE_URL.'/item/edit/25.html');
+		$this->assertEquals($request->getHost(), parse_url(BASE_URL, PHP_URL_HOST));
+		$this->assertEquals($request->getUrl(), BASE_URL.'/item/edit/25.html');
 	}
 }

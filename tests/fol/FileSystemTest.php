@@ -3,7 +3,7 @@ use Fol\FileSystem;
 
 class FileSystemTest extends PHPUnit_Framework_TestCase {
 	public function testFileSystem () {
-		$filesystem = new FileSystem();
+		$filesystem = new FileSystem(BASE_PATH);
 		$this->assertEquals($filesystem->getPath(), BASE_PATH);
 
 		$filesystem->cd('tests/fol');

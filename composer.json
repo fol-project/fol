@@ -21,8 +21,21 @@
 		"php": ">=5.4.0",
 		"fol/core": "0.*"
 	},
+	"scripts": {
+		"post-create-project-cmd": "Fol\\Composer::postCreateProject"
+	},
 	"config": {
-		"vendor-dir": "libs",
-		"bin-dir": "libs/bin"
+		"vendor-dir": "vendor",
+		"bin-dir": "bin"
+	},
+	"autoload": {
+		"psr-4": {
+			"App\\": "app/"
+		}
+	},
+	"extra": {
+		"config": [
+			"app/config/environment.php"
+		]
 	}
 }

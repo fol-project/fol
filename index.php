@@ -1,14 +1,14 @@
 <?php
-use Fol\Loader;
 use Fol\Errors;
 
-include('bootstrap.php');
+require 'bootstrap.php';
+
 
 //Register errors
 Errors::register();
 Errors::displayErrors();
 
-//Register the apps here
 
-
-//Handle the request and send the response
+//Execute the app
+$app = new App\App();
+$app()->send();
