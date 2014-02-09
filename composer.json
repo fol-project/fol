@@ -34,8 +34,6 @@
 		}
 	},
 	"extra": {
-		"config": [
-			"app/config/environment.php"
-		]
+		"config": []
 	}
 }

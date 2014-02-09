@@ -11,19 +11,25 @@ Características:
 
 * Rápido e lixeiro.
 * Escrito en PHP 5.4.
-* Pensado para combinar con bibliotecas externas e compatible con Composer.
+* Pensado para funcionar con composer
+* Tamén está preparado para usar bower para instalar assets
 ```
 
 Instalación
 ===========
 
-O mellor xeito de instalalo é usando composer, primeiro instalas o framework (con create-project) e logo metes unha app baleira para comezar a traballar:
+O mellor xeito de instalalo é usando composer, primeiro instalas o framework (con create-project):
 
 ```
 $ composer create-project fol/fol o-meu-proxecto
-$ cd o-meu-proxecto
-$ composer require fol/web
 ```
+
+Á hora de instalalo pediráseche configurar certas constantes básicas:
+
+* ENVIRONMENT: O nome do entorno de desenvolvemento. Pode se calquera nome. Por defecto é "development".
+* BASE_URL: A url base sobre a que vai funcionar a web. Serve para xerar urls absolutas. Por defecto é "http://localhost"
+
+En calquera momento podes cambiar esa configuración no arquivo environment.php
 
 Unha vez feito isto, deberías poder ver algo no navegador (http://localhost/o-meu-proxecto).
 
@@ -31,59 +37,18 @@ Unha vez feito isto, deberías poder ver algo no navegador (http://localhost/o-m
 Documentación rápida
 ====================
 
-No directorio raíz de FOL existen tres carpetas: tests, libs e assets
+A parte dos directorios "vendor" (usado por composer para gardar aí todos os paquetes e dependencias) e "components" xerada por bower para instalar os seus componentes, hai outras dúas carpetas:
 
-* Na carpeta tests gárdaranse tests unitarios do Fol asi como unha plantilla para testear a tua propia aplicación
-* Na carpeta libs gárdaranse as bibliotecas externas, dependencias, e o propio código do Fol.
-* Na carpeta assets gárdanse arquivos públicos accesibles como imaxes, css, js, etc. Non tes por que gardar todo aí xa que cada app pode ter a súa propia carpeta de assets. Esta sería unha xenérica por se hai cousas que queiras compartir entre varias apps.
-
-Cando instales unha app (por exemplo fol/web) crearáseche unha nova carpeta que se, se non escolleches outra cousa, chamarase "web". Esa é a carpeta onde se garda a túa aplicación, ou sexa: plantillas, datos, etc, que forman o teu sitio web. Podes crear todas as aplicacións que queiras, cada unha na súa carpeta.
+* app: onde se garda a aplicación por defecto (plantillas, assets, controladores, modelos, etc).
+* tests: tests unitarios do Fol asi como unha plantilla para testear a tua propia aplicación
 
 O arquivo bootstrap.php na raíz é o que inicia o framework e define as seguintes constantes:
 
-* ENVIRONMENT: O nome do entorno de desenvolvemento actual. Útil por se queres ter distintas configuración (por defecto, sería "development")
 * ACCESS_INTERFACE: Se estamos executando fol por cli, sería "cli" senón "http"
-* BASE_PATH: A ruta base onde está aloxado o teu sitio web (ruta interna do servidor). Por exemplo "/var/www/o-meu-proxecto" (sen barra ao final)
-* BASE_URL: A ruta base onde está aloxado o sitio web (ruta http do navegador). Por exemplo se accedemos por http://localhost/o-meu-proxecto, o seu valor sería "/o-meu-proxecto" (sen barra ao final). Por defecto, en cli está baleiro e en http é detectado automaticamente.
-* BASE_HOST: A parte da url para definir urls absolutas. Por defecto, se estamos en cli sería: http://localhost e se estamos en http detéctao automaticamente.
+* ENVIRONMENT: O nome do entorno de desenvolvemento actual. Xenérase ao instalar o paquete.
+* BASE_PATH: A ruta base onde está aloxado o teu sitio web (ruta interna do servidor).
+* BASE_URL: A ruta base onde está aloxado o sitio web (ruta http do navegador). Xenerase ao instalar o paquete
 
-Traballar con distintos entornos
---------------------------------
-
-Existe un arquivo chamado environment.php que é cargado por bootstrap.php e que serve para definir o entorno actual asi como algunhas variables relacionadas. Todas esas variables son definidas usando a función putenv() e son as seguintes:
-
-* FOL_ENVIRONMENT: O nome do entorno actual
-* FOL_BASE_URL: Defíneo se queres forzar unha url base concreta
-* FOL_BASE_HOST: Defíneo se queres forzar un dominio concreto
-
-Exemplo de configuración:
-
-```php
-
-if ($_SERVER['HTTP_HOST'] === 'localhost') {
-	putenv('FOL_ENVIRONMENT=development');
-} else {
-	putenv('FOL_ENVIRONMENT=production');
-}
-
-if (ACCESS_INTERFACE === 'cli') {
-	putenv('FOL_BASE_HOST=http://dominio.com');
-	putenv('FOL_BASE_URL=/sitioweb');
-}
-```
-
-Loader
-------
-
-Serve para cargar automaticamente o resto de clases empregando o estándar PSR-0. Tamén se ocupa de executar o autoloader de Composer. Está cargada en bootstrap.php
-
-#### Exemplo
-
-```php
-Loader::register(); //Rexistra o autoload
-Loader::setLibrariesPath(BASE_PATH.'libs'); //Define o directorio onde se gardan as bibliotecas
-Loader::registerComposer(); //Executa o autoloader de Composer (se o atopa)
-```
 
 Errors
 ------
@@ -126,44 +91,89 @@ $log->pushHandler(new StreamHandler(BASE_PATH.'/logs/debug.log', Logger::DEBUG))
 Errors::setLogger($log);
 ```
 
-Apps
-----
+App
+---
 
-As aplicacións manexan o código do noso sitio web. Podes meter todo o sitio web nunha soa aplicación ou dividilo en distintas aplicacións (unha para o blog, outra para galeria de fotos, etc). Unha aplicación non é máis que unha clase que se instancia e se executa. Isto permite executar aplicacións unha dentro doutra, estendelas, etc. As aplicacións deben estender á clase Fol\App para que teñan dispoñibles as seguintes propiedades:
+Fol usa os estándares psr-0 e psr-4, implementados no loader de Composer, para cargar todas as clases necesarias. A clase App\App é a que se executa por defecto e é a que contén todo o código da túa páxina web. O arquivo index.php é o que se encarga de inicializar todo (carga o bootstrap.php, configura os erros, inicializa a app e execútaa). A app está definida do arquivo app/App.php e podes modificar esa clase para que funcione como queiras. Ademáis tes dispoñibles os seguintes métodos:
 
-* $app->name: Devolve o nome da aplicación (por exemplo: "Web")
-* $app->namespace: Devolve o namespace donde está aloxada a aplicación (por exemplo: "Apps\Web")
-* $app->path: Devolve a ruta relativa (dende a base da instalación, ou sexa BASE_PATH) onde está aloxada a aplicación (Por exemplo: "/web")
-* $app->url: Devolve a url relativa para acceder á raiz desa aplicación (normalmente esta vacia, porque a raíz do sitio xa é BASE_URL)
+* $app->getNamespace(): Devolve o namespace da aplicación (App). Ademáis podes usalo para xerar nomes de clases co mesmo namespace, por exemplo ```$app->getNamespace('Controllers\\Index')``` devolve "App\Controllers\Index".
+* $app->getPath(): Devolve o path onde está aloxada a aplicación. Podes engadir paths relativos e incluso divididos varios argumentos, por exemplo: ```$app->getPath('assets/css', 'subdirectorio')``` devolve algo parecido a "/var/www/sitioweb/app/assets/css/subdirectorio"
+* $app->getUrl(): O mesmo que getPath pero para devolver rutas http. Ten en conta que son rutas reais, para acceder, por exemplo aos assets. Para usar MVC usa a clase Router. ```$app->getUrl('assets/css', 'subdirectorio')``` devolvería algo parecido a "http://sitioweb.com/app/assets/css/subdirectorio"
 
-Para crear unha aplicación, podemos crear un directorio novo e meter dentro un arquivo chamado App.php. Tamén podemos usar a aplicación que existe por defecto (chamada "Web") e que está dentro da carpeta "/web":
+A clase app tamén serve para xestionar "servizos", ou sexa, clases que podes instanciar en calquera momento e que dependen da túa app. Por exemplo a conexión á base de datos, configuración, xestión de plantillas, etc. Para dar de alta un servizo, tes que usar o método register, co nome do servizo e un callback que devolva o resultado. Exemplo:
 
 ```php
-namespace Apps\Web;
+// app/App.php __construct()
+
+//Clase para cargar a configuración:
+$this->register('config', function () {
+	return new \Fol\Config($this->getPath('config'));
+});
+
+//Clase para a conexión á base de datos
+$this->register('db', function () {
+	$config = $this->config->get('db');
+
+	return new \PDO($config['dns'], $config['username'], $config['password']);
+});
+```
+
+Coa función "get" podemos obter os servizos rexistrados. Tamén podemos usar o magic method __get() para instancialos e gardalos nunha propiedade para usar nun futuro:
+
+```php
+//Accedemos ao servizo chamando directamente polo seu nome (db):
+$this->db->exec("DELETE FROM fruit WHERE colour = 'red'");
+
+//Usa "get" para xerar unha nova instancia de cada vez sen gardala:
+$db = $this->get('db');
+
+//Get permite tamén pasarlle argumentos ao noso callback
+$this->get('db', $arg1, $arg2);
+```
+
+Outra función de "get" é a de instanciar clases relativas á nosa app aínda que non estean rexistradas como servizos. Por exemplo, imaxinemonos que temos a clase App\Controllers\Index. Podemos instanciala diretamente:
+
+```php
+$indexController = $this->get('Controllers\\Index');
+```
+
+Por último, a app debe ter definido o magic method __invoke, que é o que se utiliza para executalo (colle un request e devolve un obxecto response).
+
+Resumindo, a estrutura dunha app sería algo asi:
+
+```php
+namespace App;
 
 class App extends \Fol\App {
 
 	public function __construct () {
-		//Contructor da applicación (cargar a configuración, instanciar clases básicas, etc)
+		// Contructor da applicación
+		// carga a configuración, instancia clases básicas, rexistra servizos, etc...
 	}
 
-	public function __invoke () {
-		//Función que se executa ao invocar a app
+	public function __invoke ($request = null) {
+		// Devolve un response a partir dun request
 	}
 }
 ```
 
-Ten en conta que as aplicacións cárganse co estándar PSR-0, igual que calquera outra biblioteca. A única diferencia é que se aloxan noutra carpeta distinta a libs. Polo tanto, a aplicación \Apps\Web\App, estaría no arquivo "/web/App.php". Se queres aloxar as aplicacións noutro directorio distinto, só tes que configurar a clase Loader para que busque o namespace "Apps\\Web" noutro directorio distinto. Esa configuración atópase no arquivo index.php:
+Polo que o sistema sería algo asi:
 
 ```php
-//Rexistramos a ubicación da raíz da aplicación (todas as aplicacións comezan polo namespace "Apps" + o nome da aplicación):
-Loader::registerNamespace('Apps\\Web', BASE_PATH.'/web');
+use Fol\Http\Request;
 
-//Agora instanciamos a aplicación:
-$aplicacion = new \Apps\Web\App();
+//Instanciamos a nosa aplicación:
+$app = new App\App;
 
-//executamos a aplicación e mandamos o resultado
-$aplicacion()->send();
+//Agora executamola
+$response = $app();
+
+//Podemos executala de novo con outro request diferente:
+$request = Request::create('http://sitioweb.com/posts/23');
+$response = $app($request);
+
+//Enviamos a resposta ao navegador:
+$response->send();
 ```
 
 Fol proporciona unha serie de utilidades mínimas para comezar a traballar. Se queres algo máis completo, podes instalalo vía composer. As utilidades básicas son clases que permiten crear un sistema MVC, xestionar "requests" e "responses", manexo de sesións, plantillas de php e carga de arquivos de configuración.
@@ -249,8 +259,10 @@ use Fol\Router\RouteFactory;
 class App extends \Fol\App {
 
 	public function __construct () {
-		//Creamos o enrutador
-		$routeFactory = new RouteFactory($this);
+		//Instanciamos o RouteFactory pasándolle o namespace onde estan os nosos controladores
+		$routeFactory = new RouteFactory($this->getNamespace('Controllers'));
+
+		//Creamos o noso router, pasándolle o routeFactory
 		$this->router = new Router($routeFactory);
 
 		//Definimos as distintas rutas (nome da ruta, url, controlador e outras opcions)
@@ -268,28 +280,28 @@ class App extends \Fol\App {
 }
 ```
 
-Cando se fai unha petición http, o servidor (apache, ngnix, etc) redirixe todo a index.php e dende alí instanciase a nosa app e executase esa petición. A función Request::createFromGlobals() detecta se estamos en "cli" ou en "http" e xenera a petición collendo as variables dende $_GET, $_POST, $_FILES, etc (no caso de http) ou dende a variable $argv (no caso de cli). Iso permitenos executar a nosa web dende liña de comandos e facer tests para ver se todo funciona ben. Para iso debemos executar directamente o arquivo index.php pasándolle o método (GET, POST, PUT, DELETE, etc), a url e outras variables. Se non se especifica método, colle GET por defecto.
+Cando se fai unha petición http, o servidor (apache, ngnix, etc) redirixe todo a index.php e dende alí instanciase a nosa app e executase esa petición. A función Request::createFromGlobals() detecta se estamos en "cli" ou en "http" e xenera a petición collendo as variables dende $_GET, $_POST, $_FILES, etc (no caso de http) ou dende a variable $argv (no caso de cli). Iso permitenos executar a nosa web dende liña de comandos para facer tests, executar crons, etc. Para iso debemos executar directamente o arquivo index.php pasándolle o método (GET, POST, PUT, DELETE, etc), a url e outras variables. Se non se especifica método, colle GET por defecto.
 
 Facer unha petición GET por liña de comandos:
 
 ```
-$ php index.php /posts/list
+$ php index.php GET /posts/list
 ```
 
 Facer unha petición GET por liña de comandos pasándolle parámetros:
 
 ```
-$ php index.php "/posts/lists?order=id&page=2"
+$ php index.php GET "/posts/lists?order=id&page=2"
 ```
 ou tamén:
 ```
-$ php index.php /posts/lists GET --order id --page 2
+$ php index.php GET /posts/lists --order id --page 2
 ```
 
 Facer unha petición POST pasándolle tamén parámetros:
 
 ```
-$ php index.php /posts/create POST --title "Título do posts"
+$ php index.php POST /posts/create --title "Título do posts"
 ```
 
 
@@ -326,37 +338,28 @@ server {
 		rewrite ^(.*)$ /index.php last;
 	}
 
-	#Web assets should be served directly. Use the commented code for more than one folder
-	location ~* /assets/ {
-	#location ~* (/folder1|/folder2)?/assets/ {
-		try_files $uri $uri/ @mycache;
-	}
-
-	#This is the mycache location, called when assets are not found. Use the commented code for more than one folder
+	#This is the mycache location, called when assets are not found
 	location @mycache {
 		expires 1y;
 		access_log on;
 		add_header Cache-Control "public";
-		rewrite ^/assets/(.*)$ /assets/cache/index.php last;
-		#rewrite ^(/folder1|/folder2)?/assets/(.*)$ $1/assets/cache/index.php last;
+		rewrite ^/app/assets/(.*)$ /app/assets/cache/index.php last;
 	}
 
-	#Some specific files in the assets directory. Use the commented code for more than one folder
-	location ~* /assets/.*\.(jpg|jpeg|gif|png|ico|cur|gz|svg|svgz|mp4|ogg|ogv|webm|htc)$ {
-	#location ~* (/folder1|/folder2)?/assets/.*\.(jpg|jpeg|gif|png|ico|cur|gz|svg|svgz|mp4|ogg|ogv|webm|htc)$ {
-		expires 1M;
-		access_log off;
-		add_header Cache-Control "public";
-		try_files $uri $uri/ @mycache;
-	}
-
-	# CSS and Javascript. Use the commented code for more than one folder
-	location ~* /assets/.*\.(css|js)$ {
-	#location ~* (/folder1|/folder2)?/assets/.*\.(css|js)$ {
+	#Assets files
+	location ~* /app/assets/.*$ {
 		expires 1y;
 		access_log off;
 		add_header Cache-Control "public";
 		try_files $uri $uri/ @mycache;
+	}
+
+	#bower components should be served directly
+	location ~* /components/.*$ {
+		expires 1y;
+		access_log off;
+		add_header Cache-Control "public";
+		rewrite ^/components/(.*)$ /components/$1 last;
 	}
 }
 ```
