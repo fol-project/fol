@@ -15,7 +15,7 @@
 	],
 	"support": {
 		"email": "oom@oscarotero.com",
-		"issues": "https://github.com/oscarotero/Fol/issues"
+		"issues": "https://github.com/oscarotero/fol/issues"
 	},
 	"require": {
 		"php": ">=5.4.0",
