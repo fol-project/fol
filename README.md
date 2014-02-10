@@ -359,7 +359,6 @@ server {
 		expires 1y;
 		access_log off;
 		add_header Cache-Control "public";
-		rewrite ^/components/(.*)$ /components/$1 last;
 	}
 }
 ```
