@@ -13,15 +13,15 @@ Características:
 * Escrito en PHP 5.4.
 * Pensado para funcionar con composer
 * Tamén está preparado para usar bower para instalar assets
-```
+
 
 Instalación
 ===========
 
-O mellor xeito de instalalo é usando composer, primeiro instalas o framework (con create-project):
+Para instalalo precisas ter composer: https://getcomposer.org/doc/00-intro.md#installation-nix (recomendo instalalo de xeito global para que estea sempre dispoñible). Despois simplemente executa create-project do seguinte xeito:
 
 ```
-$ composer create-project fol/fol o-meu-proxecto
+$ composer create-project fol/fol directorio-destino
 ```
 
 Á hora de instalalo pediráseche configurar certas constantes básicas:
@@ -305,12 +305,12 @@ $ php index.php POST /posts/create --title "Título do posts"
 ```
 
 
-INSTALACIÓN
-===========
+CONFIGURACIÓN DO SERVIDOR
+=========================
 
 En Apache
 ---------
-Unha vez descargado o FOL, xa debería funcionar, non hai que facer nada especial.
+Unha vez instalado o FOL, xa debería funcionar, non hai que facer nada especial.
 
 En Nginx
 --------
