@@ -230,8 +230,8 @@ Fol\Http\Response
 Esta clase xenera as respostas que se enviarán ao navegador do usuario.
 
 ```php
-//Xeramos un response dende o request. Isto é útil xa que xa lle mete o content-type adecuado, aínda que poderíamos crear un dende cero se o preferimos asi.
-$response = $request->generateResponse();
+//Creamos un response
+$response = new Fol\Http\Response();
 
 //A clase Response contén dentro outros obxectos para xestionar partes específicas:
 $response->headers; //Para enviar cabeceiras
@@ -239,6 +239,9 @@ $response->cookies; //Para enviar cookies
 
 //Tamén podemos engadirlle o contido ou body da resposta:
 $response->setContent('texto de resposta');
+
+//Se temos o request, podemos pasarllo para que o prepare antes (axusta o mime-type así como outras cabeceiras)
+$response->prepare($request);
 
 //E finalmente para enviar a resposta ao servidor, podemos usar a función "send":
 $response->send();
