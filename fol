@@ -1,0 +1,19 @@
+#!/usr/bin/env php
+<?php
+
+use Fol\Errors;
+use Fol\Http\Request;
+
+require 'bootstrap.php';
+
+
+//Register errors
+Errors::register();
+Errors::displayErrors();
+
+
+//Execute the app
+$request = Request::createFromCli($argv);
+
+$app = new App\App();
+$app($request)->send();

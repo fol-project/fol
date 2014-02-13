@@ -4,15 +4,15 @@ Aqui tes o FOL
 
 [![Build Status](https://travis-ci.org/oscarotero/Fol.png?branch=master)](https://travis-ci.org/oscarotero/Fol)
 
-FOL é un (micro)framework escrito en PHP por Oscar Otero (http://oscarotero.com) como exercicio de deseño e como ferramenta para desenvolver experimentos e proxectos persoais.
-Como é algo persoal que non pretende ter moita repercusión (hai miles de frameworks en PHP), escribo a documentación en galego por comodidade e por se alguen máis daquí lle interesa o proxecto. Aínda así, a documentación básica que hai en forma de comentarios no código está en inglés (ou algo parecido).
+FOL é un (micro)framework escrito en PHP por Oscar Otero (http://oscarotero.com) como exercicio de deseño e como ferramenta para experimental.
+Como é algo persoal que non pretende ter moita repercusión (hai miles de frameworks en PHP), escribo a documentación en galego por comodidade e por se alguen máis daquí lle interesa o proxecto. De todos xeitos, os comentarios dentro do código están en inglés.
 
 Características:
 
 * Rápido e lixeiro.
 * Escrito en PHP 5.4.
 * Pensado para funcionar con composer
-* Tamén está preparado para usar bower para instalar assets
+* Tamén está preparado para usar bower para instalar os seus componentes
 
 
 Instalación
@@ -24,12 +24,12 @@ Para instalalo precisas ter composer: https://getcomposer.org/doc/00-intro.md#in
 $ composer create-project fol/fol o-meu-proxecto
 ```
 
-Á hora de instalalo pediráseche configurar certas constantes básicas:
+Á hora de instalalo pediráseche configurar estas constantes básicas:
 
 * ENVIRONMENT: O nome do entorno de desenvolvemento. Pode se calquera nome. Por defecto é "development".
-* BASE_URL: A url base sobre a que vai funcionar a web. Serve para xerar urls absolutas. Por defecto é "http://localhost" pero se a instalación se fixo nun subdirectorio, debes modificalo para, por exemplo: http://localhost/o-meu-proxecto
+* BASE_URL: A url onde está aloxado o sitio web (ruta http do navegador). Serve para xerar as urls. Por defecto é "http://localhost" pero se a instalación se fixo nun subdirectorio, debes modificalo para, por exemplo: http://localhost/o-meu-proxecto
 
-En calquera momento podes cambiar esa configuración no arquivo environment.php
+En calquera momento podes cambiar manualmente esa configuración no arquivo environment.php
 
 Unha vez feito isto, deberías poder ver algo no navegador (http://localhost/o-meu-proxecto).
 
@@ -37,23 +37,22 @@ Unha vez feito isto, deberías poder ver algo no navegador (http://localhost/o-m
 Documentación rápida
 ====================
 
-A parte dos directorios "vendor" (usado por composer para gardar aí todos os paquetes e dependencias) hai tres carpetas:
+A parte do directorio "vendor" (usado por composer para gardar aí todos os paquetes e dependencias) hai dúas carpetas:
 
-* app: onde se garda a aplicación por defecto (plantillas, controladores, modelos, etc).
-* public: todos os arquivos accesibles publicamente (css, imaxes, js, etc) ademáis do "front controller".
-* tests: tests unitarios do Fol asi como unha plantilla para testear a tua propia aplicación
+* app: onde se garda a aplicación por defecto (plantillas, controladores, modelos, tests, etc).
+* public: todos os arquivos accesibles publicamente (css, imaxes, js, componentes de bower, etc) ademáis do "front controller" (index.php).
 
-O arquivo bootstrap.php na raíz é o que inicia o framework e define as seguintes constantes:
+O arquivo bootstrap.php define as seguintes constantes:
 
-* ACCESS_INTERFACE: Se estamos executando fol por cli, sería "cli" senón "http"
-* ENVIRONMENT: O nome do entorno de desenvolvemento actual. Xenérase ao instalar o paquete.
+* ACCESS_INTERFACE: Se estamos executando fol por comandos, sería "cli" senón "http"
 * BASE_PATH: A ruta base onde está aloxado o teu sitio web (ruta interna do servidor).
-* BASE_URL: A ruta base onde está aloxado o sitio web (ruta http do navegador). Xenerase ao instalar o paquete
+* BASE_URL: O valor que puxeches na instalación
+* ENVIRONMENT: O valor que puxeches na instalación.
 
 
 Errors
 ------
-A clase Errors rexistra os erros que se poidan producir na execución dos scripts e lanza callbacks. Deste modo centralízanse todos os erros para poder manexalos mellor.
+A clase Errors rexistra os erros que se poidan producir na execución dos scripts e lanza callbacks. Ademáis convirte todos os erros de php en exceptions, deste modo centralízanse todos os erros para poder manexalos mellor.
 
 #### Exemplo
 
@@ -66,7 +65,7 @@ Errors::pushHandler(function ($exception) {
 	die();
 });
 
-//Mostra os erros en pantalla con toda a información útil:
+//Fai que cando haxa erros os imprima (util na fase de desenvolvemento):
 Errors::displayErrors();
 ```
 
@@ -95,10 +94,12 @@ Errors::setLogger($log);
 App
 ---
 
-Fol usa os estándares psr-0 e psr-4, implementados no loader de Composer, para cargar todas as clases necesarias. A clase App\App é a que se executa por defecto e é a que contén todo o código da túa páxina web. O arquivo index.php é o que se encarga de inicializar todo (carga o bootstrap.php, configura os erros, inicializa a app e execútaa). A app está definida do arquivo app/App.php e podes modificar esa clase para que funcione como queiras. Ademáis tes dispoñibles os seguintes métodos:
+Fol usa os estándares psr-0 e psr-4, implementados no loader de Composer, para cargar todas as clases necesarias. O arquivo public/index.php fai de controlador inicial, ou sexa, todas as peticións que non sexan de assets (css, js, imaxes, etc) se redirixen a este arquivo e é o que se encarga de iniciar todo (carga o bootstrap.php, configura os erros, inicializa a nosa aplicación e execútaa).
 
-* $app->getNamespace(): Devolve o namespace da aplicación (App). Ademáis podes usalo para xerar nomes de clases co mesmo namespace, por exemplo ```$app->getNamespace('Controllers\\Index')``` devolve "App\Controllers\Index".
-* $app->getPath(): Devolve o path onde está aloxada a aplicación. Podes engadir paths relativos e incluso divididos varios argumentos, por exemplo: ```$app->getPath('assets/css', 'subdirectorio')``` devolve algo parecido a "/var/www/sitioweb/app/assets/css/subdirectorio"
+A aplicación está definida na clase App\App e contén todo o código da túa páxina web. Está definida do arquivo app/App.php e podes modificar esa clase para que funcione como queiras. Ademáis tes dispoñibles os seguintes métodos:
+
+* $app->getNamespace(): Devolve o namespace da aplicación (ou sexa "App"). Ademáis podes usalo para xerar subnamespaces ou subclases no mesmo namespace, por exemplo ```$app->getNamespace('Controllers\\Index')``` devolve "App\Controllers\Index".
+* $app->getPath(): Devolve o path onde está aloxada a aplicación. Podes engadir paths relativos e incluso dividilos varios argumentos, por exemplo: ```$app->getPath('assets/css', 'subdirectorio')``` devolve algo parecido a "/var/www/sitioweb/app/assets/css/subdirectorio"
 * $app->getPublicUrl(): O mesmo que getPath pero para devolver rutas http do directorio público. Ten en conta que son rutas reais, para acceder, por exemplo aos assets. Para usar MVC usa a clase Router. ```$app->getUrl('assets/css', 'subdirectorio')``` devolvería algo parecido a "http://localhost/o-meu-proxecto/public/assets/css/subdirectorio"
 
 A clase app tamén serve para xestionar "servizos", ou sexa, clases que podes instanciar en calquera momento e que dependen da túa app. Por exemplo a conexión á base de datos, configuración, xestión de plantillas, etc. Para dar de alta un servizo, tes que usar o método register, co nome do servizo e un callback que devolva o resultado. Exemplo:
@@ -119,20 +120,23 @@ $this->register('db', function () {
 });
 ```
 
-Coa función "get" podemos obter os servizos rexistrados. Tamén podemos usar o magic method __get() para instancialos e gardalos nunha propiedade para usar nun futuro:
+O método "get" executa o callback de cada servizo rexistrado e devolvenos o resultado. Se só queres ter unha instancia de cada servizo (por exemplo, unha conexión á base de datos), en vez de chamar por get, chama pola propiedade do mesmo nome. Deste xeito, a primeira vez que a chames, executará o magic method __get() que gardará o resultado e que cando a volvas chamar nun futuro, xa non se executa máis:
 
 ```php
-//Accedemos ao servizo chamando directamente polo seu nome (db):
-$this->db->exec("DELETE FROM fruit WHERE colour = 'red'");
-
-//Usa "get" para xerar unha nova instancia de cada vez sen gardala:
-$db = $this->get('db');
+//Usa "get" para xerar unha nova instancia de cada vez:
+$newConnection = $this->get('db');
 
 //Get permite tamén pasarlle argumentos ao noso callback
 $this->get('db', $arg1, $arg2);
+
+//Chama directamente pola propiedade
+$db = $this->db;
+
+//Asi, se a volves a chamar, devolveche o mesmo obxecto:
+$this->db->exec("DELETE FROM fruit WHERE colour = 'red'");
 ```
 
-Outra función de "get" é a de instanciar clases relativas á nosa app aínda que non estean rexistradas como servizos. Por exemplo, imaxinemonos que temos a clase App\Controllers\Index. Podemos instanciala diretamente:
+Outra función de "get" é a de instanciar clases relativas á nosa app aínda que non estean rexistradas como servizos. Por exemplo, imaxinemonos que temos a clase App\Controllers\Index. Podemos instanciala directamente:
 
 ```php
 $indexController = $this->get('Controllers\\Index');
@@ -158,7 +162,7 @@ class App extends \Fol\App {
 }
 ```
 
-Polo que o sistema sería algo asi:
+E executado sería algo asi:
 
 ```php
 use Fol\Http\Request;
@@ -177,7 +181,7 @@ $response = $app($request);
 $response->send();
 ```
 
-Fol proporciona unha serie de utilidades mínimas para comezar a traballar. Se queres algo máis completo, podes instalalo vía composer. As utilidades básicas son clases que permiten crear un sistema MVC, xestionar "requests" e "responses", manexo de sesións, plantillas de php e carga de arquivos de configuración.
+Fol non é un framework con moitas funcionalidades senón que proporciona o mínimo para comezar a traballar. O resto de cousas que precises terás que buscalas e instalalas vía Composer. As utilidades básicas son clases que permiten crear un sistema MVC, xestionar "requests" e "responses", manexo de sesións, plantillas de php e carga de arquivos de configuración.
 
 * Http: Conxunto de clases para manexar requests e responses (con headers, variables, cookies, etc).
 * Router: Conxunto de clases para definir rutas asociadas a controladores
@@ -254,7 +258,7 @@ Fol\Router\Router
 Xenera as distintas rutas do noso sitio web. Podemos definir esas rutas no contructor da nosa app:
 
 ```php
-namespace Apps\Web;
+namespace App;
 
 use Fol\Http\Request;
 use Fol\Router\Router;
@@ -266,46 +270,39 @@ class App extends \Fol\App {
 		//Instanciamos o RouteFactory pasándolle o namespace onde estan os nosos controladores
 		$routeFactory = new RouteFactory($this->getNamespace('Controllers'));
 
-		//Creamos o noso router, pasándolle o routeFactory
+		//Instanciamos o Router, pasándolle o routeFactory
 		$this->router = new Router($routeFactory);
 
 		//Definimos as distintas rutas (nome da ruta, url, controlador e outras opcions)
 		$this->router->map('index', '/', 'Index::index', ['methods' => 'GET']);
 		$this->router->map('contacto', '/about', 'Index::about');
 	}
-
-	public function __invoke () {
-		//Creamos o request collendo os datos globais
-		$request = Request::createFromGlobals();
-
-		//Executamos a ruta e devolvemos a resposta
-		return $this->router->handle($request, $this);
-	}
 }
 ```
 
-Cando se fai unha petición http, o servidor (apache, ngnix, etc) redirixe todo a index.php e dende alí instanciase a nosa app e executase esa petición. A función Request::createFromGlobals() detecta se estamos en "cli" ou en "http" e xenera a petición collendo as variables dende $_GET, $_POST, $_FILES, etc (no caso de http) ou dende a variable $argv (no caso de cli). Iso permitenos executar a nosa web dende liña de comandos para facer tests, executar crons, etc. Para iso debemos executar directamente o arquivo index.php pasándolle o método (GET, POST, PUT, DELETE, etc), a url e outras variables. Se non se especifica método, colle GET por defecto.
+EXECUCIÓN POR LIÑA DE COMANDOS
+==============================
 
-Facer unha petición GET por liña de comandos:
+Fol trae un arquivo executable na raíz para lanzar a nosa aplicación dende liña de comandos. Exemplos:
 
 ```
-$ php index.php GET /posts/list
+$ fol GET /posts/list
 ```
 
 Facer unha petición GET por liña de comandos pasándolle parámetros:
 
 ```
-$ php index.php GET "/posts/lists?order=id&page=2"
+$ fol GET "/posts/lists?order=id&page=2"
 ```
 ou tamén:
 ```
-$ php index.php GET /posts/lists --order id --page 2
+$ fol GET /posts/lists --order id --page 2
 ```
 
 Facer unha petición POST pasándolle tamén parámetros:
 
 ```
-$ php index.php POST /posts/create --title "Título do posts"
+$ fol POST /posts/create --title "Título do posts"
 ```
 
 
@@ -359,14 +356,3 @@ server {
 	}
 }
 ```
-
-TESTS
-=====
-
-No directorio test atópanse unha serie de tests unitarios para comprobar que todo funciona correctamente. Para poder executalos, debes ter instalado phpunit (https://github.com/sebastianbergmann/phpunit/) que o podes facer directamente co composer:
-```
-$ composer global require phpunit/phpunit
-```
-
-En phpunit.xml gárdase a configuración básica de phpunit, ou sexa a direccion do arquivo bootstrap.php necesario para iniciar todo e a listaxe de tests para executar. Hai dous testsuites, un propio do Fol para comprobar que todas as súas clases funcionan ben e outra para testear apps.
-Existe xa un arquivo inicial para escribir rapidamente os teus tests unitarios en app/BasicTest.php. Simplemente tes que editar a liña onde se rexistra a app no Loader e a función setUpBeforeClass onde se instancia esa app, que se usará en todos os tests. O metodo testApp () sería un test de exemplo, onde creamos un request, pasámosllo á nosa app para que nos devolva un response e comprobamos que o que nos devolve é correcto (unha páxina html co status code 200).
