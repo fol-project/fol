@@ -27,8 +27,7 @@ $RECYCLE.BIN/
 
 # BOWER (or similar)
 
-components/*
-!components/.htaccess
+public/components/*
 
 
 

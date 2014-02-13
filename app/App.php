@@ -13,12 +13,11 @@ use Fol\Router\RouteFactory;
 class App extends \Fol\App {
 	public function __construct () {
 
-		//Init basic classes
-		$this->requestStack = new RequestStack;
+		//Init config
 		$this->config = new Config($this->getPath('config'));
 
 
-		//Router
+		//Init router
 		$this->router = new Router(new RouteFactory($this->getNamespace('Controllers')));
 
 		$this->router->map([
@@ -39,6 +38,9 @@ class App extends \Fol\App {
 		$this->register([
 			'templates' => function () {
 				return new Templates($this->getPath('templates'));
+			},
+			'requestStack' => function () {
+				return new RequestStack;
 			}
 		]);
 	}

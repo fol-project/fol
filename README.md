@@ -21,13 +21,13 @@ Instalación
 Para instalalo precisas ter composer: https://getcomposer.org/doc/00-intro.md#installation-nix (recomendo instalalo de xeito global para que estea sempre dispoñible). Despois simplemente executa create-project do seguinte xeito:
 
 ```
-$ composer create-project fol/fol directorio-destino
+$ composer create-project fol/fol o-meu-proxecto
 ```
 
 Á hora de instalalo pediráseche configurar certas constantes básicas:
 
 * ENVIRONMENT: O nome do entorno de desenvolvemento. Pode se calquera nome. Por defecto é "development".
-* BASE_URL: A url base sobre a que vai funcionar a web. Serve para xerar urls absolutas. Por defecto é "http://localhost"
+* BASE_URL: A url base sobre a que vai funcionar a web. Serve para xerar urls absolutas. Por defecto é "http://localhost" pero se a instalación se fixo nun subdirectorio, debes modificalo para, por exemplo: http://localhost/o-meu-proxecto
 
 En calquera momento podes cambiar esa configuración no arquivo environment.php
 
@@ -37,9 +37,10 @@ Unha vez feito isto, deberías poder ver algo no navegador (http://localhost/o-m
 Documentación rápida
 ====================
 
-A parte dos directorios "vendor" (usado por composer para gardar aí todos os paquetes e dependencias) e "components" xerada por bower para instalar os seus componentes, hai outras dúas carpetas:
+A parte dos directorios "vendor" (usado por composer para gardar aí todos os paquetes e dependencias) hai tres carpetas:
 
-* app: onde se garda a aplicación por defecto (plantillas, assets, controladores, modelos, etc).
+* app: onde se garda a aplicación por defecto (plantillas, controladores, modelos, etc).
+* public: todos os arquivos accesibles publicamente (css, imaxes, js, etc) ademáis do "front controller".
 * tests: tests unitarios do Fol asi como unha plantilla para testear a tua propia aplicación
 
 O arquivo bootstrap.php na raíz é o que inicia o framework e define as seguintes constantes:
@@ -98,7 +99,7 @@ Fol usa os estándares psr-0 e psr-4, implementados no loader de Composer, para 
 
 * $app->getNamespace(): Devolve o namespace da aplicación (App). Ademáis podes usalo para xerar nomes de clases co mesmo namespace, por exemplo ```$app->getNamespace('Controllers\\Index')``` devolve "App\Controllers\Index".
 * $app->getPath(): Devolve o path onde está aloxada a aplicación. Podes engadir paths relativos e incluso divididos varios argumentos, por exemplo: ```$app->getPath('assets/css', 'subdirectorio')``` devolve algo parecido a "/var/www/sitioweb/app/assets/css/subdirectorio"
-* $app->getUrl(): O mesmo que getPath pero para devolver rutas http. Ten en conta que son rutas reais, para acceder, por exemplo aos assets. Para usar MVC usa a clase Router. ```$app->getUrl('assets/css', 'subdirectorio')``` devolvería algo parecido a "http://sitioweb.com/app/assets/css/subdirectorio"
+* $app->getPublicUrl(): O mesmo que getPath pero para devolver rutas http do directorio público. Ten en conta que son rutas reais, para acceder, por exemplo aos assets. Para usar MVC usa a clase Router. ```$app->getUrl('assets/css', 'subdirectorio')``` devolvería algo parecido a "http://localhost/o-meu-proxecto/public/assets/css/subdirectorio"
 
 A clase app tamén serve para xestionar "servizos", ou sexa, clases que podes instanciar en calquera momento e que dependen da túa app. Por exemplo a conexión á base de datos, configuración, xestión de plantillas, etc. Para dar de alta un servizo, tes que usar o método register, co nome do servizo e un callback que devolva o resultado. Exemplo:
 
@@ -338,30 +339,23 @@ server {
 
 	#Redirect all to index.php
 	location / {
-		rewrite ^(.*)$ /index.php last;
+		rewrite ^(.*)$ /public/index.php last;
 	}
 
-	#This is the mycache location, called when assets are not found
-	location @mycache {
+	#This is the public location, called when public files are not found
+	location @public {
 		expires 1y;
 		access_log on;
 		add_header Cache-Control "public";
-		rewrite ^/app/assets/(.*)$ /app/assets/cache/index.php last;
+		rewrite ^/public/(.*)$ /public/index.php last;
 	}
 
-	#Assets files
-	location ~* /app/assets/.*$ {
+	#public files
+	location ~* /public/.*$ {
 		expires 1y;
 		access_log off;
 		add_header Cache-Control "public";
-		try_files $uri $uri/ @mycache;
-	}
-
-	#bower components should be served directly
-	location ~* /components/.*$ {
-		expires 1y;
-		access_log off;
-		add_header Cache-Control "public";
+		try_files $uri $uri/ @public;
 	}
 }
 ```

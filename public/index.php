@@ -1,7 +1,7 @@
 <?php
 use Fol\Errors;
 
-require 'bootstrap.php';
+require '../bootstrap.php';
 
 
 //Register errors

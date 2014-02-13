@@ -13,20 +13,12 @@ class Index {
 		return $templates->render('html.php');
 	}
 
+
 	public function phpinfo ($request) {
 		phpinfo();
 	}
 
-	//Files preprocessor
-	public function file ($request) {
-		$cached = $request->getPath(true);
-		$origin = str_replace('/cache/', '/', $cached);
-
-		echo $request->getFormat();
-		echo "$cached \n $origin \n";
-	}
-
-	//Error controller
+	
 	public function error ($request, $response) {
 		$exception = $request->parameters->get('exception');
 
