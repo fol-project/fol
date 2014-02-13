@@ -2,5 +2,5 @@
 
 return [
 	'ENVIRONMENT' => 'development',
-	'BASE_URL' => 'http://localhost/fol'
+	'BASE_URL' => 'http://localhost/'
 ];
