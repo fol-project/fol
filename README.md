@@ -34,6 +34,15 @@ En calquera momento podes cambiar manualmente esa configuración no arquivo envi
 Unha vez feito isto, deberías poder ver algo no navegador (http://localhost/o-meu-proxecto).
 
 
+Opcións de instalación
+======================
+
+Cando se executa o comando create-project de composer, fol lanza un script, que ademáis de pedir as constantes básicas (ENVIRONMENT e BASE_URL) tamén executar máis operacións segundo a túa configuración na propiedade "extra" do arquivo composer.json:
+
+* config: Array cunha listaxe de arquivos de configuración que se poden modificar na instalación (por exemplo bases de datos, etc). O script xenerará novos arquivos que se gardarán nun subdirectorio de config co mesmo nome que a constante ENVIRONMENT.
+* writable: Array cunha listaxe de directorios que precisan ter permisos de escritura (daránselle permisos 0777). Se o directorio non existe, crearase un novo. Útil para xerar directorios para gardar os logs, caches, etc.
+
+
 Documentación rápida
 ====================
 
