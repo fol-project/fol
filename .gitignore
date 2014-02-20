@@ -24,6 +24,10 @@ $RECYCLE.BIN/
 *.msp
 
 
+# DATA STUFF (logs, cache, etc)
+logs
+
+
 
 # BOWER (or similar)
 
