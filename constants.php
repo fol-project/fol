@@ -1,6 +1,6 @@
 <?php
-
-return array (
-  'ENVIRONMENT' => 'development',
-  'BASE_URL' => 'http://localhost',
-);
+return [
+	'ENVIRONMENT' => 'development',
+	'BASE_URL' => 'http://localhost',
+	'PUBLIC_DIR' => '/public'
+];
