@@ -328,10 +328,10 @@ Hai que configurar o rewrite, polo que tes que editar o arquivo de configuració
 
 ```
 server {
-	root /var/www/;
+	root /var/www/public;
 
 	charset utf-8;
-	
+
 	location ~* \.php$ {
 		fastcgi_split_path_info ^(.+\.php)(/.+)$;
 		fastcgi_pass unix:/var/run/php5-fpm.sock;
@@ -343,25 +343,33 @@ server {
 		deny all;
 	}
 
-	#Redirect all to index.php
+	# Manage all request
 	location / {
-		rewrite ^(.*)$ /public/index.php last;
+		try_files $uri @public;
 	}
 
-	#This is the public location, called when public files are not found
-	location @public {
-		expires 1y;
-		access_log on;
+	# Headers for specific assets
+	location ~* .*\.(jpg|jpeg|gif|png|ico|cur|gz|svg|svgz|mp4|ogg|ogv|webm|htc)$ {
+		expires 1M;
+		access_log off;
 		add_header Cache-Control "public";
-		rewrite ^/public/(.*)$ /public/index.php last;
+		try_files $uri @public;
 	}
 
-	#public files
-	location ~* /public/.*$ {
+	# Headers for CSS and Javascript
+	location ~* .*\.(css|js)$ {
 		expires 1y;
 		access_log off;
 		add_header Cache-Control "public";
-		try_files $uri $uri/ @public;
+		try_files $uri @public;
+	}
+
+	# This is the public location, called in each request
+	location @public {
+		if (!-f $request_filename) {
+			rewrite ^(.*)$ /index.php last;
+		}
 	}
 }
+
 ```
