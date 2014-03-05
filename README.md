@@ -200,6 +200,8 @@ Fol non é un framework con moitas funcionalidades senón que proporciona o mín
 * Session: Clase para manexar a sesión (inicializar, gardar datos, destruír, etc)
 * Templates: Clase para cargar e renderizar plantillas. Son plantillas puras de php.
 * FileSystem: Clase para xestionar arquivos e directorios. Tamén ten funcións para xestionar a subida de arquivos tanto por POST (variable $_FILES) como a carga dende unha url ou pasando directamente contido en base64.
+* Terminal: Clase para executar comandos e utilidades relacionadas.
+
 
 Algunhas das clases máis importantes:
 
