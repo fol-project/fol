@@ -2,9 +2,9 @@ Aqui tes o FOL
 ==============
 (o resto da gaita xa é cousa túa)
 
-[![Build Status](https://travis-ci.org/oscarotero/Fol.png?branch=master)](https://travis-ci.org/oscarotero/Fol)
+[![Build Status](https://travis-ci.org/oscarotero/fol.png?branch=master)](https://travis-ci.org/oscarotero/fol)
 
-FOL é un (micro)framework escrito en PHP por Oscar Otero (http://oscarotero.com) como exercicio de deseño e como ferramenta para experimental.
+FOL é un (micro)framework escrito en PHP por Oscar Otero (http://oscarotero.com) como exercicio de deseño e como ferramenta para experimentar.
 Como é algo persoal que non pretende ter moita repercusión (hai miles de frameworks en PHP), escribo a documentación en galego por comodidade e por se alguen máis daquí lle interesa o proxecto. De todos xeitos, os comentarios dentro do código están en inglés.
 
 Características:
@@ -13,6 +13,7 @@ Características:
 * Escrito en PHP 5.4.
 * Pensado para funcionar con composer
 * Tamén está preparado para usar bower para instalar os seus componentes
+* Compatible con PSR-0/1/2/3/4
 
 
 Instalación
@@ -28,19 +29,11 @@ $ composer create-project fol/fol o-meu-proxecto
 
 * ENVIRONMENT: O nome do entorno de desenvolvemento. Pode se calquera nome. Por defecto é "development".
 * BASE_URL: A url onde está aloxado o sitio web (ruta http do navegador). Serve para xerar as urls. Por defecto é "http://localhost" pero se a instalación se fixo nun subdirectorio, debes modificalo para, por exemplo: http://localhost/o-meu-proxecto
+* PUBLIC_DIR: O nome do directorio public. Depende de como configures o host. Por defecto está vacio, eso significa que a raíz do teu host é o directorio "public". No caso de que non poidas facer iso, cambia o valor a "/public". Isto afecta a todas as peticións a arquivos reais (css, js, imaxes, etc).
 
-En calquera momento podes cambiar manualmente esa configuración no arquivo environment.php
+En calquera momento podes cambiar manualmente esa configuración no arquivo constants.php
 
 Unha vez feito isto, deberías poder ver algo no navegador (http://localhost/o-meu-proxecto).
-
-
-Opcións de instalación
-======================
-
-Cando se executa o comando create-project de composer, fol lanza un script, que ademáis de pedir as constantes básicas (ENVIRONMENT e BASE_URL) tamén executar máis operacións segundo a túa configuración na propiedade "extra" do arquivo composer.json:
-
-* config: Array cunha listaxe de arquivos de configuración que se poden modificar na instalación (por exemplo bases de datos, etc). O script xenerará novos arquivos que se gardarán nun subdirectorio de config co mesmo nome que a constante ENVIRONMENT.
-* writable: Array cunha listaxe de directorios que precisan ter permisos de escritura (daránselle permisos 0777). Se o directorio non existe, crearase un novo. Útil para xerar directorios para gardar os logs, caches, etc.
 
 
 Documentación rápida
@@ -57,6 +50,7 @@ O arquivo bootstrap.php define as seguintes constantes:
 * BASE_PATH: A ruta base onde está aloxado o teu sitio web (ruta interna do servidor).
 * BASE_URL: O valor que puxeches na instalación
 * ENVIRONMENT: O valor que puxeches na instalación.
+* PUBLIC_DIR: O valor que puxeches na instalación.
 
 
 Errors
@@ -373,5 +367,4 @@ server {
 		}
 	}
 }
-
 ```
