@@ -1,26 +1,30 @@
 <?php
 use Fol\Http\Request;
 
-class BasicTest extends PHPUnit_Framework_TestCase {
-	protected static $app;
+class BasicTest extends PHPUnit_Framework_TestCase
+{
+    protected static $app;
 
-	//Init your app before start the test case
-	public static function setUpBeforeClass () {
-		self::$app = new App\App;
-	}
+    //Init your app before start the test case
+    public static function setUpBeforeClass()
+    {
+        self::$app = new App\App;
+    }
 
-	//Remove the app on finish the test case
-	public static function tearDownAfterClass () {
-		self::$app = null;
-	}
+    //Remove the app on finish the test case
+    public static function tearDownAfterClass()
+    {
+        self::$app = null;
+    }
 
-	//Write your tests
-	public function testApp () {
-		$app = self::$app;
+    //Write your tests
+    public function testApp()
+    {
+        $app = self::$app;
 
-		$request = Request::create('/');
-		$response = $app($request);
+        $request = Request::create('/');
+        $response = $app($request);
 
-		$this->assertInstanceOf('Fol\\Http\\Response', $response);
-	}
+        $this->assertInstanceOf('Fol\\Http\\Response', $response);
+    }
 }

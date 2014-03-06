@@ -1,27 +1,28 @@
 <?php
-namespace App\Controllers;
+namespace app\Controllers;
 
 use Fol\Http\Response;
-use Fol\Http\HttpException;
 
-class Index {
-	public function index ($request) {
-		$templates = $this->app->templates;
+class Index
+{
+    public function index($request)
+    {
+        $templates = $this->app->templates;
 
-		$templates->saveRender('content', '<h1>Ola mundo!!</h1><p><a href="phpinfo">Ver o phpinfo</a></p>');
+        $templates->saveRender('content', '<h1>Ola mundo!!</h1><p><a href="phpinfo">Ver o phpinfo</a></p>');
 
-		return $templates->render('html.php');
-	}
+        return $templates->render('html.php');
+    }
 
+    public function phpinfo($request)
+    {
+        phpinfo();
+    }
 
-	public function phpinfo ($request) {
-		phpinfo();
-	}
+    public function error($request, $response)
+    {
+        $exception = $request->parameters->get('exception');
 
-	
-	public function error ($request, $response) {
-		$exception = $request->parameters->get('exception');
-
-		$response->setContent($exception->getMessage());
-	}
+        $response->setContent($exception->getMessage());
+    }
 }
