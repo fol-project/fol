@@ -1,5 +1,5 @@
 <?php
-namespace app\Controllers;
+namespace App\Controllers;
 
 use Fol\Http\Response;
 

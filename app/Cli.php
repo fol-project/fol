@@ -1,5 +1,5 @@
 <?php
-namespace app;
+namespace App;
 
 use Fol\Terminal;
 use Fol\Http\Request;
