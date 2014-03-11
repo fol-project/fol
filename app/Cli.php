@@ -28,7 +28,7 @@ class Cli
     public static function executeRequest(array $options)
     {
         $options = Terminal::parseOptions($options, [
-            1 => ['GET', 'POST', 'HEAD', 'PUT', 'DELETE'],
+            1 => [Terminal::OPTION_SET, ['GET', 'POST', 'HEAD', 'PUT', 'DELETE']],
             2 => Terminal::OPTION_REQUIRED
         ]);
 
