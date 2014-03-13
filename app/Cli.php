@@ -19,6 +19,7 @@ class Cli
         self::executeRequest($argv);
     }
 
+
     /**
      * Execute a request from cli
      *
@@ -32,17 +33,14 @@ class Cli
             2 => Terminal::OPTION_REQUIRED
         ]);
 
-        $method = $options[0][1];
-        $url = BASE_URL.$options[0][2];
-        $params = $options[1];
-
-        $request = Request::create($url, $method, $params);
+        $request = Request::create($options[2], $options[1], $options);
 
         $app = new App();
         $app($request)->send();
 
         die();
     }
+
 
     /**
      * Edit configuration values from cli

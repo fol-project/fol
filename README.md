@@ -216,11 +216,10 @@ $request->get->set('nome', 'novo-valor'); //Modifica o valor do parámetro 'nome
 //Outros obxectos dentro de Request son:
 
 $request->post; //Para os parámetros POST
-$request->server; //Para as variables do servidor (o equivalente a $_SERVER)
 $request->headers; //Para as cabeceiras http
 $request->cookies; //Cookies enviadas
 $request->files; //Arquivos enviados
-$request->parameters; //Para gardar parámetros manualmente
+$request->parameters; //Para gardar parámetros (por exemplo os do router)
 ```
 
 Tamén podemos crear requests sen usar as variables globais, util para facer subrequests ou testear a aplicación:
@@ -291,24 +290,32 @@ EXECUCIÓN POR LIÑA DE COMANDOS
 Fol trae un arquivo executable na raíz para lanzar a nosa aplicación dende liña de comandos. Exemplos:
 
 ```
-$ fol GET /posts/list
+$ php fol GET /posts/list
 ```
 
 Facer unha petición GET por liña de comandos pasándolle parámetros:
 
 ```
-$ fol GET "/posts/lists?order=id&page=2"
+$ php fol GET "/posts/lists?order=id&page=2"
 ```
 ou tamén:
 ```
-$ fol GET /posts/lists --order id --page 2
+$ php fol GET /posts/lists --order id --page 2
 ```
 
 Facer unha petición POST pasándolle tamén parámetros:
 
 ```
-$ fol POST /posts/create --title "Título do posts"
+$ php fol POST /posts/create --title "Título do posts"
 ```
+
+Trae outro comando para modificar calquera arquivo de configuración dende liña de comandos:
+
+```
+$ php fol config database
+```
+
+E podes modificar ou engadir máis comandos no arquivo app/Cli.php
 
 
 CONFIGURACIÓN DO SERVIDOR
