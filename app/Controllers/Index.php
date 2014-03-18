@@ -1,8 +1,6 @@
 <?php
 namespace App\Controllers;
 
-use Fol\Http\Response;
-
 class Index
 {
     public function index($request, $response, $app)
@@ -23,7 +21,7 @@ class Index
 
     public function error($request, $response)
     {
-        $exception = $request->router->get('exception');
+        $exception = $request->route->get('exception');
 
         $response->setContent($exception->getMessage());
     }
