@@ -5,11 +5,13 @@ use Fol\Http\Response;
 
 class Index
 {
-    public function index($request)
+    public function index($request, $response, $app)
     {
-        $templates = $this->app->templates;
+        $templates = $app->templates;
 
-        $templates->saveRender('content', '<h1>Ola mundo!!</h1><p><a href="phpinfo">Ver o phpinfo</a></p>');
+        $href = $app->router->getUrl('phpinfo');
+
+        $templates->saveRender('content', '<h1>Ola mundo!!</h1><p><a href="'.$href.'">Ver o phpinfo</a></p>');
 
         return $templates->render('html.php');
     }
@@ -21,7 +23,7 @@ class Index
 
     public function error($request, $response)
     {
-        $exception = $request->parameters->get('exception');
+        $exception = $request->router->get('exception');
 
         $response->setContent($exception->getMessage());
     }

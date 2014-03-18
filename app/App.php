@@ -7,8 +7,8 @@ use Fol\Templates;
 use Fol\Http\Request;
 use Fol\Http\RequestStack;
 
-use Fol\Router\Router;
-use Fol\Router\RouteFactory;
+use Fol\Http\Router\Router;
+use Fol\Http\Router\RouteFactory;
 
 class App extends \Fol\App
 {
@@ -52,7 +52,7 @@ class App extends \Fol\App
         }
 
         $this->requestStack->push($request);
-        $response = $this->router->handle($request, $this);
+        $response = $this->router->handle($request, [$this]);
         $this->requestStack->pop();
 
         return $response;

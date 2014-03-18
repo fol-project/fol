@@ -321,9 +321,94 @@ E podes modificar ou engadir máis comandos no arquivo app/Cli.php
 CONFIGURACIÓN DO SERVIDOR
 =========================
 
+Server de php
+-------------
+Para usar o servidor que trae o propio php, lanza o seguinte comando no directorio public:
+```
+$ php -S localhost:8000 index.php
+```
+Agora se no navegador vas a http://localhost:8000 deberías ver algo. Ten en conta que debes ter configurada a constante BASE_URL co mesmo host (neste exemplo: http://localhost:8000)
+
 En Apache
 ---------
 Unha vez instalado o FOL, xa debería funcionar, non hai que facer nada especial.
+Se prefires configurar o sitio web mediante httpd.conf, este sería o exemplo:
+
+```
+<Directory "/var/www/public">
+
+	# No indexes
+	<IfModule mod_autoindex.c>
+		Options -Indexes
+	</IfModule>
+
+	# Hidden files
+	<Files ~ "^\.">
+		Order allow,deny
+		Deny from all
+	</Files>
+
+	<IfModule mod_rewrite.c>
+		Options +FollowSymlinks
+		RewriteEngine On
+
+		# Redirect Trailing Slashes...
+		RewriteRule ^(.*)/$ /$1 [L,R=301]
+
+		# If the requested filename exists, simply serve it.
+		RewriteCond %{REQUEST_FILENAME} -f
+		RewriteRule .? - [L]
+
+		# Rewrites the requested to index.php
+		RewriteRule ^.*$ index.php [L,QSA]
+	</IfModule>
+
+	# Use UTF-8 encoding for anything served text/plain or text/html
+	AddDefaultCharset utf-8
+
+	# Force UTF-8 for a number of file formats
+	AddCharset utf-8 .atom .css .js .json .rss .vtt .xml
+
+	# JavaScript
+	AddType application/javascript js jsonp
+	AddType application/json json
+
+	# Audio
+	AddType audio/ogg oga ogg
+	AddType audio/mp4 m4a f4a f4b
+
+	# Video
+	AddType video/ogg ogv
+	AddType video/mp4 mp4 m4v f4v f4p
+	AddType video/webm webm
+	AddType video/x-flv flv
+
+	# SVG
+	AddType image/svg+xml svg svgz
+	AddEncoding gzip svgz
+
+	# Webfonts
+	AddType application/vnd.ms-fontobject eot
+	AddType application/x-font-ttf ttf ttc
+	AddType font/opentype otf
+	AddType application/x-font-woff woff
+
+	# Assorted types
+	AddType image/x-icon ico
+	AddType image/webp webp
+	AddType text/cache-manifest appcache manifest
+	AddType text/x-component htc
+	AddType application/xml rss atom xml rdf
+	AddType application/x-chrome-extension crx
+	AddType application/x-opera-extension oex
+	AddType application/x-xpinstall xpi
+	AddType application/octet-stream safariextz
+	AddType application/x-web-app-manifest+json webapp
+	AddType text/x-vcard vcf
+	AddType application/x-shockwave-flash swf
+	AddType text/vtt vtt
+</Directory>
+```
 
 En Nginx
 --------
@@ -342,6 +427,7 @@ server {
 		include fastcgi_params;
 	}
 
+	# Deny access for hidden
 	location ~ /\. {
 		deny all;
 	}
@@ -351,17 +437,9 @@ server {
 		try_files $uri @public;
 	}
 
-	# Headers for specific assets
-	location ~* .*\.(jpg|jpeg|gif|png|ico|cur|gz|svg|svgz|mp4|ogg|ogv|webm|htc)$ {
+	# Headers for assets
+	location ~* .*\.(css|js|jpg|jpeg|gif|png|ico|cur|gz|svg|svgz|mp4|ogg|ogv|webm|htc|woff|eot|ttf)$ {
 		expires 1M;
-		access_log off;
-		add_header Cache-Control "public";
-		try_files $uri @public;
-	}
-
-	# Headers for CSS and Javascript
-	location ~* .*\.(css|js)$ {
-		expires 1y;
 		access_log off;
 		add_header Cache-Control "public";
 		try_files $uri @public;
