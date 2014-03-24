@@ -327,7 +327,7 @@ Para usar o servidor que trae o propio php, lanza o seguinte comando no director
 ```
 $ php -S localhost:8000 index.php
 ```
-Agora se no navegador vas a http://localhost:8000 deberías ver algo. Ten en conta que debes ter configurada a constante BASE_URL co mesmo host (neste exemplo: http://localhost:8000)
+Agora se no navegador vas a http://localhost:8000 deberías ver algo. Ten en conta que debes ter configurada a constante BASE_URL co mesmo host (neste exemplo: http://localhost:8000) e PUBLIC_DIR debe estar baleiro.
 
 En Apache
 ---------
@@ -336,7 +336,6 @@ Se prefires configurar o sitio web mediante httpd.conf, este sería o exemplo:
 
 ```
 <Directory "/var/www/public">
-
 	# No indexes
 	<IfModule mod_autoindex.c>
 		Options -Indexes
@@ -362,51 +361,6 @@ Se prefires configurar o sitio web mediante httpd.conf, este sería o exemplo:
 		# Rewrites the requested to index.php
 		RewriteRule ^.*$ index.php [L,QSA]
 	</IfModule>
-
-	# Use UTF-8 encoding for anything served text/plain or text/html
-	AddDefaultCharset utf-8
-
-	# Force UTF-8 for a number of file formats
-	AddCharset utf-8 .atom .css .js .json .rss .vtt .xml
-
-	# JavaScript
-	AddType application/javascript js jsonp
-	AddType application/json json
-
-	# Audio
-	AddType audio/ogg oga ogg
-	AddType audio/mp4 m4a f4a f4b
-
-	# Video
-	AddType video/ogg ogv
-	AddType video/mp4 mp4 m4v f4v f4p
-	AddType video/webm webm
-	AddType video/x-flv flv
-
-	# SVG
-	AddType image/svg+xml svg svgz
-	AddEncoding gzip svgz
-
-	# Webfonts
-	AddType application/vnd.ms-fontobject eot
-	AddType application/x-font-ttf ttf ttc
-	AddType font/opentype otf
-	AddType application/x-font-woff woff
-
-	# Assorted types
-	AddType image/x-icon ico
-	AddType image/webp webp
-	AddType text/cache-manifest appcache manifest
-	AddType text/x-component htc
-	AddType application/xml rss atom xml rdf
-	AddType application/x-chrome-extension crx
-	AddType application/x-opera-extension oex
-	AddType application/x-xpinstall xpi
-	AddType application/octet-stream safariextz
-	AddType application/x-web-app-manifest+json webapp
-	AddType text/x-vcard vcf
-	AddType application/x-shockwave-flash swf
-	AddType text/vtt vtt
 </Directory>
 ```
 
