@@ -5,7 +5,6 @@ use Fol\Config;
 use Fol\Templates;
 
 use Fol\Http\Request;
-use Fol\Http\RequestStack;
 
 use Fol\Http\Router\Router;
 use Fol\Http\Router\RouteFactory;
@@ -37,12 +36,10 @@ class App extends \Fol\App
         $this->register([
             'templates' => function () {
                 return new Templates($this->getPath('templates'));
-            },
-            'requestStack' => function () {
-                return new RequestStack;
             }
         ]);
     }
+
 
     //Request handler
     public function __invoke($request = null)
@@ -51,9 +48,7 @@ class App extends \Fol\App
             $request = Request::createFromGlobals();
         }
 
-        $this->requestStack->push($request);
         $response = $this->router->handle($request, [$this]);
-        $this->requestStack->pop();
 
         return $response;
     }

@@ -37,8 +37,6 @@ class Cli
 
         $app = new App();
         $app($request)->send();
-
-        die();
     }
 
 
