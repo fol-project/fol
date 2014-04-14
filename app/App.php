@@ -3,6 +3,7 @@ namespace App;
 
 use Fol\Config;
 use Fol\Templates;
+use Fol\Errors;
 
 use Fol\Http\Request;
 
@@ -11,6 +12,24 @@ use Fol\Http\Router\RouteFactory;
 
 class App extends \Fol\App
 {
+    /**
+     * Run the app (from http context)
+     */
+    public static function run ()
+    {
+        //Configure errors
+        Errors::register();
+        Errors::displayErrors();
+        Errors::setPhpLogFile(BASE_PATH.'/logs/php.log');
+
+        //Execute the app
+        parent::run();
+    }
+
+
+    /**
+     * Contructor. Register all services, etc
+     */
     public function __construct()
     {
         //Init config
@@ -41,15 +60,14 @@ class App extends \Fol\App
     }
 
 
-    //Request handler
-    public function __invoke($request = null)
+    /**
+     * Executes a request
+     *
+     * @param \Fol\Http\Request $request
+     * @return \Fol\Http\Response
+     */
+    public function __invoke(Request $request)
     {
-        if ($request === null) {
-            $request = Request::createFromGlobals();
-        }
-
-        $response = $this->router->handle($request, [$this]);
-
-        return $response;
+        return $this->router->handle($request, [$this]);
     }
 }

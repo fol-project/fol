@@ -16,27 +16,7 @@ class Cli
         }
 
         //or execute a request
-        self::executeRequest($argv);
-    }
-
-
-    /**
-     * Execute a request from cli
-     *
-     * Example:
-     * $ php fol GET /some/path?param=value
-     */
-    public static function executeRequest(array $options)
-    {
-        $options = Terminal::parseOptions($options, [
-            1 => [Terminal::OPTION_SET, ['GET', 'POST', 'HEAD', 'PUT', 'DELETE']],
-            2 => Terminal::OPTION_REQUIRED
-        ]);
-
-        $request = Request::create($options[2], $options[1], $options);
-
-        $app = new App();
-        $app($request)->send();
+        App::runCli();
     }
 
 

@@ -108,7 +108,7 @@ A aplicación está definida na clase App\App e contén todo o código da túa p
 A clase app tamén serve para xestionar "servizos", ou sexa, clases que podes instanciar en calquera momento e que dependen da túa app. Por exemplo a conexión á base de datos, configuración, xestión de plantillas, etc. Para dar de alta un servizo, tes que usar o método register, co nome do servizo e un callback que devolva o resultado. Exemplo:
 
 ```php
-// app/App.php __construct()
+// App/App::__construct()
 
 //Clase para cargar a configuración:
 $this->register('config', function () {
@@ -159,7 +159,7 @@ class App extends \Fol\App {
 		// carga a configuración, instancia clases básicas, rexistra servizos, etc...
 	}
 
-	public function __invoke ($request = null) {
+	public function __invoke (Request $request) {
 		// Devolve un response a partir dun request
 	}
 }
@@ -173,28 +173,55 @@ use Fol\Http\Request;
 //Instanciamos a nosa aplicación:
 $app = new App\App;
 
-//Agora executamola
-$response = $app();
+//Creamos un request a partir dos datos globais de php
+$request = Request::createFromGlobals();
 
-//Podemos executala de novo con outro request diferente:
-$request = Request::create('http://sitioweb.com/posts/23');
+//Agora executamola
 $response = $app($request);
 
 //Enviamos a resposta ao navegador:
 $response->send();
 ```
 
+Todo isto pódese meter na función estática App\App::run():
+
+```php
+use Fol\Http\Request;
+
+class App extends \Fol\App
+{
+
+    public static function run ()
+    {
+        //Podemos configurar aqui tamén como queremos rexistrar os erros
+        Errors::register();
+        Errors::displayErrors();
+        Errors::setPhpLogFile(BASE_PATH.'/logs/php.log');
+
+        //Executamos a aplicación e lanzamos o response:
+        $app = new static();
+        $request = Request::createFromGlobals();
+
+        $app($request)->send();
+    }
+
+    //Aqui o resto da clase app...
+}
+```
+
+Deste xeito, no arquivo public/index.php só nos temos que preocupar de lanzar esta función mentres configuramos como queremos executala na propia app.
+
+
 Fol non é un framework con moitas funcionalidades senón que proporciona o mínimo para comezar a traballar. O resto de cousas que precises terás que buscalas e instalalas vía Composer. As utilidades básicas son clases que permiten crear un sistema MVC, xestionar "requests" e "responses", manexo de sesións, plantillas de php e carga de arquivos de configuración.
 
-* Http: Conxunto de clases para manexar requests e responses (con headers, variables, cookies, etc).
-* Router: Conxunto de clases para definir rutas asociadas a controladores
+* Http: Conxunto de clases para manexar requests e responses (con headers, variables, cookies, sesións, etc).
+* Http\Router: Conxunto de clases para definir rutas asociadas a controladores
 * App: Clase base estendida por todas as apps
 * Config: Clase para cargar configuracións dende arquivos php
 * Errors: Clase para xestionar erros (silencialos, debuguealos, etc)
-* Session: Clase para manexar a sesión (inicializar, gardar datos, destruír, etc)
 * Templates: Clase para cargar e renderizar plantillas. Son plantillas puras de php.
 * FileSystem: Clase para xestionar arquivos e directorios. Tamén ten funcións para xestionar a subida de arquivos tanto por POST (variable $_FILES) como a carga dende unha url ou pasando directamente contido en base64.
-* Terminal: Clase para executar comandos e utilidades relacionadas.
+* Terminal: Clase para executar comandos e procesos no servidor.
 
 
 Algunhas das clases máis importantes:
@@ -256,8 +283,8 @@ $response->prepare($request);
 $response->send();
 ```
 
-Fol\Router\Router
------------------
+Fol\Http\Router\Router
+----------------------
 
 Xenera as distintas rutas do noso sitio web. Podemos definir esas rutas no contructor da nosa app:
 
