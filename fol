@@ -4,13 +4,9 @@ use Fol\Errors;
 
 require 'bootstrap.php';
 
-if (!isset($argv[1])) {
-	die('No command provided');
-}
-
 //Register errors
 Errors::register();
 Errors::displayErrors();
 
 //Execute the commands
-App\Cli::execute($argv);
+App\Cli::executeFromCli($argv);

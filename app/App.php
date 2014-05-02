@@ -23,7 +23,10 @@ class App extends \Fol\App
         Errors::setPhpLogFile(BASE_PATH.'/logs/php.log');
 
         //Execute the app
-        parent::run();
+        $app = new static();
+        $request = Request::createFromGlobals();
+
+        $app($request)->send();
     }
 
 
@@ -51,8 +54,8 @@ class App extends \Fol\App
 
         $this->router->setError('Index::error');
 
-        //Register other classes
-        $this->register([
+        //Register other services
+        $this->define([
             'templates' => function () {
                 return new Templates($this->getPath('templates'));
             }
@@ -64,9 +67,10 @@ class App extends \Fol\App
      * Executes a request
      *
      * @param \Fol\Http\Request $request
+     * 
      * @return \Fol\Http\Response
      */
-    public function __invoke(Request $request)
+    protected function handleRequest(Request $request)
     {
         return $this->router->handle($request, [$this]);
     }

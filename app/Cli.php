@@ -1,46 +1,19 @@
 <?php
 namespace App;
 
-use Fol\Terminal;
 use Fol\Http\Request;
+use Fol\Terminal;
 
-class Cli
+class Cli extends Terminal
 {
-    public static function execute(array $argv)
+    //Run a request
+    public static function run($method = 'GET', $url = '/')
     {
-        $fnName = $argv[1];
+        $request = Request::create($url, $method, func_get_arg(2));
 
-        //Execute a defined function
-        if (method_exists('App\\Cli', $fnName)) {
-            return self::$fnName($argv);
-        }
-
-        //or execute a request
-        App::runCli();
-    }
-
-
-    /**
-     * Edit configuration values from cli
-     *
-     * Example:
-     * $ php fol config database
-     */
-    public static function config(array $options)
-    {
         $app = new App();
-        $name = isset($options[2]) ? $options[2] : null;
-
-        if (!$name || !($config = $app->config->get($name))) {
-            die("The config '$name' is not defined");
-        }
-
-        foreach ($config as $k => &$value) {
-            $value = Terminal::prompt("Config > {$name}.{$k} = '{$value}' > ", $value);
-        }
-
-        $app->config->set($name, $config)->saveFile($name);
+        $app($request)->send();
     }
 
-    // Place here your custom functions...
+    //Place here your custom functions...
 }
