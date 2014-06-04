@@ -19,7 +19,7 @@ Características:
 Instalación
 ===========
 
-Para instalalo precisas ter composer: https://getcomposer.org/doc/00-intro.md#installation-nix (recomendo instalalo de xeito global para que estea sempre dispoñible). Despois simplemente executa create-project do seguinte xeito:
+Para instalalo precisas ter composer. Despois simplemente executa create-project do seguinte xeito:
 
 ```
 $ composer create-project fol/fol o-meu-proxecto
@@ -28,8 +28,8 @@ $ composer create-project fol/fol o-meu-proxecto
 Á hora de instalalo pediráseche configurar estas constantes básicas:
 
 * ENVIRONMENT: O nome do entorno de desenvolvemento. Pode se calquera nome. Por defecto é "development".
-* BASE_URL: A url onde está aloxado o sitio web (ruta http do navegador). Serve para xerar as urls. Por defecto é "http://localhost" pero se a instalación se fixo nun subdirectorio, debes modificalo para, por exemplo: http://localhost/o-meu-proxecto
-* PUBLIC_DIR: O nome do directorio public. Depende de como configures o host. Por defecto está vacio, eso significa que a raíz do teu host é o directorio "public". No caso de que non poidas facer iso, cambia o valor a "/public". Isto afecta a todas as peticións a arquivos reais (css, js, imaxes, etc).
+* BASE_URL: A url onde está aloxado o sitio web (ruta http do navegador). Serve para xerar as urls. Por defecto é "http://localhost" pero se a instalación se fixo nun subdirectorio ou noutro host, debes modificalo para, por exemplo: http://localhost/o-meu-proxecto
+* PUBLIC_DIR: Ruta para acceder ao directorio "public", onde está index.php. Por defecto está vacio, o que significa que a raiz do servidor apunta directamente ao directorio public. Imaxinemonos que creas un proxecto en "/var/www/o-meu-proxecto", se a raíz do servidor apunta a "/var/www/o-meu-proxecto/public", o valor de PUBLIC_DIR sería vacio, pero se apunta a "var/www/o-meu-proxecto", o valor sería "/public".
 
 En calquera momento podes cambiar manualmente esa configuración no arquivo constants.php
 
@@ -44,18 +44,10 @@ A parte do directorio "vendor" (usado por composer para gardar aí todos os paqu
 * app: onde se garda a aplicación por defecto (plantillas, controladores, modelos, tests, etc).
 * public: todos os arquivos accesibles publicamente (css, imaxes, js, componentes de bower, etc) ademáis do "front controller" (index.php).
 
-O arquivo bootstrap.php define as seguintes constantes:
-
-* ACCESS_INTERFACE: Se estamos executando fol por comandos, sería "cli" senón "http"
-* BASE_PATH: A ruta base onde está aloxado o teu sitio web (ruta interna do servidor).
-* BASE_URL: O valor que puxeches na instalación
-* ENVIRONMENT: O valor que puxeches na instalación.
-* PUBLIC_DIR: O valor que puxeches na instalación.
-
 
 Errors
 ------
-A clase Errors rexistra os erros que se poidan producir na execución dos scripts e lanza callbacks. Ademáis convirte todos os erros de php en exceptions, deste modo centralízanse todos os erros para poder manexalos mellor.
+A clase Errors rexistra os erros que se poidan producir na execución dos scripts e lanza callbacks.
 
 #### Exemplo
 
@@ -70,52 +62,34 @@ Errors::pushHandler(function ($exception) {
 
 //Fai que cando haxa erros os imprima (util na fase de desenvolvemento):
 Errors::displayErrors();
+
+//Garda os logs propios de php neste arquivo
+Errors::setPhpLogFile('log/php.err');
 ```
 
-Tamén se pode rexistrar unha clase logger para gardar os erros en logs (Recomendo esta: https://github.com/Seldaek/monolog). Para iso debes definir a clase instanciada que se ocupe de xestionar os logs. O único requerimento é que a clase debe implementar a interface Psr\Log\LoggerInterface (https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-3-logger-interface.md)
-
-Exemplo usando monolog:
-
-```php
-use Fol\Errors;
-use Monolog\Logger;
-use Monolog\Handler\StreamHandler;
-
-//Iniciamos o rexistro de erros
-Errors::register();
-
-//Instanciamos o Logger de monolog
-$log = new Logger('name');
-
-//Asignamos o handler
-$log->pushHandler(new StreamHandler(BASE_PATH.'/logs/debug.log', Logger::DEBUG));
-
-//Asignamos agora o logger, para que lle pase os erros que vaia vendo
-Errors::setLogger($log);
-```
 
 App
 ---
 
-Fol usa os estándares psr-0 e psr-4, implementados no loader de Composer, para cargar todas as clases necesarias. O arquivo public/index.php fai de controlador inicial, ou sexa, todas as peticións que non sexan de assets (css, js, imaxes, etc) se redirixen a este arquivo e é o que se encarga de iniciar todo (carga o bootstrap.php, configura os erros, inicializa a nosa aplicación e execútaa).
+Fol usa os estándares psr-0 e psr-4, implementados no loader de Composer, para cargar todas as clases necesarias. O arquivo public/index.php fai de controlador inicial, ou sexa, todas as peticións que non sexan de assets (css, js, imaxes, etc) se redirixen a este arquivo e é o que se encarga de iniciar todo (carga o bootstrap.php, configura os erros, inicializa a aplicación e execútaa).
 
-A aplicación está definida na clase App\App e contén todo o código da túa páxina web. Está definida do arquivo app/App.php e podes modificar esa clase para que funcione como queiras. Ademáis tes dispoñibles os seguintes métodos:
+A aplicación está definida na clase App\App (no arquivo app/App.php) que ademáis ten dispoñibles os seguintes métodos:
 
-* $app->getNamespace(): Devolve o namespace da aplicación (ou sexa "App"). Ademáis podes usalo para xerar subnamespaces ou subclases no mesmo namespace, por exemplo ```$app->getNamespace('Controllers\\Index')``` devolve "App\Controllers\Index".
-* $app->getPath(): Devolve o path onde está aloxada a aplicación. Podes engadir paths relativos e incluso dividilos varios argumentos, por exemplo: ```$app->getPath('assets/css', 'subdirectorio')``` devolve algo parecido a "/var/www/sitioweb/app/assets/css/subdirectorio"
-* $app->getPublicUrl(): O mesmo que getPath pero para devolver rutas http do directorio público. Ten en conta que son rutas reais, para acceder, por exemplo aos assets. Para usar MVC usa a clase Router. ```$app->getUrl('assets/css', 'subdirectorio')``` devolvería algo parecido a "http://localhost/o-meu-proxecto/public/assets/css/subdirectorio"
+* $app->getNamespace(): Devolve o namespace da aplicación (ou sexa "App"). Ademáis podes usalo para que che devolva outros namespaces ou clases relativas. Por exemplo ```$app->getNamespace('Controllers\\Index')``` devolve "App\Controllers\Index".
+* $app->getPath(): Devolve o path onde está aloxada a aplicación. Podes usar argumentos para qu che devolva rutas de arquivos ou subdirectorios. Por exemplo: ```$app->getPath('arquivos/123', '3.pdf')``` devolve algo parecido a "/var/www/o-meu-proxecto/app/arquivos/123/3.pdf"
+* $app->getPublicUrl(): O mesmo que getPath pero para devolver rutas http do directorio público. Útil para acceder a arquivos css, javascript, etc. ```$app->getPublicUrl('assets/css', 'subdirectorio')``` devolvería algo parecido a "http://localhost/o-meu-proxecto/public/assets/css/subdirectorio"
 
-A clase app tamén serve para xestionar "servizos", ou sexa, clases que podes instanciar en calquera momento e que dependen da túa app. Por exemplo a conexión á base de datos, configuración, xestión de plantillas, etc. Para dar de alta un servizo, tes que usar o método register, co nome do servizo e un callback que devolva o resultado. Exemplo:
+A clase app tamén xestiona os "servizos" usados, ou sexa, clases que podes instanciar en calquera momento e que dependen da túa app. Por exemplo a conexión á base de datos, configuración, xestión de plantillas, etc. Para dar de alta un servizo, tes que usar o método register, co nome do servizo e un callback que devolva o resultado. Exemplo:
 
 ```php
 // App/App::__construct()
 
-//Clase para cargar a configuración:
+//Rexistra a clase para cargar a configuración:
 $this->register('config', function () {
 	return new \Fol\Config($this->getPath('config'));
 });
 
-//Clase para a conexión á base de datos
+//Rexistra a clase para a conexión á base de datos
 $this->register('db', function () {
 	$config = $this->config->get('db');
 
@@ -123,19 +97,19 @@ $this->register('db', function () {
 });
 ```
 
-O método "get" executa o callback de cada servizo rexistrado e devolvenos o resultado. Se só queres ter unha instancia de cada servizo (por exemplo, unha conexión á base de datos), en vez de chamar por get, chama pola propiedade do mesmo nome. Deste xeito, a primeira vez que a chames, executará o magic method __get() que gardará o resultado e que cando a volvas chamar nun futuro, xa non se executa máis:
+E para usar os servizos:
 
 ```php
-//Usa "get" para xerar unha nova instancia de cada vez:
+//Usa o método "get" para xerar unha nova instancia de cada vez:
 $newConnection = $this->get('db');
 
 //Get permite tamén pasarlle argumentos ao noso callback
 $this->get('db', $arg1, $arg2);
 
-//Chama directamente pola propiedade
+//Tamén podes chamar directamente pola propiedade
 $db = $this->db;
 
-//Asi, se a volves a chamar, devolveche o mesmo obxecto:
+//Chamándoa como propiedade non xeras unha nova instancia, senón que usas sempre a mesma
 $this->db->exec("DELETE FROM fruit WHERE colour = 'red'");
 ```
 
@@ -145,53 +119,18 @@ Outra función de "get" é a de instanciar clases relativas á nosa app aínda q
 $indexController = $this->get('Controllers\\Index');
 ```
 
-Por último, a app debe ter definido o magic method __invoke, que é o que se utiliza para executalo (colle un request e devolve un obxecto response).
+Por último, a app debe ter definido o magic method handleRequest, que é o que se utiliza para executar as peticións http (colle un request e devolve un obxecto response).
+Tamén pode ter definida a función estática "run" que é a que se lanza en /public/index.php e que pon en marcha todo.
 
-Resumindo, a estrutura dunha app sería algo asi:
+Resumindo, a nosa app sería algo asi:
 
 ```php
 namespace App;
 
 class App extends \Fol\App {
 
-	public function __construct () {
-		// Contructor da applicación
-		// carga a configuración, instancia clases básicas, rexistra servizos, etc...
-	}
-
-	public function __invoke (Request $request) {
-		// Devolve un response a partir dun request
-	}
-}
-```
-
-E executado sería algo asi:
-
-```php
-use Fol\Http\Request;
-
-//Instanciamos a nosa aplicación:
-$app = new App\App;
-
-//Creamos un request a partir dos datos globais de php
-$request = Request::createFromGlobals();
-
-//Agora executamola
-$response = $app($request);
-
-//Enviamos a resposta ao navegador:
-$response->send();
-```
-
-Todo isto pódese meter na función estática App\App::run():
-
-```php
-use Fol\Http\Request;
-
-class App extends \Fol\App
-{
-
-    public static function run ()
+	//Lanza a nosa aplicación
+	public static function run ()
     {
         //Podemos configurar aqui tamén como queremos rexistrar os erros
         Errors::register();
@@ -205,20 +144,31 @@ class App extends \Fol\App
         $app($request)->send();
     }
 
-    //Aqui o resto da clase app...
+    //Constructor da aplicación
+	public function __construct ()
+	{
+		//Rexistra a clase para cargar a configuración:
+		$this->register('config', function () {
+			return new \Fol\Config($this->getPath('config'));
+		});
+
+		// instancia clases básicas, rexistra servizos, etc...
+	}
+
+	public function handleRequest (Request $request) {
+		// Devolve un response a partir dun request
+	}
 }
 ```
 
-Deste xeito, no arquivo public/index.php só nos temos que preocupar de lanzar esta función mentres configuramos como queremos executala na propia app.
+Fol proporciona un mínimo de utilidades para comezar a traballar pero permite instalar moitras bibliotecas extra usando composer. As utilidades básicas son clases que permiten crear un sistema MVC, xestionar "requests" e "responses", manexo de sesións, plantillas de php e carga de arquivos de configuración.
 
-
-Fol non é un framework con moitas funcionalidades senón que proporciona o mínimo para comezar a traballar. O resto de cousas que precises terás que buscalas e instalalas vía Composer. As utilidades básicas son clases que permiten crear un sistema MVC, xestionar "requests" e "responses", manexo de sesións, plantillas de php e carga de arquivos de configuración.
-
-* Http: Conxunto de clases para manexar requests e responses (con headers, variables, cookies, sesións, etc).
-* Http\Router: Conxunto de clases para definir rutas asociadas a controladores
 * App: Clase base estendida por todas as apps
 * Config: Clase para cargar configuracións dende arquivos php
 * Errors: Clase para xestionar erros (silencialos, debuguealos, etc)
+* Fol\Http: Conxunto de clases para manexar requests e responses (con headers, variables, cookies, etc).
+* Fol\Http\Sessions: Conxunto de clases para manexar sesións.
+* Fol\Http\Router: Conxunto de clases para definir rutas e cargar controladores
 * Templates: Clase para cargar e renderizar plantillas. Son plantillas puras de php.
 * FileSystem: Clase para xestionar arquivos e directorios. Tamén ten funcións para xestionar a subida de arquivos tanto por POST (variable $_FILES) como a carga dende unha url ou pasando directamente contido en base64.
 * Terminal: Clase para executar comandos e procesos no servidor.
@@ -229,24 +179,24 @@ Algunhas das clases máis importantes:
 Fol\Http\Request
 ----------------
 
-Con esta clase podemos recoller os datos dunha petición http e acceder a eles. Para crear o obxecto Request, podemos usar a función estática createFromGlobals():
+Con esta clase podemos recoller os datos dunha petición http e acceder a eles. O método estático createFromGlobals() crea unha instancia a partir dos datos globais de php:
 
 ```php
 $request = Fol\Http\Request::createFromGlobals();
 
 //Agora xa podemos acceder a todos os datos desta petición:
 
-$request->get; //Obxecto que contén todos os parámetros enviados por GET
-$request->get->get('nome'); //Devolve o parámetro enviado por GET 'nome'
-$request->get->set('nome', 'novo-valor'); //Modifica o valor do parámetro 'nome'
+$request->query; //Obxecto que contén todos os parámetros enviados na url ($_GET)
+$request->query->get('nome'); //Devolve o parámetro 'nome'
+$request->query->set('nome', 'novo-valor'); //Modifica o valor do parámetro 'nome'
 
 //Outros obxectos dentro de Request son:
 
-$request->post; //Para os parámetros POST
+$request->data; //Datos enviados no body da petición ($_POST)
 $request->headers; //Para as cabeceiras http
 $request->cookies; //Cookies enviadas
 $request->files; //Arquivos enviados
-$request->parameters; //Para gardar parámetros (por exemplo os do router)
+$request->route; //Para acceder á ruta dende o controlador
 ```
 
 Tamén podemos crear requests sen usar as variables globais, util para facer subrequests ou testear a aplicación:
@@ -254,9 +204,6 @@ Tamén podemos crear requests sen usar as variables globais, util para facer sub
 ```php
 //Creamos unha petición post pasandolle os datos para xerar un novo post
 $request = Fol\Http\Request::create('/posts/create', 'POST', ['titulo' => 'Novo post']);
-
-//Executamos esta petición na nosa app e obtemos a resposta:
-$response = $app($request);
 ```
 
 
@@ -314,35 +261,27 @@ class App extends \Fol\App {
 EXECUCIÓN POR LIÑA DE COMANDOS
 ==============================
 
-Fol trae un arquivo executable na raíz para lanzar a nosa aplicación dende liña de comandos. Exemplos:
+Fol trae un arquivo executable na raíz para lanzar a nosa aplicación dende liña de comandos. Eses comandos están definidos en app/Cli.php e por defecto está o comando "run", que permite simular peticións http dende cli:
 
 ```
-$ php fol GET /posts/list
+$ php fol run GET /posts/list
 ```
 
 Facer unha petición GET por liña de comandos pasándolle parámetros:
 
 ```
-$ php fol GET "/posts/lists?order=id&page=2"
+$ php fol run GET "/posts/lists?order=id&page=2"
 ```
 ou tamén:
 ```
-$ php fol GET /posts/lists --order id --page 2
+$ php fol run GET /posts/lists --order=id --page=2
 ```
 
 Facer unha petición POST pasándolle tamén parámetros:
 
 ```
-$ php fol POST /posts/create --title "Título do posts"
+$ php fol run POST /posts/create --title="Título do posts"
 ```
-
-Trae outro comando para modificar calquera arquivo de configuración dende liña de comandos:
-
-```
-$ php fol config database
-```
-
-E podes modificar ou engadir máis comandos no arquivo app/Cli.php
 
 
 CONFIGURACIÓN DO SERVIDOR
@@ -351,10 +290,13 @@ CONFIGURACIÓN DO SERVIDOR
 Server de php
 -------------
 Para usar o servidor que trae o propio php, lanza o seguinte comando no directorio public:
+
 ```
 $ php -S localhost:8000 index.php
 ```
-Agora se no navegador vas a http://localhost:8000 deberías ver algo. Ten en conta que debes ter configurada a constante BASE_URL co mesmo host (neste exemplo: http://localhost:8000) e PUBLIC_DIR debe estar baleiro.
+
+Agora se no navegador vas a http://localhost:8000 deberías ver algo.
+
 
 En Apache
 ---------

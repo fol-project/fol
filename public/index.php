@@ -1,16 +1,6 @@
 <?php
-
-//php -S localhost:8000 index.php
-if (php_sapi_name() === 'cli-server') {
-	$file = __DIR__.$_SERVER['REQUEST_URI'];
-
-	if (strpos($file, '?')) {
-		$file = strstr($file, '?', true);
-	}
-
-	if (is_file($file)) {
-		return false;
-	}
+if ((php_sapi_name() === 'cli-server') && ($_SERVER['SCRIPT_NAME'] !== '/index.php') && (strpos($_SERVER['SCRIPT_NAME'], '/.') === false) && is_file($_SERVER['SCRIPT_FILENAME'])) {
+	return false;
 }
 
 require '../bootstrap.php';
