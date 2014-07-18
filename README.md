@@ -10,7 +10,7 @@ Como é algo persoal que non pretende ter moita repercusión (hai miles de frame
 Características:
 
 * Rápido e lixeiro.
-* Escrito en PHP 5.4.
+* Escrito en PHP 5.5.
 * Pensado para funcionar con composer
 * Tamén está preparado para usar bower para instalar os seus componentes
 * Compatible con PSR-0/1/2/3/4
@@ -29,7 +29,7 @@ $ composer create-project fol/fol o-meu-proxecto
 
 * ENVIRONMENT: O nome do entorno de desenvolvemento. Pode se calquera nome. Por defecto é "development".
 * BASE_URL: A url onde está aloxado o sitio web (ruta http do navegador). Serve para xerar as urls. Por defecto é "http://localhost" pero se a instalación se fixo nun subdirectorio ou noutro host, debes modificalo para, por exemplo: http://localhost/o-meu-proxecto
-* PUBLIC_DIR: Ruta para acceder ao directorio "public", onde está index.php. Por defecto está vacio, o que significa que a raiz do servidor apunta directamente ao directorio public. Imaxinemonos que creas un proxecto en "/var/www/o-meu-proxecto", se a raíz do servidor apunta a "/var/www/o-meu-proxecto/public", o valor de PUBLIC_DIR sería vacio, pero se apunta a "var/www/o-meu-proxecto", o valor sería "/public".
+* PUBLIC_DIR: Ruta para acceder ao directorio "public", onde está index.php. Por defecto está vacio, o que significa que a raiz do servidor apunta directamente ao directorio public (o que é preferible).
 
 En calquera momento podes cambiar manualmente esa configuración no arquivo constants.php
 
@@ -44,9 +44,12 @@ A parte do directorio "vendor" (usado por composer para gardar aí todos os paqu
 * app: onde se garda a aplicación por defecto (plantillas, controladores, modelos, tests, etc).
 * public: todos os arquivos accesibles publicamente (css, imaxes, js, componentes de bower, etc) ademáis do "front controller" (index.php).
 
+Fol usa os estándares psr-0 e psr-4, implementados no loader de Composer, para cargar todas as clases necesarias. O arquivo public/index.php fai de controlador inicial, ou sexa, todas as peticións que non sexan de assets (css, js, imaxes, etc) se redirixen a este arquivo e é o que se encarga de iniciar todo (carga o bootstrap.php, configura os erros, inicializa a aplicación e execútaa).
+
 
 Errors
 ------
+
 A clase Errors rexistra os erros que se poidan producir na execución dos scripts e lanza callbacks.
 
 #### Exemplo
@@ -70,8 +73,6 @@ Errors::setPhpLogFile('log/php.err');
 
 App
 ---
-
-Fol usa os estándares psr-0 e psr-4, implementados no loader de Composer, para cargar todas as clases necesarias. O arquivo public/index.php fai de controlador inicial, ou sexa, todas as peticións que non sexan de assets (css, js, imaxes, etc) se redirixen a este arquivo e é o que se encarga de iniciar todo (carga o bootstrap.php, configura os erros, inicializa a aplicación e execútaa).
 
 A aplicación está definida na clase App\App (no arquivo app/App.php) que ademáis ten dispoñibles os seguintes métodos:
 
@@ -221,7 +222,7 @@ $response->headers; //Para enviar cabeceiras
 $response->cookies; //Para enviar cookies
 
 //Tamén podemos engadirlle o contido ou body da resposta:
-$response->setContent('texto de resposta');
+$response->setBody('texto de resposta');
 
 //Se temos o request, podemos pasarllo para que o prepare antes (axusta o mime-type así como outras cabeceiras)
 $response->prepare($request);

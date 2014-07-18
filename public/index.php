@@ -3,6 +3,6 @@ if ((php_sapi_name() === 'cli-server') && ($_SERVER['SCRIPT_NAME'] !== '/index.p
 	return false;
 }
 
-require '../bootstrap.php';
+require dirname(__DIR__).'/bootstrap.php';
 
 App\App::run();

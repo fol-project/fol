@@ -26,6 +26,9 @@ class App extends \Fol\App
         $app = new static();
         $request = Request::createFromGlobals();
 
+        //Define the language
+        $request->setLanguage($request->getPreferredLanguage(['gl', 'es', 'en']));
+
         $app($request)->send();
     }
 
