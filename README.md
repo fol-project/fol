@@ -140,9 +140,7 @@ class App extends \Fol\App {
 
         //Executamos a aplicación e lanzamos o response:
         $app = new static();
-        $request = Request::createFromGlobals();
-
-        $app($request)->send();
+        $app(Request::createFromGlobals())->send();
     }
 
     //Constructor da aplicación
@@ -156,7 +154,7 @@ class App extends \Fol\App {
 		// instancia clases básicas, rexistra servizos, etc...
 	}
 
-	public function handleRequest (Request $request) {
+	public function __invoke (Request $request) {
 		// Devolve un response a partir dun request
 	}
 }
@@ -262,26 +260,10 @@ class App extends \Fol\App {
 EXECUCIÓN POR LIÑA DE COMANDOS
 ==============================
 
-Fol trae un arquivo executable na raíz para lanzar a nosa aplicación dende liña de comandos. Eses comandos están definidos en app/Cli.php e por defecto está o comando "run", que permite simular peticións http dende cli:
+Fol trae un arquivo executable na raíz para lanzar a nosa aplicación dende liña de comandos chamado `fol`, que á súa vez chama a app/console.php. É aí onde podes meter o código para executar os teus comandos personalizados. Recomendo usar symfony/console para crear comandos de xeito sinxelo.
 
 ```
-$ php fol run GET /posts/list
-```
-
-Facer unha petición GET por liña de comandos pasándolle parámetros:
-
-```
-$ php fol run GET "/posts/lists?order=id&page=2"
-```
-ou tamén:
-```
-$ php fol run GET /posts/lists --order=id --page=2
-```
-
-Facer unha petición POST pasándolle tamén parámetros:
-
-```
-$ php fol run POST /posts/create --title="Título do posts"
+$ php fol [command] [args]
 ```
 
 
@@ -290,13 +272,13 @@ CONFIGURACIÓN DO SERVIDOR
 
 Server de php
 -------------
-Para usar o servidor que trae o propio php, lanza o seguinte comando no directorio public:
+Para usar o servidor que trae o propio php, lanza o seguinte comando:
 
 ```
-$ php -S localhost:8000 index.php
+$ sudo php -S localhost:80 -t public public/index.php
 ```
 
-Agora se no navegador vas a http://localhost:8000 deberías ver algo.
+Agora se no navegador vas a http://localhost deberías ver algo.
 
 
 En Apache

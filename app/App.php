@@ -13,7 +13,7 @@ use Fol\Http\Router\RouteFactory;
 class App extends \Fol\App
 {
     /**
-     * Run the app (from http context)
+     * Run the app
      */
     public static function run ()
     {
@@ -24,12 +24,7 @@ class App extends \Fol\App
 
         //Execute the app
         $app = new static();
-        $request = Request::createFromGlobals();
-
-        //Define the language
-        $request->setLanguage($request->getPreferredLanguage(['gl', 'es', 'en']));
-
-        $app($request)->send();
+        $app(Request::createFromGlobals())->send();
     }
 
 
@@ -69,12 +64,16 @@ class App extends \Fol\App
     /**
      * Executes a request
      *
-     * @param \Fol\Http\Request $request
+     * @param Request $request
      * 
-     * @return \Fol\Http\Response
+     * @return Response
      */
-    protected function handleRequest(Request $request)
+    public function __invoke(Request $request)
     {
+        //Defines the request language
+        $request->setLanguage($request->getPreferredLanguage(['gl', 'es', 'en']));
+
+        //Executes the controller
         return $this->router->handle($request, [$this]);
     }
 }
