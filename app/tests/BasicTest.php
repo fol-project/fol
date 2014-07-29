@@ -22,7 +22,7 @@ class BasicTest extends PHPUnit_Framework_TestCase
     {
         $app = self::$app;
 
-        $request = Request::create('/');
+        $request = new Request('/');
         $response = $app($request);
 
         $this->assertInstanceOf('Fol\\Http\\Response', $response);
