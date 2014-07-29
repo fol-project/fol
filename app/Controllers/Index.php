@@ -19,9 +19,7 @@ class Index
 
     public function error($request, $response)
     {
-        
         $exception = $request->route->get('exception');
-        throw $exception;
 
         $response->write($exception->getPrevious()->getMessage());
     }
