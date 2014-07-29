@@ -21,6 +21,6 @@ class Index
     {
         $exception = $request->route->get('exception');
 
-        $response->write($exception->getPrevious()->getMessage());
+        $response->write($exception->getMessage());
     }
 }
