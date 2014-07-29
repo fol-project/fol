@@ -1,7 +1,6 @@
 <?php
 use Fol\Http\Globals;
 
-define('ACCESS_INTERFACE', (php_sapi_name() === 'cli') ? 'cli' : 'http');
 define('BASE_PATH', str_replace('\\', '/', __DIR__));
 
 
@@ -14,7 +13,11 @@ $constants = require 'constants.php';
 
 if (php_sapi_name() === 'cli-server') {
 	$constants['BASE_URL'] = Globals::getScheme().'://'.Globals::get('SERVER_NAME').':'.Globals::getPort();
-	$constants['PUBLIC_DIR'] = '';
+	define('PUBLIC_DIR', '');
+} else if (Globals::get('SCRIPT_FILENAME') === __DIR__.'/public/index.php') {
+	define('PUBLIC_DIR', '/public');
+} else {
+	define('PUBLIC_DIR', '');
 }
 
 foreach ($constants as $name => $value) {

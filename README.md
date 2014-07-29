@@ -29,7 +29,7 @@ $ composer create-project fol/fol o-meu-proxecto
 
 * ENVIRONMENT: O nome do entorno de desenvolvemento. Pode se calquera nome. Por defecto é "development".
 * BASE_URL: A url onde está aloxado o sitio web (ruta http do navegador). Serve para xerar as urls. Por defecto é "http://localhost" pero se a instalación se fixo nun subdirectorio ou noutro host, debes modificalo para, por exemplo: http://localhost/o-meu-proxecto
-* PUBLIC_DIR: Ruta para acceder ao directorio "public", onde está index.php. Por defecto está vacio, o que significa que a raiz do servidor apunta directamente ao directorio public (o que é preferible).
+* SECURE_KEY: Clave secreta que podes usar para cifrar datos, etc. Por defecto xa se xenera unha de xeito aleatorio.
 
 En calquera momento podes cambiar manualmente esa configuración no arquivo constants.php
 
@@ -83,16 +83,14 @@ A aplicación está definida na clase App\App (no arquivo app/App.php) que adem�
 A clase app tamén xestiona os "servizos" usados, ou sexa, clases que podes instanciar en calquera momento e que dependen da túa app. Por exemplo a conexión á base de datos, configuración, xestión de plantillas, etc. Para dar de alta un servizo, tes que usar o método register, co nome do servizo e un callback que devolva o resultado. Exemplo:
 
 ```php
-// App/App::__construct()
-
 //Rexistra a clase para cargar a configuración:
-$this->register('config', function () {
+$app->register('config', function () {
 	return new \Fol\Config($this->getPath('config'));
 });
 
 //Rexistra a clase para a conexión á base de datos
-$this->register('db', function () {
-	$config = $this->config->get('db');
+$app->register('db', function () use ($app) {
+	$config = $app->config->get('db');
 
 	return new \PDO($config['dns'], $config['username'], $config['password']);
 });
@@ -102,25 +100,24 @@ E para usar os servizos:
 
 ```php
 //Usa o método "get" para xerar unha nova instancia de cada vez:
-$newConnection = $this->get('db');
+$newConnection = $app->get('db');
 
 //Get permite tamén pasarlle argumentos ao noso callback
-$this->get('db', $arg1, $arg2);
+$app->get('db', $arg1, $arg2);
 
 //Tamén podes chamar directamente pola propiedade
-$db = $this->db;
+$db = $app->db;
 
 //Chamándoa como propiedade non xeras unha nova instancia, senón que usas sempre a mesma
-$this->db->exec("DELETE FROM fruit WHERE colour = 'red'");
+$app->db->exec("DELETE FROM fruit WHERE colour = 'red'");
 ```
 
 Outra función de "get" é a de instanciar clases relativas á nosa app aínda que non estean rexistradas como servizos. Por exemplo, imaxinemonos que temos a clase App\Controllers\Index. Podemos instanciala directamente:
 
 ```php
-$indexController = $this->get('Controllers\\Index');
+$indexController = $app->get('Controllers\\Index');
 ```
 
-Por último, a app debe ter definido o magic method handleRequest, que é o que se utiliza para executar as peticións http (colle un request e devolve un obxecto response).
 Tamén pode ter definida a función estática "run" que é a que se lanza en /public/index.php e que pon en marcha todo.
 
 Resumindo, a nosa app sería algo asi:
@@ -158,104 +155,23 @@ class App extends \Fol\App {
 		// Devolve un response a partir dun request
 	}
 }
+
+//E en public/index.php
+
+App\App::run();
 ```
 
-Fol proporciona un mínimo de utilidades para comezar a traballar pero permite instalar moitras bibliotecas extra usando composer. As utilidades básicas son clases que permiten crear un sistema MVC, xestionar "requests" e "responses", manexo de sesións, plantillas de php e carga de arquivos de configuración.
+Fol proporciona un mínimo de utilidades para comezar a traballar pero permite instalar moitras bibliotecas extra usando composer. As utilidades básicas son clases que permiten xestionar peticións http (xestionar "requests" e "responses", variables, cookies, sesions, etc), plantillas de php e carga de arquivos de configuración.
 
 * App: Clase base estendida por todas as apps
 * Config: Clase para cargar configuracións dende arquivos php
 * Errors: Clase para xestionar erros (silencialos, debuguealos, etc)
 * Fol\Http: Conxunto de clases para manexar requests e responses (con headers, variables, cookies, etc).
 * Fol\Http\Sessions: Conxunto de clases para manexar sesións.
-* Fol\Http\Router: Conxunto de clases para definir rutas e cargar controladores
+* Fol\Http\Router: Conxunto de clases para definir rutas e construir un sistema MVC.
 * Templates: Clase para cargar e renderizar plantillas. Son plantillas puras de php.
-* FileSystem: Clase para xestionar arquivos e directorios. Tamén ten funcións para xestionar a subida de arquivos tanto por POST (variable $_FILES) como a carga dende unha url ou pasando directamente contido en base64.
-* Terminal: Clase para executar comandos e procesos no servidor.
+* FileSystem: Clase para xestionar arquivos e directorios. Tamén ten funcións para xestionar a subida de arquivos, a descarga de arquivos dende unha url ou pasando directamente contido en base64.
 
-
-Algunhas das clases máis importantes:
-
-Fol\Http\Request
-----------------
-
-Con esta clase podemos recoller os datos dunha petición http e acceder a eles. O método estático createFromGlobals() crea unha instancia a partir dos datos globais de php:
-
-```php
-$request = Fol\Http\Request::createFromGlobals();
-
-//Agora xa podemos acceder a todos os datos desta petición:
-
-$request->query; //Obxecto que contén todos os parámetros enviados na url ($_GET)
-$request->query->get('nome'); //Devolve o parámetro 'nome'
-$request->query->set('nome', 'novo-valor'); //Modifica o valor do parámetro 'nome'
-
-//Outros obxectos dentro de Request son:
-
-$request->data; //Datos enviados no body da petición ($_POST)
-$request->headers; //Para as cabeceiras http
-$request->cookies; //Cookies enviadas
-$request->files; //Arquivos enviados
-$request->route; //Para acceder á ruta dende o controlador
-```
-
-Tamén podemos crear requests sen usar as variables globais, util para facer subrequests ou testear a aplicación:
-
-```php
-//Creamos unha petición post pasandolle os datos para xerar un novo post
-$request = Fol\Http\Request::create('/posts/create', 'POST', ['titulo' => 'Novo post']);
-```
-
-
-Fol\Http\Response
------------------
-
-Esta clase xenera as respostas que se enviarán ao navegador do usuario.
-
-```php
-//Creamos un response
-$response = new Fol\Http\Response();
-
-//A clase Response contén dentro outros obxectos para xestionar partes específicas:
-$response->headers; //Para enviar cabeceiras
-$response->cookies; //Para enviar cookies
-
-//Tamén podemos engadirlle o contido ou body da resposta:
-$response->setBody('texto de resposta');
-
-//Se temos o request, podemos pasarllo para que o prepare antes (axusta o mime-type así como outras cabeceiras)
-$response->prepare($request);
-
-//E finalmente para enviar a resposta ao servidor, podemos usar a función "send":
-$response->send();
-```
-
-Fol\Http\Router\Router
-----------------------
-
-Xenera as distintas rutas do noso sitio web. Podemos definir esas rutas no contructor da nosa app:
-
-```php
-namespace App;
-
-use Fol\Http\Request;
-use Fol\Router\Router;
-use Fol\Router\RouteFactory;
-
-class App extends \Fol\App {
-
-	public function __construct () {
-		//Instanciamos o RouteFactory pasándolle o namespace onde estan os nosos controladores
-		$routeFactory = new RouteFactory($this->getNamespace('Controllers'));
-
-		//Instanciamos o Router, pasándolle o routeFactory
-		$this->router = new Router($routeFactory);
-
-		//Definimos as distintas rutas (nome da ruta, url, controlador e outras opcions)
-		$this->router->map('index', '/', 'Index::index', ['methods' => 'GET']);
-		$this->router->map('contacto', '/about', 'Index::about');
-	}
-}
-```
 
 EXECUCIÓN POR LIÑA DE COMANDOS
 ==============================
@@ -275,7 +191,7 @@ Server de php
 Para usar o servidor que trae o propio php, lanza o seguinte comando:
 
 ```
-$ sudo php -S localhost:80 -t public public/index.php
+$ sudo php -S localhost:80 -t public server.php
 ```
 
 Agora se no navegador vas a http://localhost deberías ver algo.
