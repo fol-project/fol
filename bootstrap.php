@@ -14,7 +14,7 @@ $constants = require 'constants.php';
 if (php_sapi_name() === 'cli-server') {
 	$constants['BASE_URL'] = Globals::getScheme().'://'.Globals::get('SERVER_NAME').':'.Globals::getPort();
 	define('PUBLIC_DIR', '');
-} else if (Globals::get('SCRIPT_FILENAME') === __DIR__.'/public/index.php') {
+} else if (substr(Globals::get('PHP_SELF'), -17) === '/public/index.php') {
 	define('PUBLIC_DIR', '/public');
 } else {
 	define('PUBLIC_DIR', '');
