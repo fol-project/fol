@@ -3,7 +3,7 @@
 	"type": "library",
 	"description": "PHP framework",
 	"keywords": ["framework"],
-	"homepage": "https://github.com/oscarotero/fol",
+	"homepage": "https://github.com/fol-project/fol",
 	"license": "AGPL-3.0",
 	"authors": [
 		{
@@ -15,7 +15,7 @@
 	],
 	"support": {
 		"email": "oom@oscarotero.com",
-		"issues": "https://github.com/oscarotero/fol/issues"
+		"issues": "https://github.com/fol-project/fol/issues"
 	},
 	"require": {
 		"php": ">=5.5.0",

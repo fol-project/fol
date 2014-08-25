@@ -7,9 +7,9 @@ class Index
     {
         $href = $app->router->getUrl('phpinfo');
 
-        $app->templates->saveRender('content', '<h1>Ola mundo!!</h1><p><a href="'.$href.'">Ver o phpinfo</a></p>');
-
-        return $app->templates->render('html.php');
+        return $app->templates->render('html.php', [
+            'content' => '<h1>Ola mundo!!</h1><p><a href="'.$href.'">Ver o phpinfo</a></p>'
+        ]);
     }
 
     public function phpinfo($request)
@@ -20,7 +20,7 @@ class Index
     public function error($request, $response)
     {
         $exception = $request->route->get('exception');
-
+        
         $response->write($exception->getMessage());
     }
 }

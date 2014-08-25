@@ -73,6 +73,11 @@ class App extends \Fol\App
         //Defines the request language
         $request->setLanguage($request->getPreferredLanguage(['gl', 'es', 'en']));
 
+        //Defines the session
+        $request->define('session', function () use ($request) {
+            return new \Fol\Http\Sessions\Native($request);
+        });
+
         //Executes the controller
         return $this->router->handle($request, [$this]);
     }
