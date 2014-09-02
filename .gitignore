@@ -26,6 +26,7 @@ $RECYCLE.BIN/
 
 # DATA STUFF (logs, cache, etc)
 logs
+constants.local.php
 
 
 
