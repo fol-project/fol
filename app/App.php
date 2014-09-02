@@ -37,7 +37,7 @@ class App extends \Fol\App
         $this->config = new Config($this->getPath('config'));
 
         //Init router
-        $this->router = new Router(new RouteFactory($this->getNamespace('Controllers')));
+        $this->router = new Router(new RouteFactory($this->getNamespace('Controllers'), $this->getUrl()));
 
         $this->router->map([
             'index' => [
