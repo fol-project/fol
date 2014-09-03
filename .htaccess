@@ -1,9 +1,0 @@
-<IfModule mod_rewrite.c>
-	RewriteEngine On
-
-	# Redirect Trailing Slashes...
-	RewriteRule ^(.*)/$ /$1 [L,R=301]
-
-	# Rewrites the requested to index.php
-	RewriteRule ^.*$ public/index.php [L,QSA]
-</IfModule>
