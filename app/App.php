@@ -2,11 +2,8 @@
 namespace App;
 
 use Fol\Config;
-use Fol\Templates;
-use Fol\Errors;
 
 use Fol\Http\Request;
-
 use Fol\Http\Router\Router;
 use Fol\Http\Router\RouteFactory;
 
@@ -17,11 +14,6 @@ class App extends \Fol\App
      */
     public static function run ()
     {
-        //Configure errors
-        Errors::register();
-        Errors::displayErrors();
-        Errors::setPhpLogFile(BASE_PATH.'/logs/php.log');
-
         //Execute the app
         $app = new static();
         $app(Request::createFromGlobals())->send();
@@ -51,13 +43,6 @@ class App extends \Fol\App
         ]);
 
         $this->router->setError('Index::error');
-
-        //Register other services
-        $this->define([
-            'templates' => function () {
-                return new Templates($this->getPath('templates'));
-            }
-        ]);
     }
 
 

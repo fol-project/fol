@@ -11,7 +11,6 @@
 Icon
 
 
-
 # WINDOWS
 
 Thumbs.db
@@ -24,22 +23,17 @@ $RECYCLE.BIN/
 *.msp
 
 
-# DATA STUFF (logs, cache, etc)
+# OTHER DATA (logs, cache, etc)
 logs
 constants.local.php
 
 
-
-# BOWER (or similar)
-
-public/components/*
-
-
-
-# COMPOSER
+# DEPENDENCIES (composer, bower, npm, etc)
 
 composer.phar
 vendor/
+public/bower_components/
+node_modules/
 
 # You can comment this line: http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file
 composer.lock

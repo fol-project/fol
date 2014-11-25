@@ -12,7 +12,7 @@ $composer = require BASE_PATH.'/vendor/autoload.php';
 $constants = require 'constants.local.php';
 
 if (php_sapi_name() === 'cli-server') {
-	$constants['BASE_URL'] = Globals::getScheme().'://'.Globals::get('SERVER_NAME').':'.Globals::getPort();
+	$constants['BASE_URL'] = Globals::getScheme().'://'.Globals::getHost().':'.Globals::getPort();
 }
 
 foreach ($constants as $name => $value) {
