@@ -4,22 +4,13 @@ namespace App;
 use Fol\Config;
 
 use Fol\Http\Request;
+use Fol\Http\Response;
+use Fol\Http\MiddlewareStack;
 use Fol\Http\Router\Router;
 use Fol\Http\Router\RouteFactory;
 
 class App extends \Fol\App
 {
-    /**
-     * Run the app
-     */
-    public static function run ()
-    {
-        //Execute the app
-        $app = new static();
-        $app(Request::createFromGlobals())->send();
-    }
-
-
     /**
      * Contructor. Register all services, etc
      */
@@ -29,20 +20,24 @@ class App extends \Fol\App
         $this->config = new Config($this->getPath('config'));
 
         //Init router
-        $this->router = new Router(new RouteFactory($this->getNamespace('Controllers'), $this->getUrl()));
+        $this->register('router', function () {
+            $router = new Router(new RouteFactory($this->getNamespace('Controllers')));
 
-        $this->router->map([
-            'index' => [
-                'path' => '/',
-                'target' => 'Index::index'
-            ],
-            'phpinfo' => [
-                'path' => '/phpinfo',
-                'target' => 'Index::phpinfo'
-            ]
-        ]);
+            $router->map([
+                'index' => [
+                    'path' => '/',
+                    'target' => 'Index::index'
+                ],
+                'phpinfo' => [
+                    'path' => '/phpinfo',
+                    'target' => 'Index::phpinfo'
+                ]
+            ]);
 
-        $this->router->setError('Index::error');
+            $router->setError('Index::error');
+
+            return $router;
+        });
     }
 
 
@@ -53,17 +48,24 @@ class App extends \Fol\App
      * 
      * @return Response
      */
-    public function __invoke(Request $request)
+    public function runHttp (Request $request)
     {
-        //Defines the request language
-        $request->setLanguage($request->getPreferredLanguage(['gl', 'es', 'en']));
+        $stack = new MiddlewareStack($this);
 
-        //Defines the session
-        $request->define('session', function () use ($request) {
-            return new \Fol\Http\Sessions\Native($request);
+        //Request language
+        $stack->push(function ($request, $response, $stack) {
+            $request->setLanguage($request->getPreferredLanguage(['gl', 'es', 'en']));
+            $stack->next();
         });
 
-        //Executes the controller
-        return $this->router->handle($request, [$this]);
+        //Session
+        $stack->push(new \Fol\Http\Sessions\Native());
+
+        //Controller
+        $stack->push($this->get('router'));
+
+        $stack->run($request, new Response());
+
+        return $stack->getResponse();
     }
 }

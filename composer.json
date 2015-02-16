@@ -19,16 +19,13 @@
 	},
 	"require": {
 		"php": ">=5.5.0",
-		"fol/core": "3.*"
+		"fol/http": "dev-master",
+		"fol/core": "dev-master"
 	},
 	"scripts": {
-		"post-create-project-cmd": "Fol\\Composer::setConstants",
-		"post-update-cmd": "Fol\\Composer::setConstants",
-		"post-install-cmd": "Fol\\Composer::setConstants"
-	},
-	"config": {
-		"vendor-dir": "vendor",
-		"bin-dir": "bin"
+		"post-create-project-cmd": "Fol\\Fol::composerEvent",
+		"post-update-cmd": "Fol\\Fol::composerEvent",
+		"post-install-cmd": "Fol\\Fol::composerEvent"
 	},
 	"autoload": {
 		"psr-4": {

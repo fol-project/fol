@@ -5,18 +5,18 @@ class Index
 {
     public function index($request, $response, $app)
     {
-        $href = $app->router->getUrl('phpinfo');
+        $href = $app->get('router')->getUrl('phpinfo');
 
         echo '<h1>Ola mundo!!</h1><p><a href="'.$href.'">Ver o phpinfo</a></p>';
     }
 
-    public function phpinfo($request)
+    public function phpinfo()
     {
         phpinfo();
     }
 
     public function error($request, $response)
     {
-        $response->write($exception->getMessage());
+        $response->getBody()->write($request->attributes->get('error')->getMessage());
     }
 }
