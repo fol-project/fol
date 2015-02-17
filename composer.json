@@ -20,12 +20,8 @@
 	"require": {
 		"php": ">=5.5.0",
 		"fol/http": "dev-master",
-		"fol/core": "dev-master"
-	},
-	"scripts": {
-		"post-create-project-cmd": "Fol\\Fol::composerEvent",
-		"post-update-cmd": "Fol\\Fol::composerEvent",
-		"post-install-cmd": "Fol\\Fol::composerEvent"
+		"fol/core": "dev-master",
+		"fol/tasks": "dev-master"
 	},
 	"autoload": {
 		"psr-4": {

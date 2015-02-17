@@ -1,8 +1,7 @@
 #!/usr/bin/env php
 
 <?php
-require __DIR__.'/../vendor/autoload.php';
+require __DIR__.'/bootstrap.php';
 
-Fol\Fol::init(dirname(__DIR__));
-
-require 'app/console.php';
+//Execute the app
+(new App\App())->runTasks();

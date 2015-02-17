@@ -3,6 +3,8 @@ namespace App;
 
 use Fol\Config;
 
+use Fol\Tasks\Runner;
+
 use Fol\Http\Request;
 use Fol\Http\Response;
 use Fol\Http\MiddlewareStack;
@@ -67,5 +69,15 @@ class App extends \Fol\App
         $stack->run($request, new Response());
 
         return $stack->getResponse();
+    }
+
+    /**
+     * Executes app's tasks
+     */
+    public function runTasks ()
+    {
+        Tasks::$app = $this;
+
+        (new Runner())->execute($this->getNamespace('Tasks'));
     }
 }
