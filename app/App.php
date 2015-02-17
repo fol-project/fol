@@ -74,10 +74,10 @@ class App extends \Fol\App
     /**
      * Executes app's tasks
      */
-    public function runTasks ()
+    public function runTasks (array $argv)
     {
         Tasks::$app = $this;
 
-        (new Runner())->execute($this->getNamespace('Tasks'));
+        (new Runner())->execute($this->getNamespace('Tasks'), $argv);
     }
 }

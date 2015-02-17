@@ -4,4 +4,4 @@
 require __DIR__.'/bootstrap.php';
 
 //Execute the app
-(new App\App())->runTasks();
+(new App\App())->runTasks($_SERVER['argv']);
