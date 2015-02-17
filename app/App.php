@@ -74,7 +74,7 @@ class App extends \Fol\App
     /**
      * Executes app's tasks
      */
-    public function runTasks (array $argv)
+    public function runCli (array $argv)
     {
         Tasks::$app = $this;
 

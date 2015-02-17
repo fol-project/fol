@@ -1,5 +1,5 @@
-Aqui tes o FOL
-==============
+# Aqui tes o FOL
+
 (o resto da gaita xa é cousa túa)
 
 [![Build Status](https://travis-ci.org/oscarotero/fol.png?branch=master)](https://travis-ci.org/oscarotero/fol)
@@ -9,151 +9,104 @@ Como é algo persoal que non pretende ter moita repercusión (hai miles de frame
 
 Requerimentos:
 
-* PHP 5.5.
+* PHP 5.5
 * Composer
 
 
-Instalación
-===========
+# Instalación
 
-Para instalalo precisas ter composer. Despois simplemente executa create-project do seguinte xeito:
+Para instalalo precisas ter [composer](https://getcomposer.org/). Despois simplemente executa:
 
 ```
 $ composer create-project fol/fol o-meu-proxecto
 ```
 
-Á hora de instalalo pediráseche configurar estas constantes básicas:
+Unha vez instalado, hai que configurar unha serie de variables de entorno collidas do arquivo `env.php` e gardadas en `env.local.php`. Para facelo dende a liña de comandos executa:
+
+```
+$ php fol install
+```
+
+As variables que configuras son as seguintes:
 
 * ENVIRONMENT: O nome do entorno de desenvolvemento. Pode se calquera nome. Por defecto é "development".
-* BASE_URL: A url onde está aloxado o sitio web (ruta http do navegador). Serve para xerar as urls. Por defecto é "http://localhost" pero se a instalación se fixo nun subdirectorio ou noutro host, debes modificalo para, por exemplo: http://localhost/o-meu-proxecto
+* BASE_URL: A url usada para acceder ao directorio "public" dende o navegador. Por defecto é "http://localhost" pero se a instalación se fixo nun subdirectorio ou noutro host, debes modificalo para, por exemplo: http://localhost/o-meu-proxecto/public
 * SECURE_KEY: Clave secreta que podes usar para cifrar datos, etc. Por defecto xa se xenera unha de xeito aleatorio.
 
-En calquera momento podes cambiar manualmente esa configuración no arquivo constants.php
-
-Unha vez feito isto, deberías poder ver algo no navegador (http://localhost/o-meu-proxecto).
+En calquera momento podes cambiar manualmente esa configuración editando o arquivo `env.local.php`.
 
 
-Documentación rápida
-====================
+# Documentación rápida
 
-A parte do directorio "vendor" (usado por composer para gardar aí todos os paquetes e dependencias) hai dúas carpetas:
+Unha vez instalado, atoparás os seguintes directorios:
 
-* app: onde se garda a aplicación por defecto (plantillas, controladores, modelos, tests, etc).
+* vendor: usado por composer para instalar aí todos os paquetes e dependencias
+* app: onde se garda a túa aplicación (plantillas, controladores, modelos, tests, etc).
 * public: todos os arquivos accesibles publicamente (css, imaxes, js, componentes de bower, etc) ademáis do "front controller" (index.php).
 
 
-App
----
+## App
 
-A aplicación está definida na clase App\App (no arquivo app/App.php) que ademáis ten dispoñibles os seguintes métodos:
-
-* $app->getNamespace(): Devolve o namespace da aplicación (ou sexa "App"). Ademáis podes usalo para que che devolva outros namespaces ou clases relativas. Por exemplo ```$app->getNamespace('Controllers\\Index')``` devolve "App\Controllers\Index".
-* $app->getPath(): Devolve o path onde está aloxada a aplicación. Podes usar argumentos para que che devolva rutas de arquivos ou subdirectorios. Por exemplo: ```$app->getPath('arquivos/123', '3.pdf')``` devolve algo parecido a "/var/www/o-meu-proxecto/app/arquivos/123/3.pdf"
-* $app->getPublicUrl(): O mesmo que getPath pero para devolver rutas http do directorio público. Útil para acceder a arquivos css, javascript, etc. ```$app->getPublicUrl('assets/css', 'subdirectorio')``` devolvería algo parecido a "http://localhost/o-meu-proxecto/public/assets/css/subdirectorio"
-
-A clase app tamén xestiona os "servizos" usados, ou sexa, clases que podes instanciar en calquera momento e que dependen da túa app. Por exemplo a conexión á base de datos, configuración, xestión de plantillas, etc. Para dar de alta un servizo, tes que usar o método register, co nome do servizo e un callback que devolva o resultado. Exemplo:
+A clase `App\App` (aloxada en app/App.php) é a que xestiona a túa páxina web. Básicamente encárgase de servir como contenedor de servizos, ou sexa: bases de datos, modelos, controladores, xestión de plantillas, e todo tipo de clases/servizos usados na web. Para iso implementa a interface [container-interop](https://github.com/container-interop/container-interop) o que permite poder usar calquera contenedor de dependencias. Por exemplo:
 
 ```php
-//Rexistra a clase para cargar a configuración:
-$app->register('config', function () {
-	return new \Fol\Config($this->getPath('config'));
+$app = new App\App();
+
+//Rexistrar servizos directamente:
+
+$app->register('database', function () {
+	$config = $app->config->get('database');
+	return new MyDatabaseClass($config);
 });
 
-//Rexistra a clase para a conexión á base de datos
-$app->register('db', function () use ($app) {
-	$config = $app->config->get('db');
-
-	return new \PDO($config['dns'], $config['username'], $config['password']);
-});
-```
-
-E para usar os servizos:
-
-```php
-//Usa o método "get" para xerar unha nova instancia de cada vez:
-$newConnection = $app->get('db');
-
-//Get permite tamén pasarlle argumentos ao noso callback
-$app->get('db', $arg1, $arg2);
-
-//Tamén podes chamar directamente pola propiedade
-$db = $app->db;
-
-//Chamándoa como propiedade non xeras unha nova instancia, senón que usas sempre a mesma
-$app->db->exec("DELETE FROM fruit WHERE colour = 'red'");
-```
-
-Outra función de "get" é a de instanciar clases relativas á nosa app aínda que non estean rexistradas como servizos. Por exemplo, imaxinemonos que temos a clase App\Controllers\Index. Podemos instanciala directamente:
-
-```php
-$indexController = $app->get('Controllers\\Index');
-```
-
-Tamén pode ter definida a función estática "run" que é a que se lanza en /public/index.php e que pon en marcha todo.
-
-Resumindo, a nosa app sería algo asi:
-
-```php
-namespace App;
-
-class App extends \Fol\App {
-
-	//Lanza a nosa aplicación
-	public static function run ()
-    {
-        //Podemos configurar aqui tamén como queremos rexistrar os erros
-        Errors::register();
-        Errors::displayErrors();
-        Errors::setPhpLogFile(BASE_PATH.'/logs/php.log');
-
-        //Executamos a aplicación e lanzamos o response:
-        $app = new static();
-        $app(Request::createFromGlobals())->send();
-    }
-
-    //Constructor da aplicación
-	public function __construct ()
-	{
-		//Rexistra a clase para cargar a configuración:
-		$this->register('config', function () {
-			return new \Fol\Config($this->getPath('config'));
-		});
-
-		// instancia clases básicas, rexistra servizos, etc...
-	}
-
-	public function __invoke (Request $request) {
-		// Devolve un response a partir dun request
-	}
+if ($app->has('database')) {
+	$database = $app->get('database');
 }
 
-//E en public/index.php
+//Rexistrar outros sub-contenedores:
 
-App\App::run();
+$container = new Container();
+$container->register('templates', function () {
+	return new MyTemplatesEngine('path/to/templates');
+});
+
+$app->add($containerInterop);
+
+$templates = $app->get('templates');
 ```
 
-EXECUCIÓN POR LIÑA DE COMANDOS
-==============================
+Tamén serve para gardar a configuración deses servizos ou de calquera outra cousa. Existe a propiedade `$app->config` que carga e xestiona todo tipo de configuracions.
 
-Fol trae un arquivo executable na raíz para lanzar a nosa aplicación dende liña de comandos chamado `fol`, que á súa vez chama a app/console.php. É aí onde podes meter o código para executar os teus comandos personalizados. Recomendo usar symfony/console para crear comandos de xeito sinxelo.
+Ademáis tamén ten unha serie de métodos básicos:
+
+* `$app->getNamespace()`: Devolve o namespace da aplicación (ou sexa "App"). Ademáis podes usalo para que che devolva outros namespaces ou clases relativas. Por exemplo `$app->getNamespace('Controllers\\Index')` devolve "App\Controllers\Index".
+* `$app->getPath()`: Devolve o path onde está aloxada a aplicación. Podes usar argumentos para que che devolva rutas de arquivos ou subdirectorios. Por exemplo: `$app->getPath('arquivos/123', '3.pdf')` devolve algo parecido a "/var/www/o-meu-proxecto/app/arquivos/123/3.pdf"
+* `$app->getUrl()`: O mesmo que getPath pero para devolver rutas http do directorio público. Útil para acceder a arquivos css, javascript, etc. `$app->getPublicUrl('assets/css', 'subdirectorio')` devolvería algo parecido a "http://localhost/o-meu-proxecto/public/assets/css/subdirectorio". Por defecto colle o valor que definiches como BASE_URL en env.local.php, pero podes cambialo usando `$app->setUrl()`.
+* `$app->getEnvironment()`: Devolve o nome do entorno actual (development, production, etc). Por defecto colle o valor definido como ENVIRONMENT en env.local.php, pero podes cambialo usando `$app->setEnvironment()`. Útil para cargar distintas configuracións en distintos entornos. 
+
+Por último ten dous métodos máis que sirven para executar a túa aplicación:
+
+* `$app->runHttp()` Executa un `Http\Request` e devolve un `Http\Response`, ou sexa o típico
+* `$app->runCli()` Executa a aplicación como liña de comandos. Para iso usase o sistema de tarefas de [Robo](https://github.com/Codegyre/Robo) xunto con algunhas [tarefas propias de FOL](https://github.com/fol-project/tasks). Todas estas tarefas estan creadas e pódense configurar en Tasks.php.
+
+Todas esas tarefas podes lanzalas dende o comando `fol`, por exemplo, para listalas todas:
 
 ```
-$ php fol [command] [args]
+$ php fol list
 ```
-
 
 CONFIGURACIÓN DO SERVIDOR
 =========================
 
 Server de php
 -------------
-Para usar o servidor que trae o propio php, lanza o seguinte comando:
+Para usar o servidor que trae o propio php, podes lanzar o seguinte comando:
 
 ```
-$ sudo php -S localhost:80 -t public server.php
+$ php fol server
 ```
 
-Agora en http://localhost deberías ver algo.
+Agora en http://localhost:8000 deberías ver algo.
 
 
 En Apache
