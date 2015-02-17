@@ -20,10 +20,7 @@ class BasicTest extends PHPUnit_Framework_TestCase
     //Write your tests
     public function testApp()
     {
-        $app = self::$app;
-
-        $request = new Request('/');
-        $response = $app($request);
+        $response = self::$app->runHttp(new Request('/'));
 
         $this->assertInstanceOf('Fol\\Http\\Response', $response);
     }

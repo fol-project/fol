@@ -61,7 +61,7 @@ class App extends \Fol\App
         });
 
         //Session
-        $stack->push(new \Fol\Http\Sessions\Native());
+        $stack->push(new \Fol\Http\Sessions\Session());
 
         //Controller
         $stack->push($this->get('router'));
