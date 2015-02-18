@@ -15,7 +15,7 @@ class Tasks extends FolTasks\Tasks
         $this->taskConfig()
             ->set([
                 'ENVIRONMENT' => 'development',
-                'BASE_URL' => 'http://localhost',
+                'BASE_URL' => 'http://localhost/'.basename(dirname(__DIR__)).'/public',
             ], 'env.php')
             ->run();
 
