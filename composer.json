@@ -21,7 +21,7 @@
 		"php": ">=5.5.0",
 		"fol/http": "3.*",
 		"fol/core": "5.*",
-		"fol/tasks": "dev-master"
+		"fol/tasks": "1.*"
 	},
 	"autoload": {
 		"psr-4": {
