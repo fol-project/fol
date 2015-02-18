@@ -4,7 +4,7 @@
 
 [![Build Status](https://travis-ci.org/oscarotero/fol.png?branch=master)](https://travis-ci.org/oscarotero/fol)
 
-FOL é un (micro)framework escrito en PHP por Oscar Otero. Como é algo persoal que non pretende ter moita repercusión (hai miles de frameworks en PHP), escribo a documentación en galego por comodidade e por se alguen máis daquí lle interesa o proxecto. De todos xeitos, os comentarios dentro do código están en inglés.
+FOL é un (micro)framework escrito en PHP por Oscar Otero. Como é algo persoal que non pretende ter moita repercusión (hai miles de frameworks en PHP), escribo a documentación en galego por comodidade e por se alguen máis de aquí lle interesa o proxecto. De todos xeitos, os comentarios dentro do código están en inglés.
 
 Requerimentos:
 
@@ -20,7 +20,7 @@ Para instalalo precisas ter [composer](https://getcomposer.org/). Despois simple
 $ composer create-project fol/fol o-meu-proxecto
 ```
 
-Unha vez instalado, hai que configurar unha serie de variables de entorno definidas no arquivo `env.php` e gardadas en `env.local.php`. Para facelo dende a liña de comandos executa:
+Unha vez instalado, hai que configurar unha serie de variables de entorno que se gardarán no arquivo `env.php`. Ese arquivo está ignorado por git, polo que non se incluirá no repositorio. Para facelo dende a liña de comandos executa:
 
 ```
 $ php fol install
@@ -31,7 +31,7 @@ As variables que configuras son as seguintes:
 * ENVIRONMENT: O nome do entorno de desenvolvemento. Pode ser calquera nome. Por defecto é "development".
 * BASE_URL: A url usada para acceder ao directorio "public" dende o navegador. Por defecto é "http://localhost" pero se a instalación se fixo nun subdirectorio ou noutro host, debes modificalo para, por exemplo: http://localhost/o-meu-proxecto/public
 
-En calquera momento podes cambiar manualmente esa configuración editando o arquivo `env.local.php`.
+En calquera momento podes cambiar manualmente esa configuración editando o arquivo `env.php`.
 
 
 # Documentación rápida
@@ -45,7 +45,7 @@ Unha vez instalado, atoparás os seguintes directorios:
 
 ## App
 
-A clase `App\App` (aloxada en app/App.php) é a que xestiona a túa páxina web. Básicamente encárgase de servir como contenedor de servizos, ou sexa: bases de datos, modelos, controladores, xestión de plantillas, e todo tipo de clases/servizos usados na web. Para iso implementa a interface [container-interop](https://github.com/container-interop/container-interop) o que permite poder usar calquera contenedor de dependencias. Por exemplo:
+A clase `App\App` (aloxada en app/App.php) é a que xestiona a túa páxina web. Básicamente encárgase de servir como contenedor de servizos, ou sexa: bases de datos, modelos, controladores, xestión de plantillas, e todo tipo de clases/servizos usados na web. Para iso implementa a interface [container-interop](https://github.com/container-interop/container-interop) o que permite poder usar outros sub-contenedores de dependencias que usen a mesma interface. Por exemplo:
 
 ```php
 $app = new App\App();
@@ -61,16 +61,13 @@ if ($app->has('database')) {
 	$database = $app->get('database');
 }
 
-//Rexistrar outros sub-contenedores:
+//Rexistrar outros sub-contenedores, por exemplo php-di:
+$builder = new \DI\ContainerBuilder();
+$builder->setDefinitionCache(new Doctrine\Common\Cache\ArrayCache());
 
-$container = new Container();
-$container->register('templates', function () {
-	return new MyTemplatesEngine('path/to/templates');
-});
+$app->add($builder->build());
 
-$app->add($containerInterop);
-
-$templates = $app->get('templates');
+$class = $app->get('My\\Class');
 ```
 
 Tamén serve para gardar a configuración deses servizos ou de calquera outra cousa. Existe a propiedade `$app->config` que carga e xestiona todo tipo de configuracions.

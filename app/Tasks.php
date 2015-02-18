@@ -8,15 +8,15 @@ class Tasks extends FolTasks\Tasks
 	public static $app;
 
 	/**
-	 * Install all
+	 * Install the project
 	 */
 	public function install()
 	{
 		$this->taskConfig()
 			->set([
-					'ENVIRONMENT' => 'development',
-	  				'BASE_URL' => 'http://localhost',
-				],'env.php')
+				'ENVIRONMENT' => 'development',
+  				'BASE_URL' => 'http://localhost',
+			],'env.php')
 			->run();
 
 		//npm + bower
