@@ -4,8 +4,7 @@
 
 [![Build Status](https://travis-ci.org/oscarotero/fol.png?branch=master)](https://travis-ci.org/oscarotero/fol)
 
-FOL é un (micro)framework escrito en PHP por Oscar Otero (http://oscarotero.com) como exercicio de deseño e como ferramenta para experimentar.
-Como é algo persoal que non pretende ter moita repercusión (hai miles de frameworks en PHP), escribo a documentación en galego por comodidade e por se alguen máis daquí lle interesa o proxecto. De todos xeitos, os comentarios dentro do código están en inglés.
+FOL é un (micro)framework escrito en PHP por Oscar Otero. Como é algo persoal que non pretende ter moita repercusión (hai miles de frameworks en PHP), escribo a documentación en galego por comodidade e por se alguen máis daquí lle interesa o proxecto. De todos xeitos, os comentarios dentro do código están en inglés.
 
 Requerimentos:
 
@@ -21,7 +20,7 @@ Para instalalo precisas ter [composer](https://getcomposer.org/). Despois simple
 $ composer create-project fol/fol o-meu-proxecto
 ```
 
-Unha vez instalado, hai que configurar unha serie de variables de entorno collidas do arquivo `env.php` e gardadas en `env.local.php`. Para facelo dende a liña de comandos executa:
+Unha vez instalado, hai que configurar unha serie de variables de entorno definidas no arquivo `env.php` e gardadas en `env.local.php`. Para facelo dende a liña de comandos executa:
 
 ```
 $ php fol install
@@ -29,9 +28,8 @@ $ php fol install
 
 As variables que configuras son as seguintes:
 
-* ENVIRONMENT: O nome do entorno de desenvolvemento. Pode se calquera nome. Por defecto é "development".
+* ENVIRONMENT: O nome do entorno de desenvolvemento. Pode ser calquera nome. Por defecto é "development".
 * BASE_URL: A url usada para acceder ao directorio "public" dende o navegador. Por defecto é "http://localhost" pero se a instalación se fixo nun subdirectorio ou noutro host, debes modificalo para, por exemplo: http://localhost/o-meu-proxecto/public
-* SECURE_KEY: Clave secreta que podes usar para cifrar datos, etc. Por defecto xa se xenera unha de xeito aleatorio.
 
 En calquera momento podes cambiar manualmente esa configuración editando o arquivo `env.local.php`.
 

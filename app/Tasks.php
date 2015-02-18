@@ -8,11 +8,16 @@ class Tasks extends FolTasks\Tasks
 	public static $app;
 
 	/**
-	 * Install all npm and bower components
+	 * Install all
 	 */
 	public function install()
 	{
-		$this->taskEnvironmentVariables()->run();
+		$this->taskConfig()
+			->set([
+					'ENVIRONMENT' => 'development',
+	  				'BASE_URL' => 'http://localhost',
+				],'env.php')
+			->run();
 
 		//npm + bower
 		//$this->taskNpmInstall()->run();

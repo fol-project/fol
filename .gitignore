@@ -26,7 +26,7 @@ $RECYCLE.BIN/
 # OTHER DATA (logs, cache, etc)
 
 logs
-env.local.php
+env.php
 
 
 # DEPENDENCIES (composer, bower, npm, etc)
