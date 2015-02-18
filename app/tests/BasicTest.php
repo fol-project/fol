@@ -8,7 +8,7 @@ class BasicTest extends PHPUnit_Framework_TestCase
     //Init your app before start the test case
     public static function setUpBeforeClass()
     {
-        self::$app = new App\App;
+        self::$app = new App\App();
     }
 
     //Remove the app on finish the test case

@@ -2,9 +2,7 @@
 namespace App;
 
 use Fol\Config;
-
 use Fol\Tasks\Runner;
-
 use Fol\Http\Request;
 use Fol\Http\Response;
 use Fol\Http\MiddlewareStack;
@@ -28,12 +26,12 @@ class App extends \Fol\App
             $router->map([
                 'index' => [
                     'path' => '/',
-                    'target' => 'Index::index'
+                    'target' => 'Index::index',
                 ],
                 'phpinfo' => [
                     'path' => '/phpinfo',
-                    'target' => 'Index::phpinfo'
-                ]
+                    'target' => 'Index::phpinfo',
+                ],
             ]);
 
             $router->setError('Index::error');
@@ -42,15 +40,14 @@ class App extends \Fol\App
         });
     }
 
-
     /**
      * Executes a request
      *
      * @param Request $request
-     * 
+     *
      * @return Response
      */
-    public function runHttp (Request $request)
+    public function runHttp(Request $request)
     {
         $stack = new MiddlewareStack($this);
 
@@ -74,7 +71,7 @@ class App extends \Fol\App
     /**
      * Executes app's tasks
      */
-    public function runCli (array $argv)
+    public function runCli(array $argv)
     {
         Tasks::$app = $this;
 
