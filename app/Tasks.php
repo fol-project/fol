@@ -31,8 +31,11 @@ class Tasks extends FolTasks\Tasks
      */
     public function server($port = 8000)
     {
-        $this->say("server started at http://localhost:{$port}");
+        $this->say("server started at http://127.0.0.1:{$port}\n");
 
-        $this->taskExec("php -S localhost:{$port} -t public public/index.php")->run();
+        $this->taskServer($port)
+            ->dir('public')
+            ->arg('public/index.php')
+            ->run();
     }
 }
