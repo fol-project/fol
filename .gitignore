@@ -23,9 +23,9 @@ $RECYCLE.BIN/
 *.msp
 
 
-# OTHER DATA (logs, cache, etc)
+# DATA (logs, cache, etc)
 
-logs
+data/*
 env.php
 
 

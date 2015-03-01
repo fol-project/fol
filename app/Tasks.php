@@ -12,11 +12,19 @@ class Tasks extends FolTasks\Tasks
      */
     public function install()
     {
+        //Basic configuration
         $this->taskConfig()
             ->set([
                 'ENVIRONMENT' => 'development',
                 'BASE_URL' => 'http://localhost/'.basename(dirname(__DIR__)).'/public',
             ], 'env.php')
+            ->run();
+
+        //Create log files
+        $this->taskFileSystemStack()
+            ->mkdir('data/log')
+            ->touch('data/log/php')
+            ->chmod('data/log/php', 0777)
             ->run();
 
         //npm + bower
