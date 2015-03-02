@@ -17,6 +17,6 @@ class Index
 
     public function error($request, $response)
     {
-        $response->getBody()->write($request->attributes->get('error')->getMessage());
+        $response->getBody()->write($request->attributes->get('ERROR')->getMessage());
     }
 }
