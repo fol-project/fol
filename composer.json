@@ -19,7 +19,7 @@
 	},
 	"require": {
 		"php": ">=5.5.0",
-		"fol/http": "3.*",
+		"fol/http": "4.*",
 		"fol/core": "5.*",
 		"fol/tasks": "1.*"
 	},

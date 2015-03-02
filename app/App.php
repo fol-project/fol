@@ -3,9 +3,12 @@ namespace App;
 
 use Fol\Config;
 use Fol\Tasks\Runner;
+
 use Fol\Http\Request;
 use Fol\Http\Response;
 use Fol\Http\MiddlewareStack;
+use Fol\Http\Middlewares;
+use Fol\Http\Sessions;
 use Fol\Http\Router\Router;
 use Fol\Http\Router\RouteFactory;
 
@@ -51,21 +54,19 @@ class App extends \Fol\App
     {
         $stack = new MiddlewareStack($this);
 
-        //Request language
-        $stack->push(function ($request, $response, $stack) {
-            $request->setLanguage($request->getPreferredLanguage(['gl', 'es', 'en']));
-            $stack->next();
-        });
+        //Basic middlewares
+        $stack->push(new Middlewares\BaseUrl($this->getUrl()));
+        $stack->push(new Middlewares\Languages(['gl', 'es', 'en']));
+        $stack->push(new Middlewares\Formats());
+        $stack->push(new Middlewares\Ips());
 
         //Session
-        $stack->push(new \Fol\Http\Sessions\Session());
+        $stack->push(new Sessions\Session());
 
         //Controller
         $stack->push($this->get('router'));
 
-        $stack->run($request, new Response());
-
-        return $stack->getResponse();
+        return $stack->run($request);
     }
 
     /**
