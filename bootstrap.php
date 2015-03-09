@@ -12,4 +12,4 @@ ini_set('error_log', __DIR__.'/data/log/php');
 
 require __DIR__.'/vendor/autoload.php';
 
-Fol\Fol::init(__DIR__, 'env.php');
+Fol::init(__DIR__, 'env.php');

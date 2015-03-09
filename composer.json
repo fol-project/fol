@@ -20,7 +20,7 @@
 	"require": {
 		"php": ">=5.5.0",
 		"fol/http": "4.*",
-		"fol/core": "5.*",
+		"fol/core": "6.*",
 		"fol/tasks": "1.*"
 	},
 	"autoload": {
