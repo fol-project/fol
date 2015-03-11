@@ -1,6 +1,6 @@
 <?php
 if (!ini_get('date.timezone')) {
-	ini_set('date.timezone', 'Europe/Madrid');
+    ini_set('date.timezone', 'Europe/Madrid');
 }
 
 //Error configuration

@@ -1,9 +1,7 @@
 <?php
 namespace App;
 
-use Fol\Config;
 use Fol\Tasks\Runner;
-
 use Fol\Http\Request;
 use Fol\Http\Response;
 use Fol\Http\MiddlewareStack;
