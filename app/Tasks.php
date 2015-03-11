@@ -9,15 +9,18 @@ class Tasks extends FolTasks\Tasks
 
     /**
      * Install the project
+     * 
+     * @param string  $env   The environment name
+     * 
+     * @option $force Whether or not overwrite the values
      */
-    public function install()
+    public function install($env = null, $opts = ['force|f' => false])
     {
         //Basic configuration
-        $this->taskConfig()
-            ->set([
-                'ENVIRONMENT' => 'development',
-                'BASE_URL' => 'http://localhost/'.basename(dirname(__DIR__)).'/public',
-            ], 'env.php')
+        $this->taskConfig(static::$app->config)
+            ->environment($env)
+            ->force($opts['force'])
+            ->set('app')
             ->run();
 
         //Create log files
@@ -34,11 +37,11 @@ class Tasks extends FolTasks\Tasks
 
     /**
      * Run a php server
-     * 
-     * @param integer $port The port number
      */
-    public function server($port = 8000)
+    public function server()
     {
+        $port = static::$app->config['app']['server_cli_port'];
+
         $this->say("server started at http://127.0.0.1:{$port}\n");
 
         $this->taskServer($port)

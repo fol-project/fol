@@ -19,9 +19,9 @@
 	},
 	"require": {
 		"php": ">=5.5.0",
-		"fol/http": "4.*",
-		"fol/core": "6.*",
-		"fol/tasks": "1.*"
+		"fol/http": "dev-master",
+		"fol/core": "dev-master",
+		"fol/tasks": "dev-master"
 	},
 	"autoload": {
 		"psr-4": {

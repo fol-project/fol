@@ -15,13 +15,10 @@ use Fol\Http\Router\RouteFactory;
 class App extends \Fol\App
 {
     /**
-     * Contructor. Register all services, etc
+     * Init the app
      */
-    public function __construct()
+    protected function init()
     {
-        //Init config
-        $this->config = new Config($this->getPath('config'));
-
         //Init router
         $this->register('router', function () {
             $router = new Router(new RouteFactory($this->getNamespace('Controllers')));
