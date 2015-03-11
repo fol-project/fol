@@ -76,7 +76,6 @@ Ademáis tamén ten unha serie de métodos básicos:
 * `$app->getNamespace()`: Devolve o namespace da aplicación (ou sexa "App"). Ademáis podes usalo para que che devolva outros namespaces ou clases relativas. Por exemplo `$app->getNamespace('Controllers\\Index')` devolve "App\Controllers\Index".
 * `$app->getPath()`: Devolve o path onde está aloxada a aplicación. Podes usar argumentos para que che devolva rutas de arquivos ou subdirectorios. Por exemplo: `$app->getPath('arquivos/123', '3.pdf')` devolve algo parecido a "/var/www/o-meu-proxecto/app/arquivos/123/3.pdf"
 * `$app->getUrl()`: O mesmo que getPath pero para devolver rutas http do directorio público. Útil para acceder a arquivos css, javascript, etc. `$app->getPublicUrl('assets/css', 'subdirectorio')` devolvería algo parecido a "http://localhost/o-meu-proxecto/public/assets/css/subdirectorio". Por defecto colle o valor que definiches como BASE_URL en env.local.php, pero podes cambialo usando `$app->setUrl()`.
-* `$app->getEnvironment()`: Devolve o nome do entorno actual (development, production, etc). Por defecto colle o valor 'development', pero podes cambialo usando `$app->setEnvironment()`. Útil para cargar distintas configuracións en distintos entornos. 
 
 Por último ten dous métodos máis que sirven para executar a túa aplicación:
 
