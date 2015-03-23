@@ -4,7 +4,6 @@ namespace App;
 use Fol\Tasks\Runner;
 use Fol\Http\Request;
 use Fol\Http\Response;
-use Fol\Http\MiddlewareStack;
 use Fol\Http\Middlewares;
 use Fol\Http\Sessions;
 use Fol\Http\Router\Router;
@@ -47,18 +46,31 @@ class App extends \Fol\App
      */
     public function runHttp(Request $request)
     {
-        $stack = new MiddlewareStack($this);
+        $stack = new Middlewares\Middleware();
 
-        //Basic middlewares
+        //Set the current app
+        $stack->setApp($this);
+
+        //Set the base url
         $stack->push(new Middlewares\BaseUrl($this->getUrl()));
-        $stack->push(new Middlewares\Languages(['gl', 'es', 'en']));
-        $stack->push(new Middlewares\Formats());
+
+        //Detect the client ip
         $stack->push(new Middlewares\Ips());
 
-        //Session
+        //Detect the client language
+        $stack->push(new Middlewares\Languages([
+            'availables' => 'gl', 'es', 'en'
+        ]));
+
+        //Detect the required format (json, html, png, etc...)
+        $stack->push(new Middlewares\Formats([
+            'fromExtension' => true
+        ]));
+
+        //Init the session
         $stack->push(new Sessions\Session());
 
-        //Controller
+        //Execute the router
         $stack->push($this->get('router'));
 
         return $stack->run($request);
