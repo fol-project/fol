@@ -19,9 +19,9 @@
     },
     "require": {
         "php": ">=5.5.0",
-        "fol/core": "dev-master",
-        "fol/tasks": "*",
-        "oscarotero/psr7-middlewares": "dev-master",
+        "fol/core": "8.*",
+        "fol/tasks": "1.*",
+        "oscarotero/psr7-middlewares": "1.*",
         "zendframework/zend-diactoros": "1.*",
         "relay/relay": "*",
         "vlucas/phpdotenv": "~2.1@dev"
@@ -33,14 +33,12 @@
     },
     "scripts": {
         "post-install-cmd": [
-            "cp .env.example .env",
+            "php -r \"copy('.env.example', '.env');\"",
             "php fol install"
         ],
         "post-create-project-cmd": [
-            "cp .env.example .env",
+            "php -r \"copy('.env.example', '.env');\"",
             "php fol install"
         ]
-    },
-    "minimum-stability": "dev",
-    "prefer-stable": true
+    }
 }
