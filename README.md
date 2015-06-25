@@ -20,19 +20,7 @@ Para instalalo precisas ter [composer](https://getcomposer.org/). Despois simple
 $ composer create-project fol/fol o-meu-proxecto
 ```
 
-Unha vez instalado, hai que configurar unha serie de valores. Para facelo dende a liña de comandos executa:
-
-```
-$ php fol install
-```
-
-Estas variables gardaránse nun directorio co nome do entorno que estas usando (que por defecto é "development"), dentro de app/config. As variables que configuras son as seguintes:
-
-* app.base_url: A url usada para acceder ao directorio "public" dende o navegador.
-* app.server_cli_port: O porto usado ao lanzar a web dende o servidor de php (Usando `php fol server`)
-
-En calquera momento podes cambiar manualmente esa configuración en "app/config/development/app.php"
-
+Unha vez instalado, tes que crear un arquivo `.env`. Podes renomear ou copiar `.env.example`. Nese arquivo gardarase as variables de entorno máis sensibles (contrasinais, etc), e esta ingnorado por git.
 
 # Documentación rápida
 
@@ -40,13 +28,11 @@ Unha vez instalado, atoparás os seguintes directorios:
 
 * vendor: usado por composer para instalar aí todos os paquetes e dependencias
 * app: onde se garda a túa aplicación (plantillas, controladores, modelos, tests, etc).
-* data: para gardar arquivos temporais que serán ignorados por git (logs, cache, etc).
 * public: todos os arquivos accesibles publicamente (css, imaxes, js, componentes de bower, etc) ademáis do "front controller" (index.php).
-
 
 ## App
 
-A clase `App\App` (aloxada en app/App.php) é a que xestiona a páxina web. Básicamente encárgase de servir como colector de servizos, ou sexa: bases de datos, modelos, controladores, xestión de plantillas, e todo tipo de clases/servizos usados na web. Para iso implementa a interface [container-interop](https://github.com/container-interop/container-interop) o que permite poder usar outros sub-colectores que usen a mesma interface. Por exemplo:
+A clase `App\App` (aloxada en app/App.php) é a que xestiona a páxina web, xunto con todos os servizos que precise (bases de datos, plantillas, controladores, etc). Implementa a interface [container-interop](https://github.com/container-interop/container-interop) o que permite poder combinala con outros colectores:
 
 ```php
 $app = new App\App();
@@ -75,14 +61,12 @@ Ademáis tamén ten unha serie de métodos básicos:
 
 * `$app->getNamespace()`: Devolve o namespace da aplicación (ou sexa "App"). Ademáis podes usalo para que che devolva outros namespaces ou clases relativas. Por exemplo `$app->getNamespace('Controllers\\Index')` devolve "App\Controllers\Index".
 * `$app->getPath()`: Devolve o path onde está aloxada a aplicación. Podes usar argumentos para que che devolva rutas de arquivos ou subdirectorios. Por exemplo: `$app->getPath('arquivos/123', '3.pdf')` devolve algo parecido a "/var/www/o-meu-proxecto/app/arquivos/123/3.pdf"
-* `$app->getUrl()`: O mesmo que getPath pero para devolver rutas http do directorio público. Útil para acceder a arquivos css, javascript, etc. `$app->getPublicUrl('assets/css', 'subdirectorio')` devolvería algo parecido a "http://localhost/o-meu-proxecto/public/assets/css/subdirectorio". Por defecto colle o valor que definiches como BASE_URL en env.local.php, pero podes cambialo usando `$app->setUrl()`.
+* `$app->getUrl()`: O mesmo que getPath pero para devolver rutas http do directorio público. Útil para acceder a arquivos css, javascript, etc. `$app->getUrl('assets/css', 'subdirectorio')` devolvería algo parecido a "http://localhost/o-meu-proxecto/public/assets/css/subdirectorio". Por defecto colle o valor que definiches como `APP_URL` ou `APP_CLI_SERVER_URL` (depende de que servidor uses) en .env, pero podes cambialo usando `$app->setUrl()`.
 
-Por último ten dous métodos máis que sirven para executar a túa aplicación:
+Por último ten dous métodos estáticos para executar a aplicación:
 
-* `$app->runHttp()` Executa un `Http\Request` e devolve un `Http\Response`, ou sexa o típico
-* `$app->runCli()` Executa a aplicación como liña de comandos. Para iso usase o sistema de tarefas de [Robo](https://github.com/Codegyre/Robo) xunto con algunhas [tarefas propias de FOL](https://github.com/fol-project/tasks). Todas estas tarefas estan creadas e pódense configurar en Tasks.php.
-
-Todas esas tarefas podes lanzalas dende o comando `fol`, por exemplo, para listalas todas:
+* `App\App::runHttp()` Executa a aplicación nunha contorna http
+* `App\App::runCli()` Executa a aplicación como liña de comandos. Para iso usase o sistema de tarefas de [Robo](https://github.com/Codegyre/Robo) xunto con algunhas [tarefas propias de FOL](https://github.com/fol-project/tasks). Todas estas tarefas estan creadas e pódense configurar en Tasks.php. O arquivo `fol` permite executar a aplicación por liña de comandos:
 
 ```
 $ php fol list
