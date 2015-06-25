@@ -1,27 +1,21 @@
 <?php
-use Fol\Http\Request;
+use App\App;
+use Zend\Diactoros\ServerRequest;
+use Zend\Diactoros\Uri;
 
 class BasicTest extends PHPUnit_Framework_TestCase
 {
-    protected static $app;
+    protected $app;
 
-    //Init your app before start the test case
-    public static function setUpBeforeClass()
+    public function setUp()
     {
-        self::$app = new App\App();
+        $this->app = new App();
     }
 
-    //Remove the app on finish the test case
-    public static function tearDownAfterClass()
-    {
-        self::$app = null;
-    }
-
-    //Write your tests
     public function testApp()
     {
-        $response = self::$app->runHttp(new Request('/'));
+        $response = $this->app->execHttpRequest(new ServerRequest());
 
-        $this->assertInstanceOf('Fol\\Http\\Response', $response);
+        $this->assertInstanceOf('Psr\\Http\\Message\\ResponseInterface', $response);
     }
 }

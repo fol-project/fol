@@ -1,40 +1,45 @@
 <?php
 namespace App;
 
+use Fol;
+use Relay\Relay;
+use Zend\Diactoros\ServerRequestFactory;
+use Zend\Diactoros\Response\SapiEmitter;
+use Zend\Diactoros\Response;
+use Psr7Middlewares\Middleware;
+use Psr\Http\Message\ServerRequestInterface;
 use Fol\Tasks\Runner;
-use Fol\Http\Request;
-use Fol\Http\Response;
-use Fol\Http\Middlewares;
-use Fol\Http\Sessions;
-use Fol\Http\Router\Router;
-use Fol\Http\Router\RouteFactory;
 
-class App extends \Fol\App
+class App extends Fol
 {
+    /**
+     * Run the app in a http server context
+     */
+    public static function runHttp()
+    {
+        $app = new static();
+
+        $request = ServerRequestFactory::fromGlobals();
+        $response = $app->execHttpRequest($request);
+
+        (new SapiEmitter())->emit($response);
+    }
+
+    /**
+     * Run the app in a cli context
+     */
+    public static function runCli()
+    {
+        $app = new static();
+        $app->execCommand($_SERVER['argv']);
+    }
+
     /**
      * Init the app
      */
-    protected function init()
+    public function __construct()
     {
-        //Init router
-        $this->register('router', function () {
-            $router = new Router(new RouteFactory($this->getNamespace('Controllers')));
 
-            $router->map([
-                'index' => [
-                    'path' => '/',
-                    'target' => 'Index::index',
-                ],
-                'phpinfo' => [
-                    'path' => '/phpinfo',
-                    'target' => 'Index::phpinfo',
-                ],
-            ]);
-
-            $router->setError('Index::error');
-
-            return $router;
-        });
     }
 
     /**
@@ -44,42 +49,27 @@ class App extends \Fol\App
      *
      * @return Response
      */
-    public function runHttp(Request $request)
+    public function execHttpRequest(ServerRequestInterface $request)
     {
-        $stack = new Middlewares\Middleware();
+        $dispatcher = new Relay([
+            Middleware::ClientIp(),
+            Middleware::LanguageNegotiator(),
+            function ($request, $response) {
+                $response->getBody()->write('Ola mundo');
 
-        //Set the current app
-        $stack->setApp($this);
+                return $response;
+            }
+        ]);
 
-        //Set the base url
-        $stack->push(new Middlewares\BaseUrl($this->getUrl()));
-
-        //Detect the client ip
-        $stack->push(new Middlewares\Ips());
-
-        //Detect the client language
-        $stack->push(new Middlewares\Languages([
-            'availables' => 'gl', 'es', 'en'
-        ]));
-
-        //Detect the required format (json, html, png, etc...)
-        $stack->push(new Middlewares\Formats([
-            'fromExtension' => true
-        ]));
-
-        //Init the session
-        $stack->push(new Sessions\Session());
-
-        //Execute the router
-        $stack->push($this->get('router'));
-
-        return $stack->run($request);
+        return $dispatcher($request, new Response());
     }
 
     /**
      * Executes app's tasks
+     * 
+     * @param array $argv
      */
-    public function runCli(array $argv)
+    public function execCommand(array $argv)
     {
         Tasks::$app = $this;
 

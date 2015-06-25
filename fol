@@ -4,4 +4,4 @@
 require __DIR__.'/bootstrap.php';
 
 //Execute the app
-(new App\App())->runCli($_SERVER['argv']);
+App\App::runCli();

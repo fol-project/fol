@@ -10,6 +10,11 @@ ini_set('display_startup_errors', 1);
 ini_set('log_errors', 1);
 ini_set('error_log', __DIR__.'/data/log/php');
 
-require __DIR__.'/vendor/autoload.php';
+//Init global libraries
+$composer = include __DIR__.'/vendor/autoload.php';
 
-Fol::init(__DIR__);
+$dotenv = new Dotenv\Dotenv(__DIR__);
+$dotenv->load();
+
+Fol::setGlobal('composer', $composer);
+Fol::setGlobal('dotenv', $dotenv);
