@@ -1,36 +1,46 @@
 {
-	"name": "fol/fol",
-	"type": "library",
-	"description": "PHP framework",
-	"keywords": ["framework"],
-	"homepage": "https://github.com/fol-project/fol",
-	"license": "AGPL-3.0",
-	"authors": [
-		{
-			"name": "Oscar Otero",
-			"email": "oom@oscarotero.com",
-			"homepage": "http://oscarotero.com",
-			"role": "Developer"
-		}
-	],
-	"support": {
-		"email": "oom@oscarotero.com",
-		"issues": "https://github.com/fol-project/fol/issues"
-	},
-	"require": {
-		"php": ">=5.5.0",
-		"fol/core": "dev-master",
-		"fol/tasks": "*",
-		"oscarotero/psr7-middlewares": "dev-master",
-		"zendframework/zend-diactoros": "1.*",
-		"relay/relay": "*",
-		"vlucas/phpdotenv": "~2.1@dev"
-	},
-	"autoload": {
-		"psr-4": {
-			"App\\": "app/"
-		}
-	},
-	"minimum-stability": "dev",
-	"prefer-stable": true
+    "name": "fol/fol",
+    "type": "library",
+    "description": "PHP framework",
+    "keywords": ["framework"],
+    "homepage": "https://github.com/fol-project/fol",
+    "license": "AGPL-3.0",
+    "authors": [
+        {
+            "name": "Oscar Otero",
+            "email": "oom@oscarotero.com",
+            "homepage": "http://oscarotero.com",
+            "role": "Developer"
+        }
+    ],
+    "support": {
+        "email": "oom@oscarotero.com",
+        "issues": "https://github.com/fol-project/fol/issues"
+    },
+    "require": {
+        "php": ">=5.5.0",
+        "fol/core": "dev-master",
+        "fol/tasks": "*",
+        "oscarotero/psr7-middlewares": "dev-master",
+        "zendframework/zend-diactoros": "1.*",
+        "relay/relay": "*",
+        "vlucas/phpdotenv": "~2.1@dev"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/"
+        }
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "cp .env.example .env",
+            "php fol install"
+        ],
+        "post-create-project-cmd": [
+            "cp .env.example .env",
+            "php fol install"
+        ]
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }

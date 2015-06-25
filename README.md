@@ -20,7 +20,7 @@ Para instalalo precisas ter [composer](https://getcomposer.org/). Despois simple
 $ composer create-project fol/fol o-meu-proxecto
 ```
 
-Unha vez instalado, tes que crear un arquivo `.env`. Podes renomear ou copiar `.env.example`. Nese arquivo gardarase as variables de entorno máis sensibles (contrasinais, etc), e esta ingnorado por git.
+Unha vez instalado, créase automaticamente un arquivo `.env`. Se non se creou, podes facelo ti a partir de `.env.example`. Nese arquivo gárdanse as variables de entorno máis sensibles (contrasinais, etc), e esta ingnorado por git.
 
 # Documentación rápida
 

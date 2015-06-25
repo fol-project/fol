@@ -10,20 +10,11 @@ class Tasks extends FolTasks\Tasks
     /**
      * Install the project
      *
-     * @param string $env The environment name
-     *
      * @option $force Whether or not overwrite the values
      */
-    public function install($env = null, $opts = ['force|f' => false])
+    public function install($env = null)
     {
-        //Basic configuration
-        $this->taskConfig(static::$app->config)
-            ->environment($env)
-            ->force($opts['force'])
-            ->set('app')
-            ->run();
-
-        //Create log files
+        //Create logs and .env files
         $this->taskFileSystemStack()
             ->mkdir('data/log')
             ->touch('data/log/php')
