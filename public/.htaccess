@@ -1,27 +1,25 @@
 # No indexes
 <IfModule mod_autoindex.c>
-	Options -Indexes
+    Options -Indexes
 </IfModule>
 
 # Hidden files
 <Files ~ "^\.">
-	Order allow,deny
-	Deny from all
+    Order allow,deny
+    Deny from all
 </Files>
 
 <IfModule mod_rewrite.c>
-	Options +FollowSymlinks
-	RewriteEngine On
+    RewriteEngine On
 
-	# Redirect Trailing Slashes...
-	RewriteRule ^(.*)/$ /$1 [L,R=301]
+    # Redirect Trailing Slashes If Not A Folder...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)/$ /$1 [L,R=301]
 
-	# If the requested filename exists, simply serve it.
-	RewriteCond %{REQUEST_FILENAME} -f
-	RewriteRule .? - [L]
-
-	# Rewrites the requested to index.php
-	RewriteRule ^.*$ index.php [L,QSA]
+    # Handle Front Controller...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ index.php [L]
 </IfModule>
 
 # Use UTF-8 encoding for anything served text/plain or text/html

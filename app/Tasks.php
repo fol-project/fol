@@ -31,11 +31,9 @@ class Tasks extends FolTasks\Tasks
      */
     public function server()
     {
-        $port = static::$app->config['app']['server_cli_port'];
+        $this->say("server started at ".getenv('FOLK_CLI_SERVER_URL')."\n");
 
-        $this->say("server started at http://127.0.0.1:{$port}\n");
-
-        $this->taskServer($port)
+        $this->taskServer(parse_url(getenv('FOLK_CLI_SERVER_URL'), PHP_URL_PORT) ?: 80)
             ->dir('public')
             ->arg('public/index.php')
             ->run();
