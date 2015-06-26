@@ -8,22 +8,14 @@ class Tasks extends FolTasks\Tasks
     public static $app;
 
     /**
-     * Install the project
-     *
-     * @option $force Whether or not overwrite the values
+     * Update the project
      */
-    public function install($env = null)
+    public function update()
     {
-        //Create logs and .env files
-        $this->taskFileSystemStack()
-            ->mkdir('data/log')
-            ->touch('data/log/php')
-            ->chmod('data/log/php', 0777)
-            ->run();
-
-        //npm + bower
-        //$this->taskNpmInstall()->run();
-        //$this->taskBowerInstall()->run();
+        //Update dependencies
+        $this->taskComposerInstall()->run();
+        $this->taskNpmInstall()->run();
+        $this->taskBowerInstall('node_modules/.bin/bower')->run();
     }
 
     /**

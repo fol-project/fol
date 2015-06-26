@@ -33,12 +33,10 @@
     },
     "scripts": {
         "post-install-cmd": [
-            "php -r \"copy('.env.example', '.env');\"",
-            "php fol install"
+            "php install.php"
         ],
         "post-create-project-cmd": [
-            "php -r \"copy('.env.example', '.env');\"",
-            "php fol install"
+            "php install.php"
         ]
     }
 }
