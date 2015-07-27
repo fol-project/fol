@@ -23,7 +23,7 @@ $RECYCLE.BIN/
 *.msp
 
 
-# DATA (logs, cache, etc)
+# DATA (logs, cache, environment variables, etc)
 
 data/*
 .env
