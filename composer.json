@@ -20,7 +20,7 @@
     "require": {
         "php": ">=5.5.0",
         "fol/core": "8.*",
-        "fol/tasks": "1.*",
+        "codegyre/robo": "^0.5.4",
         "oscarotero/psr7-middlewares": "1.*",
         "zendframework/zend-diactoros": "1.*",
         "relay/relay": "*",
@@ -32,11 +32,6 @@
         }
     },
     "scripts": {
-        "post-install-cmd": [
-            "php install.php"
-        ],
-        "post-create-project-cmd": [
-            "php install.php"
-        ]
+        "post-install-cmd": "php vendor/bin/robo install"
     }
 }

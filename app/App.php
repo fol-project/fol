@@ -8,30 +8,21 @@ use Zend\Diactoros\Response\SapiEmitter;
 use Zend\Diactoros\Response;
 use Psr7Middlewares\Middleware;
 use Psr\Http\Message\ServerRequestInterface;
-use Fol\Tasks\Runner;
+use Psr\Http\Message\ResponseInterface;
 
 class App extends Fol
 {
     /**
-     * Run the app in a http server context
+     * Run the app
      */
-    public static function runHttp()
+    public static function run()
     {
         $app = new static();
 
         $request = ServerRequestFactory::fromGlobals();
-        $response = $app->execHttpRequest($request);
+        $response = $app->dispatch($request);
 
         (new SapiEmitter())->emit($response);
-    }
-
-    /**
-     * Run the app in a cli context
-     */
-    public static function runCli()
-    {
-        $app = new static();
-        $app->execCommand($_SERVER['argv']);
     }
 
     /**
@@ -45,11 +36,11 @@ class App extends Fol
     /**
      * Executes a request
      *
-     * @param Request $request
+     * @param ServerRequestInterface $request
      *
-     * @return Response
+     * @return ResponseInterface
      */
-    public function execHttpRequest(ServerRequestInterface $request)
+    public function dispatch(ServerRequestInterface $request)
     {
         $dispatcher = new Relay([
             Middleware::ClientIp(),
@@ -62,17 +53,5 @@ class App extends Fol
         ]);
 
         return $dispatcher($request, new Response());
-    }
-
-    /**
-     * Executes app's tasks
-     * 
-     * @param array $argv
-     */
-    public function execCommand(array $argv)
-    {
-        Tasks::$app = $this;
-
-        (new Runner())->execute($this->getNamespace('Tasks'), $argv);
     }
 }

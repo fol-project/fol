@@ -33,7 +33,7 @@ data/*
 
 composer.phar
 vendor/
-public/bower_components/
+bower_components/
 node_modules/
 
 # You can comment this line: http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file

@@ -11,4 +11,4 @@ if (
 require dirname(__DIR__).'/bootstrap.php';
 
 //Execute the app
-App\App::runHttp();
+App\App::run();
