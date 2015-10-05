@@ -1,7 +1,7 @@
 <?php
+
 use App\App;
 use Zend\Diactoros\ServerRequest;
-use Zend\Diactoros\Uri;
 
 class BasicTest extends PHPUnit_Framework_TestCase
 {

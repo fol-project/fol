@@ -1,4 +1,5 @@
 <?php
+
 if (!ini_get('date.timezone')) {
     ini_set('date.timezone', 'Europe/Madrid');
 }
@@ -10,7 +11,6 @@ ini_set('display_startup_errors', 1);
 ini_set('log_errors', 1);
 ini_set('error_log', __DIR__.'/data/log/php');
 ini_set('expose_php', 0);
-
 
 //Init global libraries
 $composer = include __DIR__.'/vendor/autoload.php';

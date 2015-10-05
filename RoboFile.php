@@ -1,4 +1,5 @@
 <?php
+
 require __DIR__.'/bootstrap.php';
 
 /**
@@ -9,7 +10,7 @@ require __DIR__.'/bootstrap.php';
 class RoboFile extends \Robo\Tasks
 {
     /**
-     * Install all npm and bower components
+     * Install all npm and bower components.
      */
     public function install()
     {
@@ -19,13 +20,12 @@ class RoboFile extends \Robo\Tasks
         }
 
         //npm + bower
-        $this->taskComposerInstall()->run();
         $this->taskNpmInstall()->run();
         $this->taskBowerInstall('node_modules/.bin/bower')->run();
     }
 
     /**
-     * Run a php server
+     * Run a php server.
      */
     public function server()
     {

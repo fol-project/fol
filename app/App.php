@@ -1,8 +1,9 @@
 <?php
+
 namespace App;
 
 use Fol;
-use Relay\Relay;
+use Relay\RelayBuilder;
 use Zend\Diactoros\ServerRequestFactory;
 use Zend\Diactoros\Response\SapiEmitter;
 use Zend\Diactoros\Response;
@@ -13,7 +14,7 @@ use Psr\Http\Message\ResponseInterface;
 class App extends Fol
 {
     /**
-     * Run the app
+     * Run the app.
      */
     public static function run()
     {
@@ -26,15 +27,14 @@ class App extends Fol
     }
 
     /**
-     * Init the app
+     * Init the app.
      */
     public function __construct()
     {
-
     }
 
     /**
-     * Executes a request
+     * Executes a request.
      *
      * @param ServerRequestInterface $request
      *
@@ -42,14 +42,16 @@ class App extends Fol
      */
     public function dispatch(ServerRequestInterface $request)
     {
-        $dispatcher = new Relay([
+        $relay = new RelayBuilder();
+
+        $dispatcher = $relay->newInstance([
             Middleware::ClientIp(),
-            Middleware::LanguageNegotiator(),
+            Middleware::FormatNegotiator(),
             function ($request, $response) {
                 $response->getBody()->write('Ola mundo');
 
                 return $response;
-            }
+            },
         ]);
 
         return $dispatcher($request, new Response());
