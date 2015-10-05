@@ -4,7 +4,7 @@
 
 [![Build Status](https://travis-ci.org/fol-project/fol.svg?branch=master)](https://travis-ci.org/fol-project/fol)
 
-FOL é un (micro)framework escrito en PHP por Oscar Otero. Como é algo persoal que non pretende ter moita repercusión (hai miles de frameworks en PHP), escribo a documentación en galego por comodidade e por se alguen máis de aquí lle interesa o proxecto. De todos xeitos, os comentarios dentro do código están en inglés.
+FOL é un (micro)framework escrito en PHP por Oscar Otero. Como é algo persoal que non pretende ter moita repercusión (hai miles de frameworks en PHP), escribo a documentación en galego por comodidade e por se alguen máis de aquí lle interesa o proxecto.
 
 Requerimentos:
 
@@ -12,27 +12,19 @@ Requerimentos:
 * Composer
 
 
-# Instalación
+## Instalación
 
-Para instalalo precisas ter [composer](https://getcomposer.org/). Despois simplemente executa:
+Crea o teu proxecto:
 
 ```
 $ composer create-project fol/fol o-meu-proxecto
 ```
 
-Unha vez instalado, créase automaticamente un arquivo `.env`. Se non se creou, podes facelo ti a partir de `.env.example`. Nese arquivo gárdanse as variables de entorno máis sensibles (contrasinais, etc), e esta ingnorado por git.
-
-# Documentación rápida
-
-Unha vez instalado, atoparás os seguintes directorios:
-
-* vendor: usado por composer para instalar aí todos os paquetes e dependencias
-* app: onde se garda a túa aplicación (plantillas, controladores, modelos, tests, etc).
-* public: todos os arquivos accesibles publicamente (css, imaxes, js, componentes de bower, etc) ademáis do "front controller" (index.php).
+Unha vez instalado, créase automaticamente un arquivo `.env` a partir de `.env.example`. Nese arquivo gárdanse as variables de entorno máis sensibles (contrasinais, etc), e esta ingnorado por git.
 
 ## App
 
-A clase `App\App` (aloxada en app/App.php) é a que xestiona a páxina web, xunto con todos os servizos que precise (bases de datos, plantillas, controladores, etc). Implementa a interface [container-interop](https://github.com/container-interop/container-interop) o que permite poder combinala con outros colectores:
+A clase `App\App` (aloxada en app/App.php) é a que xestiona a páxina web. Implementa a interface [container-interop](https://github.com/container-interop/container-interop) a modo de *service provider:*
 
 ```php
 $app = new App\App();
@@ -46,41 +38,33 @@ $app->register('database', function () {
 
 $database = $app->get('database');
 
-//Rexistrar outros sub-colectores, por exemplo php-di:
-$builder = new \DI\ContainerBuilder();
-$builder->setDefinitionCache(new Doctrine\Common\Cache\ArrayCache());
+//Outros métodos
+$app->getNamespace(); // App\App
+$app->getNamespace('Controllers'); // App\App\Controllers
 
-$app->add($builder->build());
+$app->getPath(); // /www/my-site/app
+$app->getPath('subdirectory'); // /www/my-site/app/subdirectory
 
-$class = $app->get('My\\Class');
+$app->getUrl(); // http://localhost
+$app->getUrl('styles.css'); // http://localhost/styles.css
+
+$app->getUrlHost(); // http://localhost
+$app->getUrlPath('styles.css'); // /styles.css
 ```
 
-Tamén serve para gardar a configuración deses servizos ou de calquera outra cousa. Existe a propiedade `$app->config` que carga e xestiona todo tipo de configuracions que se gardan en app/config
+## Liña de comandos
 
-Ademáis tamén ten unha serie de métodos básicos:
+Fol usa [Robo](https://github.com/Codegyre/Robo) como xestor de tarefas. Polo que edita o arquivo `RoboFile.php` para meter aí os comandos que queiras. Se non tes robo instalado globalmente, podes executar o que instala localmente composer `vendor/bin/robo`
 
-* `$app->getNamespace()`: Devolve o namespace da aplicación (ou sexa "App"). Ademáis podes usalo para que che devolva outros namespaces ou clases relativas. Por exemplo `$app->getNamespace('Controllers\\Index')` devolve "App\Controllers\Index".
-* `$app->getPath()`: Devolve o path onde está aloxada a aplicación. Podes usar argumentos para que che devolva rutas de arquivos ou subdirectorios. Por exemplo: `$app->getPath('arquivos/123', '3.pdf')` devolve algo parecido a "/var/www/o-meu-proxecto/app/arquivos/123/3.pdf"
-* `$app->getUrl()`: O mesmo que getPath pero para devolver rutas http do directorio público. Útil para acceder a arquivos css, javascript, etc. `$app->getUrl('assets/css', 'subdirectorio')` devolvería algo parecido a "http://localhost/o-meu-proxecto/public/assets/css/subdirectorio". Por defecto colle o valor que definiches como `APP_URL` ou `APP_CLI_SERVER_URL` (depende de que servidor uses) en .env, pero podes cambialo usando `$app->setUrl()`.
 
-Por último ten dous métodos estáticos para executar a aplicación:
+## Configuración do servidor
 
-* `App\App::runHttp()` Executa a aplicación nunha contorna http
-* `App\App::runCli()` Executa a aplicación como liña de comandos. Para iso usase o sistema de tarefas de [Robo](https://github.com/Codegyre/Robo) xunto con algunhas [tarefas propias de FOL](https://github.com/fol-project/tasks). Todas estas tarefas estan creadas e pódense configurar en Tasks.php. O arquivo `fol` permite executar a aplicación por liña de comandos:
+### Server de php
 
-```
-$ php fol list
-```
-
-CONFIGURACIÓN DO SERVIDOR
-=========================
-
-Server de php
--------------
 Para usar o servidor que trae o propio php, podes lanzar o seguinte comando:
 
 ```
-$ php fol server
+$ robo server
 ```
 
 Agora en http://localhost:8000 deberías ver algo.

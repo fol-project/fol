@@ -1,7 +1,0 @@
-{
-  "name": "node-dependencies",
-  "private": true,
-  "dependencies": {
-    "bower": "^1.5.3"
-  }
-}

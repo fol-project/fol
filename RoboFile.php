@@ -20,8 +20,8 @@ class RoboFile extends \Robo\Tasks
         }
 
         //npm + bower
-        $this->taskNpmInstall()->run();
-        $this->taskBowerInstall('node_modules/.bin/bower')->run();
+        //$this->taskNpmInstall()->run();
+        //$this->taskBowerInstall('node_modules/.bin/bower')->run();
     }
 
     /**
