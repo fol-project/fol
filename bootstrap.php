@@ -15,8 +15,8 @@ ini_set('expose_php', 0);
 //Init global libraries
 $composer = include __DIR__.'/vendor/autoload.php';
 
-if (!is_file('.env')) {
-    copy('.env.example', '.env');
+if (!is_file(__DIR__.'/.env')) {
+    copy(__DIR__.'/.env.example', __DIR__.'/.env');
 }
 
 $dotenv = new Dotenv\Dotenv(__DIR__);
