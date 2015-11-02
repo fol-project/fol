@@ -19,12 +19,12 @@
     },
     "require": {
         "php": ">=5.5.0",
-        "fol/core": "8.*",
-        "codegyre/robo": "^0.5.4",
-        "oscarotero/psr7-middlewares": "1.*",
-        "zendframework/zend-diactoros": "1.*",
-        "relay/relay": "*",
-        "vlucas/phpdotenv": "~2.0"
+        "fol/core": "10.x",
+        "codegyre/robo": "0.x",
+        "oscarotero/psr7-middlewares": "3.x",
+        "zendframework/zend-diactoros": "1.x",
+        "relay/relay": "1.x",
+        "vlucas/phpdotenv": "2.x"
     },
     "autoload": {
         "psr-4": {

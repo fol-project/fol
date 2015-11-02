@@ -42,15 +42,13 @@ class App extends Fol
      */
     public function dispatch(ServerRequestInterface $request)
     {
-        $relay = new RelayBuilder();
-
-        $dispatcher = $relay->newInstance([
+        $dispatcher = (new RelayBuilder())->newInstance([
             Middleware::ClientIp(),
             Middleware::FormatNegotiator(),
-            function ($request, $response) {
+            function ($request, $response, $next) {
                 $response->getBody()->write('Ola mundo');
 
-                return $response;
+                return $next($request, $response);
             },
         ]);
 
