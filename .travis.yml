@@ -9,7 +9,6 @@ php:
 env:
   - TRAVIS_NODE_VERSION="4"
 
-install:
+script:
   - composer install
-
-script: phpunit
+  - phpunit
