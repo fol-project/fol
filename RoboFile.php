@@ -19,9 +19,11 @@ class RoboFile extends \Robo\Tasks
             mkdir(__DIR__.'/data/log', 0777, true);
         }
 
-        //npm + bower
-        $this->taskNpmInstall()->run();
-        $this->taskBowerInstall('node_modules/.bin/bower')->run();
+        //npm + bower (only in dev mode)
+        if (env('APP_DEV')) {
+            $this->taskNpmInstall()->run();
+            $this->taskBowerInstall('node_modules/.bin/bower')->run();
+        }
     }
 
     /**

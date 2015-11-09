@@ -2,11 +2,12 @@
   "name": "node-dependencies",
   "private": true,
   "devDependencies": {
-    "bower": "^1.5.3",
-    "browser-sync": "^2.9.7",
+    "bower": "^1.6.5",
+    "browser-sync": "^2.9.12",
     "gulp": "^3.9.0",
     "gulp-imagemin": "^2.4.0",
     "gulp-rename": "^1.2.2",
-    "gulp-stylecow": "^3.0.1"
+    "gulp-stylecow": "^3.0.2",
+    "webpack": "^1.12.3"
   }
 }
