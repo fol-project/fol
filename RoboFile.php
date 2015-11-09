@@ -20,8 +20,8 @@ class RoboFile extends \Robo\Tasks
         }
 
         //npm + bower
-        //$this->taskNpmInstall()->run();
-        //$this->taskBowerInstall('node_modules/.bin/bower')->run();
+        $this->taskNpmInstall()->run();
+        $this->taskBowerInstall('node_modules/.bin/bower')->run();
     }
 
     /**
@@ -29,9 +29,21 @@ class RoboFile extends \Robo\Tasks
      */
     public function server()
     {
-        $this->taskServer(parse_url(env('APP_CLI_SERVER_URL'), PHP_URL_PORT) ?: 80)
+        $url = env('APP_CLI_SERVER_URL');
+
+        //php server
+        $this->taskServer(parse_url($url, PHP_URL_PORT) ?: 80)
             ->dir('public')
             ->arg('public/index.php')
+            ->background()
+            ->run();
+
+        //gulp + browser sync
+        $this->taskExec('node node_modules/.bin/gulp sync')
+            ->env([
+                'APP_URL' => $url,
+                'APP_SYNC_PORT' => env('APP_SYNC_PORT'),
+            ])
             ->run();
     }
 }

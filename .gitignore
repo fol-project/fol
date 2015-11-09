@@ -23,10 +23,13 @@ $RECYCLE.BIN/
 *.msp
 
 
-# DATA (logs, cache, environment variables, etc)
+# LOCAL DATA (logs, cache, environment variables, etc)
 
 data/*
 .env
+public/css
+public/js
+public/img
 
 
 # DEPENDENCIES (composer, bower, npm, etc)

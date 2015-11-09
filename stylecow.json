@@ -1,0 +1,42 @@
+{
+	"files": [
+		{
+			"input": "assets/css/styles.css",
+			"output": "public/css/styles.css",
+			"map": "public/css/styles.map"
+		}
+	],
+	"support": {
+		"explorer": 10,
+		"edge": 12,
+		"firefox": 41,
+		"chrome": 45,
+		"safari": 7,
+		"opera": 20,
+		"android": 4.2,
+		"ios": 8.1
+	},
+	"plugins": [
+		"base64",
+		"calc",
+		"color",
+		"custom-media",
+		"custom-selector",
+		"extend",
+		"fixes",
+		"flex",
+		"font-variant",
+		"import",
+		"matches",
+		"media-queries",
+		"msfilter-background-alpha",
+		"msfilter-linear-gradient",
+		"msfilter-transform",
+		"nested-rules",
+		"prefixes",
+		"rem",
+		"variables",
+		"webkit-gradient"
+	],
+	"code": "minify"
+}
