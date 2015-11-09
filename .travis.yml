@@ -1,13 +1,12 @@
 language: php
-sudo: false
 
 php:
   - 5.5
   - 5.6
   - 7.0
 
-before_install:
-  - apt-get install nodejs
+env:
+  - TRAVIS_NODE_VERSION="4"
 
 install:
   - composer install
