@@ -6,6 +6,9 @@ php:
   - 5.6
   - 7.0
 
+before_install:
+  - apt-get install nodejs
+
 install:
   - composer install
 
