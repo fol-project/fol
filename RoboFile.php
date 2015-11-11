@@ -45,6 +45,7 @@ class RoboFile extends \Robo\Tasks
             ->env([
                 'APP_URL' => $url,
                 'APP_SYNC_PORT' => env('APP_SYNC_PORT'),
+                'APP_DEV' => env('APP_DEV'),
             ])
             ->run();
     }

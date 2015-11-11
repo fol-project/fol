@@ -5,10 +5,13 @@ let gulp     = require('gulp'),
     stylecow = require('gulp-stylecow'),
     imagemin = require('gulp-imagemin'),
     rename   = require('gulp-rename'),
-    sync     = require('browser-sync').create();
+    sync     = require('browser-sync').create(),
+    env      = process.env;
 
 gulp.task('css', function () {
-    let config = require('./stylecow.json');
+    var config = require('./stylecow.json');
+
+    config.code = env.APP_DEV ? 'normal' : 'minify';
 
     config.files.forEach(function (file) {
         gulp.src(file.input)
@@ -20,7 +23,22 @@ gulp.task('css', function () {
 });
 
 gulp.task('js', function () {
-    //here your js tasks
+    var config = require('./webpack.config');
+
+    if (!env.APP_DEV) {
+        config.plugins = config.plugins.concat(
+            new webpack.optimize.DedupePlugin(),
+            new webpack.optimize.UglifyJsPlugin()
+        );
+    }
+
+    webpack(config, function (err, stats) {
+        if (err) {
+            throw new gutil.PluginError("webpack", err);
+        }
+
+        callback();
+    });
 });
 
 gulp.task('img', function () {
@@ -45,8 +63,8 @@ gulp.task('sync', ['default'], function () {
     });
 
     sync.init({
-        port: process.env.APP_SYNC_PORT || 3000,
-        proxy: process.env.APP_URL || 'http://127.0.0.1:8000'
+        port: env.APP_SYNC_PORT || 3000,
+        proxy: env.APP_URL || 'http://127.0.0.1:8000'
     });
 
     gulp.watch('assets/**/*.js', ['js']);
