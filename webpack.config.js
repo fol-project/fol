@@ -1,8 +1,7 @@
 "use strict";
 
-let path               = require("path"),
-    webpack            = require("webpack"),
-    CommonsChunkPlugin = require("webpack/lib/optimize/CommonsChunkPlugin");
+let path    = require("path"),
+    webpack = require("webpack");
 
 module.exports = {
     context: __dirname + '/assets/js',
@@ -20,6 +19,6 @@ module.exports = {
         new webpack.ResolverPlugin(
             new webpack.ResolverPlugin.DirectoryDescriptionFilePlugin('bower.json', ['main'])
         ),
-        new CommonsChunkPlugin('common.js')
+        new webpack.optimize.CommonsChunkPlugin('common.js')
     ]
 };
