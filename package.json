@@ -5,6 +5,7 @@
     "bower": "^1.6.5",
     "browser-sync": "^2.9.12",
     "gulp": "^3.9.0",
+    "gulp-cached": "^1.1.0",
     "gulp-imagemin": "^2.4.0",
     "gulp-rename": "^1.2.2",
     "gulp-stylecow": "^3.0.2",

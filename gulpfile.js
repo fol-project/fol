@@ -5,6 +5,7 @@ let gulp     = require('gulp'),
     stylecow = require('gulp-stylecow'),
     imagemin = require('gulp-imagemin'),
     rename   = require('gulp-rename'),
+    cache    = require('gulp-cached'),
     sync     = require('browser-sync').create(),
     env      = process.env;
 
@@ -43,6 +44,7 @@ gulp.task('js', function () {
 
 gulp.task('img', function () {
     gulp.src('assets/img/**/*')
+        .pipe(cache('img'))
         .pipe(imagemin())
         .pipe(gulp.dest('public/img'));
 });
@@ -73,4 +75,3 @@ gulp.task('sync', ['default'], function () {
 });
 
 gulp.task('default', ['css', 'js', 'img']);
-gulp.task('build', ['default']);
