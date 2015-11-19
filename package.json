@@ -10,5 +10,8 @@
     "gulp-rename": "^1.2.2",
     "gulp-stylecow": "^3.0.2",
     "webpack": "^1.12.3"
+  },
+  "scripts": {
+    "install": "bower install"
   }
 }

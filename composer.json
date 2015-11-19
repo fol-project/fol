@@ -30,8 +30,5 @@
         "psr-4": {
             "App\\": "app/"
         }
-    },
-    "scripts": {
-        "post-install-cmd": "php vendor/bin/robo install"
     }
 }

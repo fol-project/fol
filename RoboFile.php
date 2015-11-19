@@ -10,18 +10,6 @@ require __DIR__.'/bootstrap.php';
 class RoboFile extends \Robo\Tasks
 {
     /**
-     * Install all npm and bower components.
-     */
-    public function install()
-    {
-        //npm + bower (only in dev mode)
-        if (env('APP_DEV')) {
-            $this->taskNpmInstall()->run();
-            $this->taskBowerInstall('node_modules/.bin/bower')->run();
-        }
-    }
-
-    /**
      * Run a php server.
      */
     public function server()
@@ -30,6 +18,9 @@ class RoboFile extends \Robo\Tasks
 
         //php server
         $this->taskServer(parse_url($url, PHP_URL_PORT) ?: 80)
+            ->env([
+                'APP_DEV' => 'true',
+            ])
             ->dir('public')
             ->arg('public/index.php')
             ->background()
@@ -40,7 +31,7 @@ class RoboFile extends \Robo\Tasks
             ->env([
                 'APP_URL' => $url,
                 'APP_SYNC_PORT' => env('APP_SYNC_PORT'),
-                'APP_DEV' => env('APP_DEV'),
+                'APP_DEV' => 'true',
             ])
             ->run();
     }
