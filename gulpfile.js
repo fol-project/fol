@@ -18,6 +18,10 @@ gulp.task('css', function () {
     config.files.forEach(function (file) {
         gulp.src(file.input)
             .pipe(stylecow(config))
+            .on('error', function (error) {
+                console.log(error.toString());
+                this.emit('end');
+            })
             .pipe(rename(file.output))
             .pipe(gulp.dest(''))
             .pipe(sync.stream());
@@ -35,10 +39,6 @@ gulp.task('js', function (callback) {
     }
 
     webpack(config, function (err, stats) {
-        if (err) {
-            throw new gutil.PluginError("webpack", err);
-        }
-
         callback();
     });
 });
