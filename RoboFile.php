@@ -12,7 +12,7 @@ class RoboFile extends \Robo\Tasks
     /**
      * Run a php server.
      */
-    public function server()
+    public function run()
     {
         $url = env('APP_CLI_SERVER_URL');
 
