@@ -14,11 +14,6 @@ class RoboFile extends \Robo\Tasks
      */
     public function install()
     {
-        //logs folder
-        if (!is_dir(__DIR__.'/data/log')) {
-            mkdir(__DIR__.'/data/log', 0777, true);
-        }
-
         //npm + bower (only in dev mode)
         if (env('APP_DEV')) {
             $this->taskNpmInstall()->run();

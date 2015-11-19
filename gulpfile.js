@@ -6,6 +6,7 @@ let gulp     = require('gulp'),
     imagemin = require('gulp-imagemin'),
     rename   = require('gulp-rename'),
     cache    = require('gulp-cached'),
+    webpack  = require('webpack'),
     sync     = require('browser-sync').create(),
     env      = process.env;
 
@@ -23,7 +24,7 @@ gulp.task('css', function () {
     });
 });
 
-gulp.task('js', function () {
+gulp.task('js', function (callback) {
     var config = require('./webpack.config');
 
     if (!env.APP_DEV) {
