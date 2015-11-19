@@ -1,9 +1,6 @@
 language: php
 sudo: false
 
-env:
-  - APP_DEV="false"
-
 php:
   - 5.5
   - 5.6
