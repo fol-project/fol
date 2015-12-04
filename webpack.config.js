@@ -1,7 +1,8 @@
 "use strict";
 
 let path    = require("path"),
-    webpack = require("webpack");
+    webpack = require("webpack"),
+    bower   = require("bower-webpack-plugin");
 
 module.exports = {
     context: __dirname + '/assets/js',
@@ -10,15 +11,11 @@ module.exports = {
     },
     output: {
         path: __dirname + '/public/js',
+        publicPath: '/js/',
         filename: '[name].js'
     },
-    resolve: {
-        root: [path.join(__dirname, 'bower_components')]
-    },
     plugins: [
-        new webpack.ResolverPlugin(
-            new webpack.ResolverPlugin.DirectoryDescriptionFilePlugin('bower.json', ['main'])
-        ),
+        new bower(),
         new webpack.optimize.CommonsChunkPlugin('common.js')
     ]
 };

@@ -1,22 +1,21 @@
-"use strict";
-
-let gulp     = require('gulp'),
+var gulp     = require('gulp'),
     path     = require('path'),
     stylecow = require('gulp-stylecow'),
     imagemin = require('gulp-imagemin'),
+    htmlmin  = require('gulp-htmlmin'),
     rename   = require('gulp-rename'),
-    cache    = require('gulp-cached'),
-    webpack  = require('webpack'),
     sync     = require('browser-sync').create(),
+    webpack  = require('webpack'),
     env      = process.env;
 
-gulp.task('css', function () {
+gulp.task('css', function() {
     var config = require('./stylecow.json');
 
     config.code = env.APP_DEV ? 'normal' : 'minify';
 
     config.files.forEach(function (file) {
-        gulp.src(file.input)
+        gulp
+            .src(file.input)
             .pipe(stylecow(config))
             .on('error', function (error) {
                 console.log(error.toString());
@@ -28,7 +27,7 @@ gulp.task('css', function () {
     });
 });
 
-gulp.task('js', function (callback) {
+gulp.task('js', function(done) {
     var config = require('./webpack.config');
 
     if (!env.APP_DEV) {
@@ -39,40 +38,71 @@ gulp.task('js', function (callback) {
     }
 
     webpack(config, function (err, stats) {
-        callback();
+        done();
     });
 });
 
-gulp.task('img', function () {
-    gulp.src('assets/img/**/*')
-        .pipe(cache('img'))
+gulp.task('img', function() {
+    gulp
+        .src([
+            'build/**/*.jpg',
+            'build/**/*.png',
+            'build/**/*.gif',
+            'build/**/*.svg'
+        ])
         .pipe(imagemin())
-        .pipe(gulp.dest('public/img'));
+        .pipe(gulp.dest('build'));
 });
 
-gulp.task('sync', ['default'], function () {
-    sync.watch(['app/**/*', 'public/**/*'], function (event, file) {
+gulp.task('html', function () {
+    gulp
+        .src('build/**/*.html')
+        .pipe(htmlmin({
+            removeComments: true,
+            collapseWhitespace: true,
+            collapseBooleanAttributes: true,
+            removeAttributeQuotes: true,
+            removeRedundantAttributes: true,
+            useShortDoctype: true,
+            removeEmptyAttributes: true,
+            removeScriptTypeAttributes: true,
+            removeStyleLinkTypeAttributes: true,
+            removeEmptyElements: true,
+            minifyJS: true,
+            minifyCSS: true,
+            minifyURLS: {
+                output: 'rootRelative',
+                removeEmptyQueries: true
+            }
+        }))
+        .pipe(gulp.dest('build'));
+});
+
+gulp.task('sync', ['css', 'js'], function () {
+    sync.watch('source/**/*', function (event, file) {
         if (event !== 'change') {
             return;
         }
 
         switch (path.extname(file)) {
+            case '.yml':
             case '.php':
-                return sync.reload('*.html');
+                sync.reload('*.html');
+                return;
 
             default:
-                return sync.reload(path.basename(file));
+                sync.reload(path.basename(file));
+                return;
         }
     });
 
     sync.init({
-        port: env.APP_SYNC_PORT || 3000,
-        proxy: env.APP_URL || 'http://127.0.0.1:8000'
+        port: process.env.APP_SYNC_PORT || 3000,
+        proxy: process.env.APP_URL || 'http://127.0.0.1:8000'
     });
 
-    gulp.watch('assets/**/*.js', ['js']);
-    gulp.watch('assets/**/*.css', ['css']);
-    gulp.watch('assets/**/*.{jpg,png,gif,svg}', ['img']);
+    gulp.watch('source/**/*.js', ['js']);
+    gulp.watch('source/**/*.css', ['css']);
 });
 
-gulp.task('default', ['css', 'js', 'img']);
+gulp.task('default', ['css', 'js', 'img', 'html']);
