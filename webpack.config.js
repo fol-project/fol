@@ -15,7 +15,9 @@ module.exports = {
         filename: '[name].js'
     },
     plugins: [
-        new bower(),
+        new bower({
+            excludes: /\.css$/
+        }),
         new webpack.optimize.CommonsChunkPlugin('common.js')
     ]
 };
