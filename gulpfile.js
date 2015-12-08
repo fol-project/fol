@@ -2,10 +2,10 @@ var gulp     = require('gulp'),
     path     = require('path'),
     stylecow = require('gulp-stylecow'),
     imagemin = require('gulp-imagemin'),
-    htmlmin  = require('gulp-htmlmin'),
     rename   = require('gulp-rename'),
     sync     = require('browser-sync').create(),
     webpack  = require('webpack'),
+    url      = require('url'),
     env      = process.env;
 
 gulp.task('css', function() {
@@ -37,55 +37,27 @@ gulp.task('js', function(done) {
         );
     }
 
+    config.output.publicPath = path.join(url.parse(env.APP_URL).pathname || '/', 'js/');
+
     webpack(config, function (err, stats) {
         done();
     });
 });
 
 gulp.task('img', function() {
-    gulp
-        .src([
-            'build/**/*.jpg',
-            'build/**/*.png',
-            'build/**/*.gif',
-            'build/**/*.svg'
-        ])
+    gulp.src('assets/img/**/*.{jpg,png,gif,svg}')
+        .pipe(cache('img'))
         .pipe(imagemin())
-        .pipe(gulp.dest('build'));
-});
-
-gulp.task('html', function () {
-    gulp
-        .src('build/**/*.html')
-        .pipe(htmlmin({
-            removeComments: true,
-            collapseWhitespace: true,
-            collapseBooleanAttributes: true,
-            removeAttributeQuotes: true,
-            removeRedundantAttributes: true,
-            useShortDoctype: true,
-            removeEmptyAttributes: true,
-            removeScriptTypeAttributes: true,
-            removeStyleLinkTypeAttributes: true,
-            removeEmptyElements: true,
-            minifyJS: true,
-            minifyCSS: true,
-            minifyURLS: {
-                output: 'rootRelative',
-                removeEmptyQueries: true
-            }
-        }))
-        .pipe(gulp.dest('build'));
+        .pipe(gulp.dest('public/img'));
 });
 
 gulp.task('sync', ['css', 'js'], function () {
-    sync.watch('source/**/*', function (event, file) {
+    sync.watch(['app/**/*', 'public/**/*'], function (event, file) {
         if (event !== 'change') {
             return;
         }
 
         switch (path.extname(file)) {
-            case '.yml':
             case '.php':
                 sync.reload('*.html');
                 return;
@@ -101,8 +73,9 @@ gulp.task('sync', ['css', 'js'], function () {
         proxy: process.env.APP_URL || 'http://127.0.0.1:8000'
     });
 
-    gulp.watch('source/**/*.js', ['js']);
-    gulp.watch('source/**/*.css', ['css']);
+    gulp.watch('assets/**/*.js', ['js']);
+    gulp.watch('assets/**/*.css', ['css']);
+    gulp.watch('assets/**/*.{jpg,png,gif,svg}', ['img']);
 });
 
-gulp.task('default', ['css', 'js', 'img', 'html']);
+gulp.task('default', ['css', 'js', 'img']);
