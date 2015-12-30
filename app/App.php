@@ -31,6 +31,8 @@ class App extends Fol
      */
     public function __construct()
     {
+        $this->setPath(dirname(__DIR__));
+        $this->setUrl((php_sapi_name() === 'cli-server') ? env('APP_CLI_SERVER_URL') : env('APP_URL'));
     }
 
     /**

@@ -19,12 +19,14 @@
     },
     "require": {
         "php": ">=5.5.0",
-        "fol/core": "10.x",
+        "fol/core": "11.x",
         "codegyre/robo": "0.x",
         "oscarotero/psr7-middlewares": "3.x",
         "zendframework/zend-diactoros": "1.x",
         "relay/relay": "1.x",
-        "vlucas/phpdotenv": "2.x"
+        "vlucas/phpdotenv": "2.x",
+        "oscarotero/env": "^1.0",
+        "willdurand/negotiation": "^2.0"
     },
     "autoload": {
         "psr-4": {

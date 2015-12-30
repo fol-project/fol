@@ -31,5 +31,6 @@ $dotenv->load();
 
 Fol::setGlobal('composer', $composer);
 Fol::setGlobal('dotenv', $dotenv);
+Env::init();
 
 unset($composer, $dotenv);
