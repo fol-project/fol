@@ -19,7 +19,7 @@
     },
     "require": {
         "php": ">=5.5.0",
-        "fol/core": "11.x",
+        "fol/core": "^11.1",
         "codegyre/robo": "0.x",
         "oscarotero/psr7-middlewares": "3.x",
         "zendframework/zend-diactoros": "1.x",
