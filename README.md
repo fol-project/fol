@@ -30,12 +30,12 @@ A clase `App\App` (aloxada en app/App.php) é a que xestiona a páxina web. Mira
 
 Fol usa [Robo](https://github.com/Codegyre/Robo) como xestor de tarefas. Polo que edita o arquivo `RoboFile.php` para meter aí os comandos que queiras. Se non tes robo instalado globalmente, podes executar o que instala localmente composer `vendor/bin/robo`
 
-Só hai un comando definido por defecto que é `robo run`, que o que fai é lanzar un servidor e abrir a web no teu navegador, xerando todos os assets e usando [BrowserSync](http://browsersync.io/) para sincronizar os cambios.
+Só hai un comando definido por defecto que é `robo run`, que o que fai é lanzar un servidor de php, executa gulp e usa [BrowserSync](http://browsersync.io/) para sincronizar os cambios.
 
 ## Configuración do servidor
 
-En Apache
----------
+### En Apache
+
 Ainda que funciona sen facer nada, o mellor é establecer como documentRoot o directorio public:
 
 ```
@@ -59,8 +59,8 @@ Se queres meter o teu proxecto nun subdirectorio (por exemplo http://localhost/f
 ```
 
 
-En Nginx
---------
+### En Nginx
+
 Tes que editar o arquivo de configuración (nginx/sites-enabled/default):
 
 ```
