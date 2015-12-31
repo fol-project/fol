@@ -28,9 +28,17 @@ A clase `App\App` (aloxada en app/App.php) é a que xestiona a páxina web. Mira
 
 ## Liña de comandos
 
-Fol usa [Robo](https://github.com/Codegyre/Robo) como xestor de tarefas. Polo que edita o arquivo `RoboFile.php` para meter aí os comandos que queiras. Se non tes robo instalado globalmente, podes executar o que instala localmente composer `vendor/bin/robo`
+Fol usa [Robo](http://robo.li/) como xestor de tarefas. Polo que edita o arquivo `RoboFile.php` para meter aí os comandos que queiras.
 
 Só hai un comando definido por defecto que é `robo run`, que o que fai é lanzar un servidor de php, executa gulp e usa [BrowserSync](http://browsersync.io/) para sincronizar os cambios.
+
+## Deploy
+
+Podes usar [Deployer](http://deployer.org/) para facer deploy ao servidor que queiras. Xa inclúe un arquivo `deploy.php` con toda a configuración que podes personalizar.
+
+## Gulp
+
+Tamén trae un arquivo gulp preparado para xestionar os css/js/imgs. Os arquivos orixinais gárdanse no directorio "assets" e gulp procésaos e pásaos ao directorio "public".
 
 ## Configuración do servidor
 
