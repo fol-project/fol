@@ -4,7 +4,7 @@
 
 [![Build Status](https://travis-ci.org/fol-project/fol.svg?branch=master)](https://travis-ci.org/fol-project/fol)
 
-FOL é un (micro)framework escrito en PHP por Oscar Otero. Como é algo persoal que non pretende ter moita repercusión (hai miles de frameworks en PHP), escribo a documentación en galego por comodidade e por se alguen máis de aquí lle interesa o proxecto.
+FOL é un (micro)framework escrito en PHP por Oscar Otero. Como é algo persoal que non pretende ter moita repercusión (hai miles de frameworks en PHP), escribo a documentación en galego por comodidade e por se alguen máis de aquí lle interesa.
 
 Requerimentos:
 
@@ -20,55 +20,19 @@ Crea o teu proxecto:
 $ composer create-project fol/fol o-meu-proxecto
 ```
 
-Unha vez instalado, créase automaticamente un arquivo `.env` a partir de `.env.example`. Nese arquivo gárdanse as variables de entorno máis sensibles (contrasinais, etc), e esta ingnorado por git.
+A primeira vez que se executa créase o arquivo `.env` (para variables de entorno) e o directorio `data/logs` (para gardar logs). Comproba que os permisos son os adecuados.
 
 ## App
 
-A clase `App\App` (aloxada en app/App.php) é a que xestiona a páxina web. Implementa a interface [container-interop](https://github.com/container-interop/container-interop) a modo de *service provider:*
-
-```php
-$app = new App\App();
-
-//Rexistrar servizos directamente:
-
-$app->register('database', function () {
-	$config = $app->config->get('database');
-	return new MyDatabaseClass($config);
-});
-
-$database = $app->get('database');
-
-//Outros métodos
-$app->getNamespace(); // App\App
-$app->getNamespace('Controllers'); // App\App\Controllers
-
-$app->getPath(); // /www/my-site/app
-$app->getPath('subdirectory'); // /www/my-site/app/subdirectory
-
-$app->getUrl(); // http://localhost
-$app->getUrl('styles.css'); // http://localhost/styles.css
-
-$app->getUrlHost(); // http://localhost
-$app->getUrlPath('styles.css'); // /styles.css
-```
+A clase `App\App` (aloxada en app/App.php) é a que xestiona a páxina web. Mira [fol-core](https://github.com/fol-project/core) para máis información.
 
 ## Liña de comandos
 
 Fol usa [Robo](https://github.com/Codegyre/Robo) como xestor de tarefas. Polo que edita o arquivo `RoboFile.php` para meter aí os comandos que queiras. Se non tes robo instalado globalmente, podes executar o que instala localmente composer `vendor/bin/robo`
 
+Só hai un comando definido por defecto que é `robo run`, que o que fai é lanzar un servidor e abrir a web no teu navegador, xerando todos os assets e usando [BrowserSync](http://browsersync.io/) para sincronizar os cambios.
 
 ## Configuración do servidor
-
-### Server de php
-
-Para usar o servidor que trae o propio php, podes lanzar o seguinte comando:
-
-```
-$ robo server
-```
-
-Agora en http://localhost:8000 deberías ver algo.
-
 
 En Apache
 ---------
