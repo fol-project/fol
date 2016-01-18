@@ -2,6 +2,7 @@
   "name": "bower-dependencies",
   "private": true,
   "dependencies": {
-    "normalize-css": "normalize.css#~3.0.3"
+    "normalize.css": "~3.0.3",
+    "apache-server-configs": "~2.14.0"
   }
 }

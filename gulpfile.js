@@ -3,10 +3,20 @@ var gulp     = require('gulp'),
     stylecow = require('gulp-stylecow'),
     imagemin = require('gulp-imagemin'),
     rename   = require('gulp-rename'),
+    concat   = require('gulp-concat'),
     sync     = require('browser-sync').create(),
     webpack  = require('webpack'),
     url      = require('url'),
     env      = process.env;
+
+gulp.task('apache', function () {
+    gulp.src([
+        'assets/.htaccess',
+        'bower_components/apache-server-configs/dist/.htaccess',
+    ])
+    .pipe(concat('.htaccess'))
+    .pipe(gulp.dest('public'))
+});
 
 gulp.task('css', function() {
     var config = require('./stylecow.json');
