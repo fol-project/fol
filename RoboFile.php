@@ -14,13 +14,14 @@ class RoboFile extends \Robo\Tasks
      */
     public function run()
     {
-        $url = env('APP_CLI_SERVER_URL');
+        $env = [
+            'APP_DEV' => 'true',
+            'APP_URL' => 'http://127.0.0.1:8000',
+        ];
 
         //php server
-        $this->taskServer(parse_url($url, PHP_URL_PORT) ?: 80)
-            ->env([
-                'APP_DEV' => 'true',
-            ])
+        $this->taskServer(parse_url($env['APP_URL'], PHP_URL_PORT))
+            ->env($env)
             ->dir('public')
             ->arg('public/index.php')
             ->background()
@@ -28,11 +29,7 @@ class RoboFile extends \Robo\Tasks
 
         //gulp + browser sync
         $this->taskExec('node node_modules/.bin/gulp sync')
-            ->env([
-                'APP_URL' => $url,
-                'APP_SYNC_PORT' => env('APP_SYNC_PORT'),
-                'APP_DEV' => 'true',
-            ])
+            ->env($env)
             ->run();
     }
 }

@@ -80,8 +80,7 @@ gulp.task('sync', ['css', 'js'], function () {
     });
 
     sync.init({
-        port: process.env.APP_SYNC_PORT || 3000,
-        proxy: process.env.APP_URL || 'http://127.0.0.1:8000'
+        proxy: process.env.APP_URL
     });
 
     gulp.watch('assets/**/*.js', ['js']);
