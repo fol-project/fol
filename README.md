@@ -48,22 +48,34 @@ Ainda que funciona sen facer nada, o mellor é establecer como documentRoot o di
 
 ```
 <Directory "/var/www/fol/public">
-	Order allow,deny
-	Allow from all
+	AllowOverride All
 </Directory>
 ```
 
-Se queres meter o teu proxecto nun subdirectorio (por exemplo http://localhost/fol) podes poñer o proxecto fora do documentRoot e crear un alias:
+Se queres meter o teu proxecto nun subdirectorio (por exemplo http://localhost/blog) podes poñer o proxecto fora do documentRoot e crear un alias:
 
 ```
 <IfModule alias_module>
-	Alias /nome-proxecto /os-meus-proxectos/fol
+	Alias /blog /var/www/blog/public
 </IfModule>
 
-<Directory "/os-meus-proxectos/fol/public">
-	Order allow,deny
-	Allow from all
+<Directory "/var/www/blog/public">
+	Options +FollowSymLinks
+	AllowOverride All
 </Directory>
+```
+Para que alias funcione, necesitas usar a directiva `RewriteBase` no .htaccess:
+
+```
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /blog/
+
+    # Handle front controller
+    RewriteCond %{REQUEST_FILENAME}/index.html !-f
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ index.php [L]
+</IfModule>
 ```
 
 
