@@ -2,7 +2,7 @@
 
 data/*
 .env
-public
+public/*
 !public/index.php
 
 

@@ -38,8 +38,7 @@ gulp.task('css', function() {
                 this.emit('end');
             })
             .pipe(rename(file.output))
-            .pipe(gulp.dest(''))
-            .pipe(sync.stream());
+            .pipe(gulp.dest(''));
     });
 });
 
@@ -60,25 +59,23 @@ gulp.task('js', function(done) {
     });
 });
 
-gulp.task('img', function() {
+gulp.task('img', function(done) {
     gulp.src('assets/img/**/*.{jpg,png,gif,svg}')
         .pipe(cache('img'))
-        .pipe(imagemin())
+        .pipe(imagemin().on('end', done))
         .pipe(gulp.dest('public/img'));
 });
 
 gulp.task('sync', ['css', 'js', 'img'], function () {
-    sync.watch('source/**/*', function (event, file) {
-        switch (path.extname(file)) {
-            case '.yml':
-            case '.php':
-                sync.reload('*.html');
-                return;
+    sync.watch([
+        'app/**/*',
+        'templates/**/*'
+    ], function (event, file) {
+        sync.reload();
+    });
 
-            default:
-                sync.reload(path.basename(file));
-                return;
-        }
+    sync.watch('public/**/*', function (event, file) {
+        sync.reload(path.basename(file));
     });
 
     sync.init({

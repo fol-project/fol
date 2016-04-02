@@ -33,6 +33,9 @@ class App extends Fol
     {
         $this->setPath(dirname(__DIR__));
         $this->setUrl(env('APP_URL'));
+
+        $this->register(new Providers\Router());
+        $this->register(new Providers\Templates());
     }
 
     /**
@@ -47,11 +50,7 @@ class App extends Fol
         $dispatcher = (new RelayBuilder())->newInstance([
             Middleware::ClientIp(),
             Middleware::FormatNegotiator(),
-            function ($request, $response, $next) {
-                $response->getBody()->write('Ola mundo');
-
-                return $next($request, $response);
-            },
+            Middleware::AuraRouter($this['router'])->arguments($this),
         ]);
 
         return $dispatcher($request, new Response());

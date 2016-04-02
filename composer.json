@@ -26,7 +26,9 @@
         "relay/relay": "1.x",
         "vlucas/phpdotenv": "2.x",
         "oscarotero/env": "^1.0",
-        "willdurand/negotiation": "^2.0"
+        "willdurand/negotiation": "^2.0",
+        "league/plates": "^3.1",
+        "aura/router": "^3.0"
     },
     "autoload": {
         "psr-4": {

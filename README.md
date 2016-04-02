@@ -8,19 +8,21 @@ FOL é un (micro)framework escrito en PHP por Oscar Otero. Como é algo persoal 
 
 Requerimentos:
 
-* PHP 5.5
+* PHP 5.5+
 * Composer
+* Node 4+
 
 
 ## Instalación
 
-Crea o teu proxecto:
-
 ```
 $ composer create-project fol/fol o-meu-proxecto
+$ cd o-meu-proxecto
+$ npm install
+$ cp .env.example .env
+$ mkdir data/logs
+$ chmod 0777 -R data
 ```
-
-A primeira vez que se executa créase o arquivo `.env` (para variables de entorno) e o directorio `data/logs` (para gardar logs). Comproba que os permisos son os adecuados.
 
 ## App
 

@@ -17,6 +17,7 @@ set('shared_dirs', ['data']);
 task('deploy:assets', function () {
     $path = env('release_path');
     $uploads = [
+        '/public/.htaccess',
         '/public/img',
         '/public/css',
         '/public/js',
@@ -25,7 +26,7 @@ task('deploy:assets', function () {
     runLocally('node node_modules/.bin/gulp');
 
     foreach ($uploads as $dir) {
-        upload($dir, $path.$dir);
+        upload(__DIR__.$dir, $path.$dir);
     }
 });
 
