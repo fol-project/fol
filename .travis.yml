@@ -8,4 +8,5 @@ php:
 
 script:
   - composer install
+  - cp .env.example .env
   - phpunit
