@@ -44,7 +44,7 @@ Tamén trae un arquivo gulp preparado para xestionar os css/js/imgs. Os arquivos
 
 ### En Apache
 
-Ainda que funciona sen facer nada, o mellor é establecer como documentRoot o directorio public:
+Xa hai un arquivo .htaccess preparado, simplemente tes que permitir usalo:
 
 ```
 <Directory "/var/www/fol/public">
@@ -77,7 +77,6 @@ Para que alias funcione, necesitas usar a directiva `RewriteBase` no .htaccess:
     RewriteRule ^ index.php [L]
 </IfModule>
 ```
-
 
 ### En Nginx
 

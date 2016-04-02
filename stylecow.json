@@ -2,22 +2,22 @@
 	"files": [
 		{
 			"input": "assets/css/styles.css",
-			"output": "public/css/styles.css",
-			"map": "public/css/styles.map"
+			"output": "public/css/styles.css"
 		}
 	],
 	"support": {
-		"explorer": 10,
-		"edge": 12,
-		"firefox": 41,
-		"chrome": 45,
-		"safari": 7,
-		"opera": 20,
-		"android": 4.2,
-		"ios": 8.1
+		"explorer": 11,
+		"edge": false,
+		"firefox": 43,
+		"chrome": 47,
+		"safari": 9,
+		"opera": false,
+		"android": 4.4,
+		"ios": 9
 	},
 	"plugins": [
 		"base64",
+		"bower-loader",
 		"calc",
 		"color",
 		"custom-media",
@@ -38,5 +38,6 @@
 		"variables",
 		"webkit-gradient"
 	],
-	"code": "minify"
+	"code": "minify",
+	"map": "auto"
 }

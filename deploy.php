@@ -1,8 +1,5 @@
 <?php
 
-//Use the same timezone on deploy from any machine
-ini_set('date.timezone', 'Europe/Madrid');
-
 require 'recipe/composer.php';
 
 server('dev', 'example.com', 22)
@@ -19,12 +16,17 @@ set('shared_dirs', ['data']);
 
 task('deploy:assets', function () {
     $path = env('release_path');
+    $uploads = [
+        '/public/img',
+        '/public/css',
+        '/public/js',
+    ];
 
     runLocally('node node_modules/.bin/gulp');
 
-    upload('public/img', $path.'/public/img');
-    upload('public/css', $path.'/public/css');
-    upload('public/js', $path.'/public/js');
+    foreach ($uploads as $dir) {
+        upload($dir, $path.$dir);
+    }
 });
 
 task('deploy', [

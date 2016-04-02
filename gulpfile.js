@@ -1,10 +1,10 @@
 var gulp     = require('gulp'),
     path     = require('path'),
+    concat   = require('gulp-concat'),
+    cache    = require('gulp-cached'),
     stylecow = require('gulp-stylecow'),
     imagemin = require('gulp-imagemin'),
     rename   = require('gulp-rename'),
-    concat   = require('gulp-concat'),
-    cache    = require('gulp-cached'),
     sync     = require('browser-sync').create(),
     webpack  = require('webpack'),
     url      = require('url'),
@@ -22,7 +22,12 @@ gulp.task('apache', function () {
 gulp.task('css', function() {
     var config = require('./stylecow.json');
 
-    config.code = env.APP_DEV ? 'normal' : 'minify';
+    if (env.APP_DEV) {
+        config.code = 'normal';
+        config.cssErrors = true;
+    } else {
+        config.code = 'minify';
+    }
 
     config.files.forEach(function (file) {
         gulp
@@ -48,7 +53,7 @@ gulp.task('js', function(done) {
         );
     }
 
-    config.output.publicPath = path.join(url.parse(env.APP_URL || '').pathname || '', 'js/');
+    config.output.publicPath = path.join(url.parse(env.APP_URL || '/').pathname, '/js/');
 
     webpack(config, function (err, stats) {
         done();
@@ -62,13 +67,10 @@ gulp.task('img', function() {
         .pipe(gulp.dest('public/img'));
 });
 
-gulp.task('sync', ['css', 'js'], function () {
-    sync.watch(['app/**/*', 'public/**/*'], function (event, file) {
-        if (event !== 'change') {
-            return;
-        }
-
+gulp.task('sync', ['css', 'js', 'img'], function () {
+    sync.watch('source/**/*', function (event, file) {
         switch (path.extname(file)) {
+            case '.yml':
             case '.php':
                 sync.reload('*.html');
                 return;
@@ -88,4 +90,4 @@ gulp.task('sync', ['css', 'js'], function () {
     gulp.watch('assets/**/*.{jpg,png,gif,svg}', ['img']);
 });
 
-gulp.task('default', ['css', 'js', 'img']);
+gulp.task('default', ['css', 'js', 'img', 'apache']);
