@@ -1,4 +1,7 @@
 <phpunit bootstrap="./bootstrap.php">
+    <php>
+        <env name="APP_URL" value="http://localhost"/>
+    </php>
 	<testsuites>
 		<testsuite name="App tests">
 			<directory>./app/tests/</directory>

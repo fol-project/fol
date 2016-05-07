@@ -15,6 +15,7 @@ class Middleware implements ServiceProviderInterface
             return (new RelayBuilder())->newInstance([
                 Middleware::basePath($app->getUrlPath()),
                 Middleware::ClientIp(),
+                Middleware::trailingSlash(),
                 Middleware::FormatNegotiator(),
                 Middleware::AuraRouter($app->get('router'))->arguments($app),
             ]);

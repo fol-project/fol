@@ -2,20 +2,22 @@
 
 use App\App;
 use Zend\Diactoros\ServerRequest;
+use Zend\Diactoros\Response;
 
 class BasicTest extends PHPUnit_Framework_TestCase
 {
-    protected $app;
+    protected static $app;
 
-    public function setUp()
+    public static function setUpBeforeClass()
     {
-        $this->app = new App();
+        static::$app = new App();
     }
 
     public function testApp()
     {
-        $response = $this->app->dispatch(new ServerRequest());
+        $response = static::$app->__invoke(new ServerRequest(), new Response());
 
         $this->assertInstanceOf('Psr\\Http\\Message\\ResponseInterface', $response);
+        $this->assertEquals(200, $response->getStatusCode());
     }
 }
