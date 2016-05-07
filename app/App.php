@@ -3,11 +3,9 @@
 namespace App;
 
 use Fol;
-use Relay\RelayBuilder;
 use Zend\Diactoros\ServerRequestFactory;
 use Zend\Diactoros\Response\SapiEmitter;
 use Zend\Diactoros\Response;
-use Psr7Middlewares\Middleware;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
@@ -21,7 +19,7 @@ class App extends Fol
         $app = new static();
 
         $request = ServerRequestFactory::fromGlobals();
-        $response = $app->dispatch($request);
+        $response = $app($request, new Response());
 
         (new SapiEmitter())->emit($response);
     }
@@ -36,6 +34,7 @@ class App extends Fol
 
         $this->register(new Providers\Router());
         $this->register(new Providers\Templates());
+        $this->register(new Providers\Middleware());
     }
 
     /**
@@ -45,14 +44,10 @@ class App extends Fol
      *
      * @return ResponseInterface
      */
-    public function dispatch(ServerRequestInterface $request)
+    public function __invoke(ServerRequestInterface $request, ResponseInterface $response)
     {
-        $dispatcher = (new RelayBuilder())->newInstance([
-            Middleware::ClientIp(),
-            Middleware::FormatNegotiator(),
-            Middleware::AuraRouter($this['router'])->arguments($this),
-        ]);
+        $dispatcher = $this->get('middleware');
 
-        return $dispatcher($request, new Response());
+        return $dispatcher($request, $response);
     }
 }

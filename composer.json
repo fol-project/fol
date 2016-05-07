@@ -28,11 +28,14 @@
         "oscarotero/env": "^1.0",
         "willdurand/negotiation": "^2.0",
         "league/plates": "^3.1",
-        "aura/router": "^3.0"
+        "aura/router": "^3.0",
+        "php-pm/php-pm": "dev-master",
+        "php-pm/psr7-adapter": "dev-master"
     },
     "autoload": {
         "psr-4": {
             "App\\": "app/"
         }
-    }
+    },
+"minimum-stability": "dev"
 }
