@@ -5,7 +5,7 @@ namespace App\Providers;
 use Fol;
 use Fol\ServiceProviderInterface;
 use Relay\RelayBuilder;
-use Psr7Middlewares\Middleware;
+use Psr7Middlewares\Middleware as M;
 
 class Middleware implements ServiceProviderInterface
 {
@@ -13,11 +13,11 @@ class Middleware implements ServiceProviderInterface
     {
         $app['middleware'] = function ($app) {
             return (new RelayBuilder())->newInstance([
-                Middleware::basePath($app->getUrlPath()),
-                Middleware::ClientIp(),
-                Middleware::trailingSlash(),
-                Middleware::FormatNegotiator(),
-                Middleware::AuraRouter($app->get('router'))->arguments($app),
+                M::basePath($app->getUrlPath()),
+                M::ClientIp(),
+                M::trailingSlash(),
+                M::FormatNegotiator(),
+                M::AuraRouter($app->get('router'))->arguments($app),
             ]);
         };
     }
