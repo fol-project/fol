@@ -29,17 +29,15 @@ gulp.task('css', function() {
         config.code = 'minify';
     }
 
-    config.files.forEach(function (file) {
-        gulp
-            .src(file.input)
-            .pipe(stylecow(config))
-            .on('error', function (error) {
-                console.log(error.toString());
-                this.emit('end');
-            })
-            .pipe(rename(file.output))
-            .pipe(gulp.dest(''));
-    });
+    stylecow
+        .src(config.files)
+        .forEach(function (file) {
+            gulp
+                .src(file.input)
+                .pipe(stylecow(config))
+                .pipe(rename(file.output))
+                .pipe(gulp.dest(''));
+        });
 });
 
 gulp.task('js', function(done) {

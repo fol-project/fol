@@ -20,8 +20,8 @@ composer create-project fol/fol o-meu-proxecto
 cd o-meu-proxecto
 npm install
 cp .env.example .env
-mkdir data/logs
-chmod 0777 -R data
+mkdir -m 0777 data
+mkdir -m 0777 data/logs
 ```
 
 ## App
