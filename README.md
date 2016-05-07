@@ -15,13 +15,13 @@ Requerimentos:
 
 ## Instalación
 
-```
-$ composer create-project fol/fol o-meu-proxecto
-$ cd o-meu-proxecto
-$ npm install
-$ cp .env.example .env
-$ mkdir data/logs
-$ chmod 0777 -R data
+```bash
+composer create-project fol/fol o-meu-proxecto
+cd o-meu-proxecto
+npm install
+cp .env.example .env
+mkdir data/logs
+chmod 0777 -R data
 ```
 
 ## App
@@ -41,6 +41,19 @@ Podes usar [Deployer](http://deployer.org/) para facer deploy ao servidor que qu
 ## Gulp
 
 Tamén trae un arquivo gulp preparado para xestionar os css/js/imgs. Os arquivos orixinais gárdanse no directorio "assets" e gulp procésaos e pásaos ao directorio "public".
+
+## PHP-PM
+
+Se queres, tamén podes usar [php-pm](https://github.com/php-pm/php-pm) para lanzar a web. Tes que instalar o [Psr-7 bridge](https://github.com/php-pm/php-pm-psr7):
+
+```bash
+# change minimum-stability to dev in your composer.json (until we have a version tagged): "minimum-stability": "dev"
+
+composer require php-pm/php-pm:dev-master
+composer require php-pm/psr7-adapter
+php vendor/bin/ppm config --bootstrap=App\\PPM
+php vendor/bin/ppm start
+```
 
 ## Configuración do servidor
 
