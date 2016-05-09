@@ -24,7 +24,7 @@ abstract class Base extends \PHPUnit_Framework_TestCase
      */
     protected static function request($uri = '/', $method = 'GET')
     {
-        return new ServerRequest([], [], static::$app->getUrl($uri));
+        return new ServerRequest([], [], static::$app->getUrl($uri), $method);
     }
 
     /**
@@ -62,6 +62,6 @@ abstract class Base extends \PHPUnit_Framework_TestCase
      */
     protected static function post($uri, array $data = [])
     {
-        return static::dispatch(static::request($uri, 'GET')->withParsedBody($data));
+        return static::dispatch(static::request($uri, 'POST')->withParsedBody($data));
     }
 }
