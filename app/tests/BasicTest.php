@@ -15,7 +15,7 @@ class BasicTest extends PHPUnit_Framework_TestCase
 
     public function testApp()
     {
-        $response = static::$app->__invoke(new ServerRequest(), new Response());
+        $response = static::$app->dispatch(new ServerRequest(), new Response());
 
         $this->assertInstanceOf('Psr\\Http\\Message\\ResponseInterface', $response);
         $this->assertEquals(200, $response->getStatusCode());

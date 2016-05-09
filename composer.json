@@ -22,10 +22,11 @@
         "fol/core": "^11.1",
         "codegyre/robo": "0.x",
         "oscarotero/psr7-middlewares": "3.x",
+        "oscarotero/env": "^1.0",
+        "oscarotero/folk": "^1.8",
         "zendframework/zend-diactoros": "1.x",
         "relay/relay": "1.x",
         "vlucas/phpdotenv": "2.x",
-        "oscarotero/env": "^1.0",
         "willdurand/negotiation": "^2.0",
         "league/plates": "^3.1",
         "aura/router": "^3.0"

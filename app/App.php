@@ -19,7 +19,7 @@ class App extends Fol
         $app = new static();
 
         $request = ServerRequestFactory::fromGlobals();
-        $response = $app($request, new Response());
+        $response = $app->dispatch($request, new Response());
 
         (new SapiEmitter())->emit($response);
     }
@@ -41,11 +41,20 @@ class App extends Fol
      * Executes a request.
      *
      * @param ServerRequestInterface $request
+     * @param ResponseInterface      $response
      *
      * @return ResponseInterface
      */
-    public function __invoke(ServerRequestInterface $request, ResponseInterface $response)
+    public function dispatch(ServerRequestInterface $request, ResponseInterface $response)
     {
+        $adminUrl = env('APP_ADMIN_URL');
+
+        if (strpos((string) $request->getUri(), $adminUrl) === 0) {
+            $admin = new Admin($adminUrl, $this);
+
+            return $admin($request);
+        }
+
         $dispatcher = $this->get('middleware');
 
         return $dispatcher($request, $response);
