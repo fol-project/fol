@@ -1,10 +1,11 @@
 <phpunit bootstrap="./bootstrap.php">
     <php>
         <env name="APP_URL" value="http://localhost"/>
+        <env name="APP_ADMIN_URL" value="http://localhost/admin"/>
     </php>
 	<testsuites>
 		<testsuite name="App tests">
-			<directory>./app/tests/</directory>
+			<directory>./app/Tests/</directory>
 		</testsuite>
 	</testsuites>
 </phpunit>

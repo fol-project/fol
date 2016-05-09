@@ -16,7 +16,7 @@ class Admin extends \Folk\Admin
 
         if (env('APP_ADMIN_AUTH_USERNAME')) {
             $this['users'] = [
-                env('APP_ADMIN_AUTH_USERNAME') => env('APP_ADMIN_AUTH_PASSWORD')
+                env('APP_ADMIN_AUTH_USERNAME') => env('APP_ADMIN_AUTH_PASSWORD'),
             ];
         }
 
