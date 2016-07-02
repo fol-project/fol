@@ -65,24 +65,22 @@ gulp.task('img', function(done) {
 });
 
 gulp.task('sync', ['css', 'js', 'img'], function () {
-    sync.watch([
+    gulp.watch('assets/**/*.js', ['js']);
+    gulp.watch('assets/**/*.css', ['css']);
+    gulp.watch('assets/**/*.{jpg,png,gif,svg}', ['img']);
+    gulp.watch([
         'app/**/*',
         'templates/**/*'
-    ], function (event, file) {
+    ], function (event) {
         sync.reload();
     });
-
-    sync.watch('public/**/*', function (event, file) {
-        sync.reload(path.basename(file));
+    gulp.watch('public/**/*', function (event) {
+        sync.reload(path.basename(event.path));
     });
 
     sync.init({
         proxy: process.env.APP_URL
     });
-
-    gulp.watch('assets/**/*.js', ['js']);
-    gulp.watch('assets/**/*.css', ['css']);
-    gulp.watch('assets/**/*.{jpg,png,gif,svg}', ['img']);
 });
 
 gulp.task('default', ['css', 'js', 'img', 'apache']);
