@@ -79,7 +79,8 @@ gulp.task('sync', ['css', 'js', 'img'], function () {
     });
 
     sync.init({
-        proxy: process.env.APP_URL
+        proxy: process.env.APP_URL,
+        open: process.env.APP_SYNC_OPEN ? true : false
     });
 });
 

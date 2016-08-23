@@ -11,12 +11,15 @@ class RoboFile extends \Robo\Tasks
 {
     /**
      * Run a php server.
+     *
+     * @option $open To open a browser automatically
      */
-    public function run()
+    public function run($opts = ['open|o' => false])
     {
         $env = [
             'APP_DEV' => 'true',
             'APP_URL' => 'http://127.0.0.1:8000',
+            'APP_SYNC_OPEN' => $opts['open']
         ];
 
         //php server
